@@ -1,0 +1,9 @@
+# Python >= 3.10
+pymupdf>=1.24.0
+sentence-transformers>=3.0.0
+torch>=2.0.0
+#
+# Embeddings fijos en código: sentence-transformers/all-MiniLM-L6-v2
+# Corpus: ./corpus/ o AGENT_CORPUS_DIR
+# Índice JSON: ./index/index.json o AGENT_INDEX_JSON
+# Opcional LLM: OPENROUTER_API_KEY, etc.

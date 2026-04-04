@@ -1,0 +1,548 @@
+{
+  "generatedAt": "2026-04-04T05:02:21.425Z",
+  "brain_path": "src/main.tsx",
+  "brain_validated_strict": false,
+  "max_files": 90,
+  "copied": [
+    {
+      "path": "src/main.tsx",
+      "category": "prompts",
+      "weight_score": 1426,
+      "reason": "SYSTEM_BRAIN"
+    },
+    {
+      "path": "src/screens/REPL.tsx",
+      "category": "prompts",
+      "weight_score": 1320,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/components/PromptInput/PromptInput.tsx",
+      "category": "prompts",
+      "weight_score": 602,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/cli/print.ts",
+      "category": "prompts",
+      "weight_score": 590,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/plugins/pluginLoader.ts",
+      "category": "prompts",
+      "weight_score": 508,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/components/Settings/Config.tsx",
+      "category": "prompts",
+      "weight_score": 414,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/bridge/bridgeMain.ts",
+      "category": "prompts",
+      "weight_score": 388,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/services/mcp/client.ts",
+      "category": "prompts",
+      "weight_score": 376,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/services/mcp/auth.ts",
+      "category": "prompts",
+      "weight_score": 372,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/hooks.ts",
+      "category": "prompts",
+      "weight_score": 354,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/attachments.ts",
+      "category": "prompts",
+      "weight_score": 330,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/teleport.tsx",
+      "category": "prompts",
+      "weight_score": 322,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/tools/AgentTool/AgentTool.tsx",
+      "category": "prompts",
+      "weight_score": 318,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/plugins/marketplaceManager.ts",
+      "category": "prompts",
+      "weight_score": 298,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/nativeInstaller/installer.ts",
+      "category": "prompts",
+      "weight_score": 280,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/bridge/replBridge.ts",
+      "category": "prompts",
+      "weight_score": 274,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/entrypoints/sdk/coreSchemas.ts",
+      "category": "prompts",
+      "weight_score": 266,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/commands/plugin/ManagePlugins.tsx",
+      "category": "prompts",
+      "weight_score": 260,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/services/api/claude.ts",
+      "category": "prompts",
+      "weight_score": 248,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/commands/insights.ts",
+      "category": "prompts",
+      "weight_score": 242,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/sessionStorage.ts",
+      "category": "prompts",
+      "weight_score": 240,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/config.ts",
+      "category": "prompts",
+      "weight_score": 234,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/worktree.ts",
+      "category": "prompts",
+      "weight_score": 230,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/processUserInput/processSlashCommand.tsx",
+      "category": "prompts",
+      "weight_score": 224,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/ink/ink.tsx",
+      "category": "prompts",
+      "weight_score": 202,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/teammateMailbox.ts",
+      "category": "prompts",
+      "weight_score": 202,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/components/permissions/ExitPlanModePermissionRequest/ExitPlanModePermissionRequest.tsx",
+      "category": "prompts",
+      "weight_score": 196,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/git.ts",
+      "category": "prompts",
+      "weight_score": 178,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/plugins/loadPluginCommands.ts",
+      "category": "prompts",
+      "weight_score": 172,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/swarm/permissionSync.ts",
+      "category": "prompts",
+      "weight_score": 172,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/fileHistory.ts",
+      "category": "prompts",
+      "weight_score": 166,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/permissions/yoloClassifier.ts",
+      "category": "prompts",
+      "weight_score": 166,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/plugins/installedPluginsManager.ts",
+      "category": "prompts",
+      "weight_score": 166,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/permissions/filesystem.ts",
+      "category": "prompts",
+      "weight_score": 164,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/tools/BashTool/BashTool.tsx",
+      "category": "prompts",
+      "weight_score": 160,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/ide.ts",
+      "category": "prompts",
+      "weight_score": 160,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/commands/terminalSetup/terminalSetup.tsx",
+      "category": "prompts",
+      "weight_score": 156,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/components/PromptInput/PromptInputFooterLeftSide.tsx",
+      "category": "prompts",
+      "weight_score": 156,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/hooks/useTypeahead.tsx",
+      "category": "prompts",
+      "weight_score": 156,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/messages.ts",
+      "category": "prompts",
+      "weight_score": 156,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/plugins/mcpbHandler.ts",
+      "category": "policy",
+      "weight_score": 150,
+      "reason": "categoría:policy"
+    },
+    {
+      "path": "src/utils/settings/settings.ts",
+      "category": "prompts",
+      "weight_score": 150,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/query.ts",
+      "category": "prompts",
+      "weight_score": 146,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/swarm/teamHelpers.ts",
+      "category": "prompts",
+      "weight_score": 138,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/cli/handlers/plugins.ts",
+      "category": "tools",
+      "weight_score": 136,
+      "reason": "categoría:tools"
+    },
+    {
+      "path": "src/components/LogoV2/LogoV2.tsx",
+      "category": "prompts",
+      "weight_score": 136,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/components/teams/TeamsDialog.tsx",
+      "category": "prompts",
+      "weight_score": 136,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/hooks/useInboxPoller.ts",
+      "category": "prompts",
+      "weight_score": 136,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/tools/PowerShellTool/PowerShellTool.tsx",
+      "category": "prompts",
+      "weight_score": 136,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/services/settingsSync/index.ts",
+      "category": "tools",
+      "weight_score": 134,
+      "reason": "categoría:tools"
+    },
+    {
+      "path": "src/utils/swarm/inProcessRunner.ts",
+      "category": "prompts",
+      "weight_score": 134,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/components/Messages.tsx",
+      "category": "prompts",
+      "weight_score": 132,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/services/mcp/config.ts",
+      "category": "prompts",
+      "weight_score": 132,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/tools/BashTool/bashPermissions.ts",
+      "category": "prompts",
+      "weight_score": 132,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/commands.ts",
+      "category": "prompts",
+      "weight_score": 131,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/components/Spinner.tsx",
+      "category": "prompts",
+      "weight_score": 130,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/QueryEngine.ts",
+      "category": "prompts",
+      "weight_score": 130,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/hooks/useReplBridge.tsx",
+      "category": "prompts",
+      "weight_score": 128,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/auth.ts",
+      "category": "tools",
+      "weight_score": 128,
+      "reason": "categoría:tools"
+    },
+    {
+      "path": "src/utils/bash/ShellSnapshot.ts",
+      "category": "prompts",
+      "weight_score": 126,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/cleanup.ts",
+      "category": "tools",
+      "weight_score": 124,
+      "reason": "categoría:tools"
+    },
+    {
+      "path": "src/tools/FileReadTool/FileReadTool.ts",
+      "category": "prompts",
+      "weight_score": 122,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/bridge/remoteBridgeCore.ts",
+      "category": "prompts",
+      "weight_score": 120,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/cli/transports/WebSocketTransport.ts",
+      "category": "prompts",
+      "weight_score": 120,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/services/api/sessionIngress.ts",
+      "category": "agents",
+      "weight_score": 120,
+      "reason": "categoría:agents"
+    },
+    {
+      "path": "src/services/PromptSuggestion/speculation.ts",
+      "category": "prompts",
+      "weight_score": 120,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/constants/prompts.ts",
+      "category": "prompts",
+      "weight_score": 118,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/services/mcp/useManageMCPConnections.ts",
+      "category": "prompts",
+      "weight_score": 118,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/setup.ts",
+      "category": "prompts",
+      "weight_score": 118,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/tools/shared/spawnMultiAgent.ts",
+      "category": "prompts",
+      "weight_score": 118,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/autoUpdater.ts",
+      "category": "tools",
+      "weight_score": 118,
+      "reason": "categoría:tools"
+    },
+    {
+      "path": "src/commands/thinkback/thinkback.tsx",
+      "category": "prompts",
+      "weight_score": 116,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/cli/handlers/mcp.tsx",
+      "category": "prompts",
+      "weight_score": 112,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/cli/transports/SSETransport.ts",
+      "category": "agents",
+      "weight_score": 112,
+      "reason": "categoría:agents"
+    },
+    {
+      "path": "src/components/StatusLine.tsx",
+      "category": "prompts",
+      "weight_score": 112,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/hooks/useVoice.ts",
+      "category": "prompts",
+      "weight_score": 110,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/tasks/RemoteAgentTask/RemoteAgentTask.tsx",
+      "category": "prompts",
+      "weight_score": 110,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/claudemd.ts",
+      "category": "prompts",
+      "weight_score": 110,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/markdownConfigLoader.ts",
+      "category": "tools",
+      "weight_score": 110,
+      "reason": "categoría:tools"
+    },
+    {
+      "path": "src/services/teamMemorySync/index.ts",
+      "category": "agents",
+      "weight_score": 108,
+      "reason": "categoría:agents"
+    },
+    {
+      "path": "src/services/tips/tipRegistry.ts",
+      "category": "prompts",
+      "weight_score": 108,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/hooks/fileSuggestions.ts",
+      "category": "prompts",
+      "weight_score": 106,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/tools/SendMessageTool/SendMessageTool.ts",
+      "category": "prompts",
+      "weight_score": 106,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/doctorDiagnostic.ts",
+      "category": "prompts",
+      "weight_score": 104,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/utils/tasks.ts",
+      "category": "agents",
+      "weight_score": 104,
+      "reason": "categoría:agents"
+    },
+    {
+      "path": "src/components/mcp/ElicitationDialog.tsx",
+      "category": "prompts",
+      "weight_score": 102,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/components/mcp/MCPRemoteServerMenu.tsx",
+      "category": "prompts",
+      "weight_score": 102,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/components/MessageSelector.tsx",
+      "category": "prompts",
+      "weight_score": 102,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/entrypoints/init.ts",
+      "category": "prompts",
+      "weight_score": 102,
+      "reason": "categoría:prompts"
+    },
+    {
+      "path": "src/interactiveHelpers.tsx",
+      "category": "prompts",
+      "weight_score": 102,
+      "reason": "categoría:prompts"
+    }
+  ]
+}
