@@ -19,3 +19,7 @@ Thumbs.db
 # .cursor/
 
 COMMIT_MSG.txt
+
+# archivos grandes / dumps
+CLAUDE_SOURCE_FINAL_60MB.map
+*.map
