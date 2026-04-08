@@ -1,8 +1,8 @@
 {
-  "index_schema_version": 2,
+  "index_schema_version": 3,
   "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
   "chunk_target_words": 400,
-  "corpus_root": "C:\\Users\\Hans\\Proyectos\\SANTO GRIAL\\agent_sandbox\\corpus",
+  "corpus_root": "C:\\Users\\Hans\\Proyectos\\vision-rag\\agent_sandbox\\corpus",
   "fuentes": [
     {
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
@@ -19,7 +19,7 @@
   ],
   "chunks": [
     {
-      "chunk_id": "3155c6005d6be7a1701f438dcbb9189bc89141b775788369ee1177481c713308",
+      "chunk_id": "84951c35a81fa32342ec8444657b3485fdf0c0d86ee7ceea25aaf3871d4d0720",
       "texto": "Resolución de Aprobación Resolución de Secretaría General N° 023-2026-MINEDU Código Versión Páginas Fecha de aprobación 03 36 05/02/2026 DIRECTIVA “Disposiciones y procedimientos para requerir, otorgar y rendir cuenta de viáticos, pasajes y otros gastos de viaje, por comisiones de servicio en el territorio nacional” ROBLES VIZCARRA Miguel Angel FAU 20131370998 hard Jefe de la Oficina de Contabilidad y Control Previo Doy V° B° 2026/02/05 11:59:46 DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 2 de 36 Control de Cambios Versión Sección/ Ítem Descripción del cambio: 01 - Nuevo 02 Base normativa, definiciones, disposiciones generales, específicas, complementarias responsabilidades, anexos y formatos Se actualiza, simplifica redacción y se ordena la directiva. 03 Base normativa, definiciones, disposiciones generales, específicas, complementarias responsabilidades, anexos y formatos Se actualiza normativa, se simplifica redacción, se amplía el alcance y se ordena directiva. DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 3 de 36 ÍNDICE 1. OBJETIVO....................................................................................................................................... 4 2. ÁMBITO DE APLICACIÓN ................................................................................................................ 4 3. BASE NORMATIVA ......................................................................................................................... 4 4. DEFINICIONES ................................................................................................................................ 5 5. DISPOSICIONES GENERALES ........................................................................................................... 9 6. DISPOSICIONES ESPECÍFICAS ....................................................................................................... 11 6.1. DE LAS ACCIONES ADMINISTRATIVAS PARA EL REQUERIMIENTO DE VIÁTICOS, PASAJESY OTROS GASTOS DE VIAJE .................................................................................................................................... 11 6.2. DEL OTORGAMIENTO DE VIÁTICOS, PASAJES Y OTROS GASTOS DE VIAJE ................................. 13 6.3. DEL REQUERIMIENTO DE PASAJES AÉREOS ............................................................................... 13 6.4. DE LA RENDICIÓN DE CUENTAS ................................................................................................. 15 6.5. DE LAS REPROGRAMACIONES DE OTORGAMIENTO DE VIATICOS ............................................. 19 6.6. DE LOS REEMBOLSOS POR MAYOR GASTO ................................................................................ 20 6.7. DE LA RECUPERACIÓN DE LOS VIATICOS NO RENDIDOS ............................................................ 21 7. RESPONSABILIDADES ................................................................................................................... 22 8. DISPOSICIONES COMPLEMENTARIAS .......................................................................................... 22 9. ANEXOS ....................................................................................................................................... 23 ANEXO N° 1: SOLICITUD DE VIÁTICOS ........................................................................................................... 24 ANEXO N° 2: PLANILLA DE VIÁTICOS ............................................................................................................. 25 ANEXO N° 3: SOLICITUD DE SEGURO............................................................................................................. 26 ANEXO N° 4: COMPROMISO DE DEVOLUCIÓN DE VIÁTICOS POR COMISIÓN AL INTERIOR DEL PAÍS ............................ 27 ANEXO N° 5: ALERTAS SOBRE SITUACIONES QUE REQUIERAN ATENCIÓN PRIORITARIA POR LOS ACTORES DEL SECTOR EDUCACIÓN ............................................................................................................................................... 28 ANEXO N° 6: PLAN DE TRABAJO DIARIO ........................................................................................................ 29 ANEXO N° 7: INFORME DE COMISIÓN DE LA PLANILLA DE VIÁTICOS .................................................................... 30 ANEXO N° 8: RENDICIÓN DE CUENTAS POR COMISIÓN DE SERVICIOS .................................................................. 31 ANEXO N° 9: DECLARACIÓN JURADA ............................................................................................................ 32 ANEXO N° 10: CONSTANCIA EN COMISIÓN",
       "embedding": [
         -0.0890970453619957,
@@ -408,6 +408,8 @@
         -0.07021214812994003
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 1,
       "pagina_fin": 3,
       "tipo": "indice",
@@ -420,7 +422,7 @@
       }
     },
     {
-      "chunk_id": "8df29130024e86067f9c4828cd9bac5bd1a002b32a2a5ae4dec2e419fc2875fb",
+      "chunk_id": "264d66fbca881d5a5d39ef9076331571bb22d42e87ccefbe4d0f334e5453b6bf",
       "texto": "DE SERVICIOS ................................................................................. 33 ANEXO N° 11: CONSTANCIA EN COMISIÓN DE SERVICIO, SUPERVISIÓN, MONITOREO Y SIMILARES ........................... 34 ANEXO N° 12: CUADRO DE LISTADO DE COMISIONADOS .................................................................................. 35 ANEXO N° 13: DIAGRAMA DE REQUERIMIENTO, OTORGAMIENTO Y RENDICIÓN DE CUENTAS DE VIÁTICOS, PASAJES Y OTROS GASTOS DE VIAJES EN EL TERRITORIO NACIONAL ....................................................................................... 36 DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 4 de 36",
       "embedding": [
         0.037966445088386536,
@@ -809,6 +811,8 @@
         -0.016365382820367813
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 3,
       "pagina_fin": 4,
       "tipo": "indice",
@@ -821,7 +825,7 @@
       }
     },
     {
-      "chunk_id": "a1cf5b84a2319c3585174d992bf6dab515a20520dd9747de4e9139ecb77051a0",
+      "chunk_id": "d4ae1b196a1e4f9edc14f074554c840548d3db913e13ff4c6351284788069067",
       "texto": "1. OBJETIVO Establecer disposiciones que regulen el requerimiento, el otorgamiento y rendición de viáticos, pasajes y otros gastos de viaje por comisiones de servicio dentro del país, que realicen los servidores civiles de las unidades ejecutoras bajo la administración de la Oficina General de Administración (OGA) del Ministerio de Educación (MINEDU), cualquiera fuere su régimen laboral o relación contractual, que tengan que desplazarse dentro del territorio nacional. 2. ÁMBITO DE APLICACIÓN La presente directiva es de cumplimiento obligatorio por parte de los servidores civiles de las unidades ejecutoras cuya administración este a cargo de la OGA del MINEDU, independientemente del vínculo laboral o contractual que les sea aplicable; personal de seguridad del Estado asignado al Ministerio de Educación y locadores de servicio cuando se haya establecido expresamente en sus términos de referencia de contratación. 3. BASE NORMATIVA - Ley de Presupuesto del Sector Público para el año fiscal correspondiente. - Ley N° 27815, Ley del Código de Ética de la Función Pública. - Ley N° 28716, Ley de Control Interno de las Entidades del Estado. - Decreto Legislativo N° 1438, Decreto Legislativo del Sistema Nacional de Contabilidad. - Decreto Legislativo N° 1440, Decreto Legislativo del Sistema Nacional de Presupuesto Público. - Decreto Legislativo N° 1441, Decreto Legislativo del Sistema Nacional de Tesorería. - Decreto Supremo N° 012-2007-PCM, que prohíbe a las entidades del Estado adquirir bebidas alcohólicas con cargo a recursos públicos. - Decreto Supremo N° 007-2013-EF, que regula el otorgamiento de viáticos para viajes en Comisión de Servicios en el territorio nacional. - Decreto Supremo N° 001-2015-MINEDU, que aprueba el Reglamento de Organización y Funciones del Ministerio de Educación. - Decreto Supremo N° 004-2019-JUS, que aprueba el Texto Único Ordenado de la Ley N° 27444, Ley del Procedimiento Administrativo General. - Decreto Supremo N° 057-2022-EF, que aprueba el Texto Único Ordenado del Decreto Legislativo N° 1438, Decreto Legislativo del Sistema Nacional de Contabilidad. - Resolución de Superintendencia N° 007-99-SUNAT, que aprueba el Reglamento de Comprobantes de Pago. - Resolución de Superintendencia N° 037-2002/SUNAT Régimen de Retención del IGV Aplicable a los Proveedores y Designación de Agentes de Retención. - Resolución de Superintendencia N° 166-2004/SUNAT, que aprueba las normas para la emisión de boletos de transporte aéreo de pasajeros. - Resolución de Superintendencia N° 183-2004/SUNAT, que aprueba las Normas para para la aplicación del Sistema de Pagos de Obligaciones Tributarias con el Gobierno Central al que se refiere el Decreto",
       "embedding": [
         -0.04618039354681969,
@@ -1210,6 +1214,8 @@
         -0.07858624309301376
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 4,
       "pagina_fin": 4,
       "tipo": "objetivo",
@@ -1222,7 +1228,7 @@
       }
     },
     {
-      "chunk_id": "c82d91ea5cae0bdefd2e7b19e3dd75f5faaf852195a1d59a499a866dc613a86b",
+      "chunk_id": "736bcf8d9a97e682c8e0bc67592461ccb535b4c9f97e87d1bca2bd7260a2825b",
       "texto": "Legislativo N° 940. DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 5 de 36 - Resolución de Superintendencia N° 300-2014/SUNAT, que crea un sistema de emisión electrónica; modifica los sistemas de emisión electrónica de facturas y boletas de venta para facilitar, entre otros, la emisión y el traslado de bienes realizado por los emisores electrónicos itinerantes y por quienes emiten o usan boleta de venta electrónica y designa emisores electrónicos del nuevo sistema. - Resolución de Superintendencia N° 274-2015/SUNAT, que regula la emisión electrónica de los comprobantes de retención y de los comprobantes de percepción. - Resolución de Contraloría General N° 320-2006-CG, que aprueba las Normas de Control Interno. - Resolución Directoral N° 002-2007-EF/77.15, que aprueba la Directiva de Tesorería N° 001-2007-EF/77.15. - Resolución Directoral N° 001-2011-EF/77.15, que dictan disposiciones complementarias a la Directiva de Tesorería. - Resolución Directoral N° 013-2016-EF/52.03, que establece disposiciones referidas al Procesamiento del Gasto Girado, el pago de tributos mediante transferencias electrónicas que corresponde efectuar por diversas entidades, y otros aspectos; y modifican la Directiva de Tesorería N° 001-2007-EF/77.15 y la R.D. N° 005-2011-EF/52.03. - Resolución Directoral N° 002-2020-EF/52.03, que dispone que las entidades que realicen sus operaciones a través del SIAF-SP, utilicen el medio de pago “Orden de Pago Electrónica” (OPE), a través del Banco de la Nación, y emiten otras disposiciones. - Resolución Directoral N° 004-2022-EF/52.01, que aprueba las medidas para fortalecer el proceso de la autorización del Gasto Devengado en el SIAF-SP y otros procesos vinculados con la gestión de tesorería. - Resolución Directoral N° 001-2024-EF/52.01, que aprueba la Directiva N° 001- 2024-EF/52.06, “Directiva para la formalización, sustento y registro del Gasto Devengado”. - Resolución de Secretaría General N° 101-2022-MINEDU, que aprueba la Directiva N° DI-005-02-MINEDU “Elaboración, aprobación y tramitación de actos resolutivos y documentos normativos del Ministerio de Educación”. Las referidas normas incluyen sus respectivas disposiciones ampliatorias, modificatorias y conexas, de ser el caso. 4. DEFINICIONES 4.1. GLOSARIO DE TÉRMINOS: Para efectos de la presente directiva se entenderán los términos enumerados como se indica a continuación: 4.1.1. Comisionado: Servidor civil que se desplace en comisión de servicios, con carácter temporal, fuera de la localidad de su centro de trabajo habitual, para cumplir labores relacionadas con sus actividades (o por la necesidad o naturaleza del servicio), siempre que no esté haciendo uso de sus vacaciones o",
       "embedding": [
         0.010224375873804092,
@@ -1611,6 +1617,8 @@
         -0.06288620084524155
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 4,
       "pagina_fin": 5,
       "tipo": "texto_general",
@@ -1623,7 +1631,7 @@
       }
     },
     {
-      "chunk_id": "02997e993f05af2ef3cd4749fbc413ccc30783d0873481f2f3e0ba114bcabec9",
+      "chunk_id": "6fd5ca089664f926af8f656ff88187a7913c8ccd4fee6e083b24f58dbea9e2f7",
       "texto": "descanso físico; así como personal de seguridad del Estado asignado al MINEDU, consultores, locadores FAG, PAC y locadores de servicios del Ministerio de Educación, DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 6 de 36 cuando se haya establecido expresamente en sus contratos y/o términos de referencia. 4.1.2. Comisión de Servicios: Es el desplazamiento temporal del comisionado fuera de su sede habitual de trabajo, dentro del territorio nacional con indicación de fecha de inicio y de término, a fin de lograr determinados objetivos y metas institucionales. 4.1.3. Declaración Jurada de Gastos: Documento anexo que suscribe un comisionado bajo juramento, sujeto a la presunción de veracidad, para sustentar gastos por los cuales no es posible obtener comprobantes de pago autorizados y emitidos de acuerdo a lo establecido en el Reglamento de Comprobantes de Pago de la SUNAT; este documento se presenta hasta por un monto que no puede exceder del treinta por ciento (30%) del monto total de los viáticos asignados para el viaje en comisión de servicios dentro del territorio nacional, el comisionado está facultado a presentar en forma detallada y cronológica. 4.1.4. Firma: Firma digital del comisionado o excepcionalmente rúbrica manuscrita (para el caso de locadores, servidores civiles con firma digital vencidas o en trámite, personal de seguridad del Estado, u otros casos similares). La rúbrica manuscrita debe estar seguida de Nombres y Apellidos, número de DNI y cargo. 4.1.5. Gastos por combustible: Gastos por la adquisición de combustible. Para el caso de consumo de los vehículos oficiales del MINEDU, son asignados al conductor para el traslado del comisionado al destino. 4.1.6. Informe de Comisión: Documento elaborado por el comisionado, donde se registra la firma del Comisionado, el jefe de la unidad de organización y con el visto bueno del coordinador administrativo o quien haga sus veces, en el cual se detalla las tareas realizadas por el comisionado, por cada día de permanencia en el lugar de destino. 4.1.7. Otros Gastos de Viaje: Servicios diversos referidos al gasto adicional que no corresponde a viáticos ni pasajes, que están previstos en el requerimiento inicial y que son necesarios para el cumplimiento de los objetivos de la comisión de servicios (cochera, lavado del vehículo y peajes). 4.1.8. Pasajes: Gastos para la adquisición de boletos de viaje, tickets electrónicos y/o asignaciones proporcionadas a los comisionados, para",
       "embedding": [
         0.021826013922691345,
@@ -2012,6 +2020,8 @@
         -0.08918041735887527
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 5,
       "pagina_fin": 6,
       "tipo": "texto_general",
@@ -2024,7 +2034,7 @@
       }
     },
     {
-      "chunk_id": "b914c25d043119c0a21a24dfb6b7e19389228ef2c6cd3470440c9b282de1a5a3",
+      "chunk_id": "8a6665e4a5b1906c613784e497fc285ffc11a8c2ec0e2f6ce817962c7e72f2e2",
       "texto": "su transporte a los lugares dentro del territorio nacional donde se desarrollará la comisión de servicios, utilizando para el efecto vía aérea, terrestre, fluvial o marítima según corresponda. (no incluye gastos por movilidad local). DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 7 de 36 4.1.9. Plan de Trabajo Diario: Documento elaborado por el comisionado, en el cual se detalla las tareas programadas a realizar por el comisionado, por cada día de permanencia en el lugar de destino. 4.1.10. Planilla de Viáticos: Documento que autoriza la comisión de servicios, emitido a través del aplicativo SIGA-VIATICOS, en el cual se registra la firma del comisionado, del jefe de la unidad de organización y el Visto Bueno de su coordinador administrativo o quien haga sus veces. Registra el motivo de viaje, comisionado, escala, beneficiario, Numero de Código de Cuenta interbancaria, importes aprobados para la comisión y clasificadores presupuestarios de gastos autorizados. 4.1.11. Rendición de Cuentas por Comisión de Servicios: Documento emitido a través del aplicativo SIGA-VIATICOS o del SIGA VIATICOS WEB, en el cual se registra la firma del comisionado, del jefe de la unidad de organización y el Visto Bueno de su coordinador administrativo o quien haga sus veces. Registra el detalle del gasto, para rendir cuenta de los gastos efectuados en la comisión de servicios, debiendo contar con el sustento documentario correspondiente. 4.1.12. Reembolso por Mayores Gastos: Se otorga de manera excepcional, cuando el comisionado efectúa gastos por una necesidad o condición sobreviniente del servicio que no fue previsto ni incluido como viáticos, pasajes terrestres u otro gasto de viaje. Este reembolso se produce cuando el comisionado efectúa gastos en comisión de servicios por un importe superior al otorgado, el mismo que debe ser justificado por el comisionado y debe contar con la validación del superior inmediato del comisionado. 4.1.13. Retención del IGV: Es el procedimiento mediante el cual el comisionado, que actúa como comprador o usuario de un bien o servicio afecto al Régimen de Retenciones del Impuesto General a las Ventas (I.G.V.), retiene el tres por ciento (3%) del pago, cuando la facturación supere los S/ 700,00 (SETECIENTOS Y 00/100 SOLES) para su posterior entrega al fisco según la fecha de vencimiento de sus obligaciones tributarias. La emisión del Comprobante de Retención Electrónico está a cargo de la Oficina de Tesorería, por",
       "embedding": [
         0.009003224782645702,
@@ -2413,6 +2423,8 @@
         -0.04088713973760605
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 6,
       "pagina_fin": 7,
       "tipo": "texto_general",
@@ -2425,7 +2437,7 @@
       }
     },
     {
-      "chunk_id": "fe03d9680beb8e758b825d2338ac0a0ced9bacb1c25fc572d1e9ea7ac966f972",
+      "chunk_id": "ac01f505570c592549eb9e5c70060a6aa29e65841ed1c5aada79d849934f1ff0",
       "texto": "lo que el comisionado debe solicitar las instrucciones de emisión a dicha Oficina. 4.1.14. Servidor civil: Comprende a los servidores civiles del MINEDU, los cuales se encuentran clasificados como: funcionario público, directivo público, servidor civil de carrera y servidor de actividades complementarias; pudiendo existir servidores de confianza en cualquiera de estos grupos; asimismo se incluye al Personal Altamente Calificado PAC (Ley N° 29806) y del Fondo de Apoyo Gerencial FAG (Decreto Ley N° 25650). DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 8 de 36 4.1.15. Solicitud de Seguro: Documento emitido a través del aplicativo SIGA-VIATICOS, en el cual se registra el Visto Bueno del coordinador administrativo o quien haga sus veces y la firma del jefe de la unidad de organización, para la inclusión del comisionado en la póliza de seguros que corresponda. Registra los datos personales del comisionado, domicilio, datos del viaje y beneficiario del seguro. 4.1.16. Solicitud de Viáticos: Documento emitido a través del aplicativo SIGA-VIATICOS, registra las actividades operativas, motivo de viaje, comisionado, escala, meta, lugar de destino de viaje, fecha de salida y retorno de la comisión y rutas de viaje. 4.1.17. Unidades Ejecutoras: Son las unidades ejecutoras bajo la administración de la OGA del Ministerio de Educación, las cuales son: - 024 Ministerio de Educación - Sede Central. - 026 Programa Educación Básica para Todos. - 116 Colegio Mayor Secundario “Presidente del Perú”. - Otras que se puedan crear bajo la administración de la OGA del Ministerio de Educación. 4.1.18. Viáticos: Asignación de dinero que se otorga al comisionado para cubrir gastos de alimentación, alojamiento, traslados (hacia y desde el lugar de embarque/desembarque) y movilidad local (que abarca el desplazamiento en el lugar donde se realiza la comisión). 4.2. SIGLAS Para la presente directiva se aplican las siguientes siglas: - CCI : Código de Cuenta Interbancaria. - CCMN : Cuadro Consolidado Multianual de Necesidades. - E-SINAD : Sistema de Información de Apoyo a la Administración _Documentaria y de Archivo. - IGV : Impuesto General a las Ventas. - MINEDU : Ministerio de Educación. - OCCP : Oficina de Contabilidad y Control Previo. - OGA : Oficina General de Administración. - OL : Oficina de Logística. - OPE : Orden de Pago Electrónica. - OT : Oficina de Tesorería. - POI : Plan Operativo Institucional. - RUC : Registro",
       "embedding": [
         -0.005659640766680241,
@@ -2814,6 +2826,8 @@
         -0.03496118634939194
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 7,
       "pagina_fin": 8,
       "tipo": "texto_general",
@@ -2826,7 +2840,7 @@
       }
     },
     {
-      "chunk_id": "6e930195b18f8d200a7e369f00dfb6e88f098bd886492948ad7e23c26dec2829",
+      "chunk_id": "a89afef2f86700b3b7f49e4825846b353d5b30f7814a1537589cdcdd371913fc",
       "texto": "Único de Contribuyente. - SIAF : Sistema Integrado de Administración Financiera de _Sector Público. - SIGA : Sistema Integrado de Gestión Administrativa. - STOIPAD : Secretaria Técnica de los Órganos Instructores del _Procedimiento Administrativo Disciplinario. - SUNAT : Superintendencia Nacional de Aduanas y Administración DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 9 de 36 _Tributaria. - TUUA : Tarifa Única por Uso de Aeropuerto. 5. DISPOSICIONES GENERALES 5.1. Los comisionados, así como los jefes de las unidades de organización, actúan conforme a la base normativa vigente que se indica en el numeral 3 de la presente directiva, aplicables en el desarrollo de su comisión de servicios y rendición de cuentas. 5.2. La programación de los viajes en comisión de servicios es responsabilidad del jefe de la unidad de organización que lo solicita, siendo condición necesaria que, dichos viajes se encuentren acorde a las actividades previstas en el POI del MINEDU. 5.3. El jefe de la unidad de organización, debe remitir sus programaciones de viajes a la Coordinación de Presupuesto de la OCCP, solicitando las Certificaciones de Crédito Presupuestario, conforme a lo previsto en el Decreto Legislativo N° 1440, Decreto Legislativo del Sistema Nacional de Presupuesto Público, las cuales deben estar previstas y detalladas en su Plan Anual de Trabajo en función de sus actividades programadas en el POI. 5.4. La escala de viáticos que se aplica para viajes en comisión de servicios dentro del territorio nacional, es la siguiente: ESCALA DE VIÁTICOS PARA VIAJES EN COMISIÓN DE SERVICIOS EN ELTERRITORIO NACIONAL (Según Decreto Supremo N° 007-2013-EF) 5.5. Para los casos de la autorización de las comisiones de servicio, en función al tiempo previsto de duración, esta se otorga de la siguiente manera: a) Hasta por quince (15) días de comisión de servicio, deben contar con la autorización del jefe la unidad de organización. b) Las comisiones de servicios excepcionalmente pueden ser programadas con una duración de entre dieciséis (16) a treinta (30) días, para lo cual se debe contar, además, con la autorización del Ministro de Educación, Viceministro o Secretario General, según la unidad de organización de COMISIONADOS S/ (VIÁTICO POR DÍA) Ministro, Viceministro y Secretario General. 380,00 Servidores civiles de las unidades ejecutoras bajo la administración de la Oficina General de Administración del Ministerio de Educación, (incluyendo aquellos que brinden servicios de",
       "embedding": [
         0.04067874699831009,
@@ -3215,6 +3229,8 @@
         0.02086467668414116
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 8,
       "pagina_fin": 9,
       "tipo": "texto_general",
@@ -3227,7 +3243,7 @@
       }
     },
     {
-      "chunk_id": "6f026761046af74a5b3109bb56ead174da4fe4a629ec3d4a3cc2fb25073ca019",
+      "chunk_id": "dd2132f666a42aa502d9f8f469075ba64e12d3c8de8c5a85f14870c037b57db8",
       "texto": "consultoría que, por la necesidad o naturaleza del servicio, la entidad requiera realizar viajes al interior del país); personal de seguridad del Estado asignado al Ministerio de Educación y locadores de servicios cuando se haya establecido expresamente en sus términos de referencia de contratación. 320,00 DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 10 de 36 Alta Dirección de la cual dependan. La Secretaría de Planificación Estratégica autoriza estas comisiones para los servidores de sus unidades de organización. 5.6. Para los casos de autorización de comisiones de servicio, de los jefes de las unidades de organización de Alta Dirección, se otorgan de la siguiente manera: a) Para el Ministro, Jefe de Gabinete, servidores civiles del Despacho Ministerial, Viceministros y servidores civiles de la Secretaría General, la suscripción de la Planilla de Viáticos es efectuada por la Secretaría General. b) Para los servidores civiles de los Despachos Viceministeriales, la suscripción de la Planilla de Viáticos es efectuada por el Viceministerio del cual dependen. c) Para el Secretario General, la suscripción de la Planilla de Viáticos es efectuada por el Despacho Ministerial (ministro o jefe de Gabinete de Asesores del Despacho Ministerial). 5.7. Para el caso del procurador público, la suscripción de la Planilla de Viáticos es efectuada por la Secretaría General. 5.8. Para el caso del Secretario de Planificación Estratégica, la suscripción de la Planilla de Viáticos es efectuada por la Secretaría General. 5.9. El costo de los pasajes terrestres y/o fluviales necesarios para el desarrollo de la comisión de servicios, se tramitan dentro de la Planilla de Viáticos. 5.10. La solicitud de viáticos para comisiones de servicio dentro del territorio nacional y la rendición de cuentas, se registran en el aplicativo SIGA-VIÁTICOS que tiene establecido para estos efectos el MINEDU. 5.11. La Oficina de Planificación Estratégica y Presupuesto tiene a su cargo el soporte especializado del aplicativo SIGA-VIÁTICOS. La OCCP, a través de la Coordinación Financiera, tiene a su cargo la administración y creación de usuarios en el aplicativo SIGA-VIÁTICOS. 5.12. Para el otorgamiento de viáticos se considera como un día a las comisiones cuya duración sea mayor a cuatro (4) horas y menor o igual a veinticuatro (24) horas. En caso sea menor o igual a (4) horas, el monto del viático es otorgado de manera proporcional a las horas de la comisión.",
       "embedding": [
         -0.0269458144903183,
@@ -3616,6 +3632,8 @@
         -0.06158066540956497
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 9,
       "pagina_fin": 10,
       "tipo": "texto_general",
@@ -3628,7 +3646,7 @@
       }
     },
     {
-      "chunk_id": "7bfcf60b7657c7c925949d7c418d391534dd54ffc82f4c739ca49333bab8ea65",
+      "chunk_id": "a089f6270dac42d656c91b8eb967a6c54d8ed9ef702ca9c7426698baa864256a",
       "texto": "5.13. No se otorgan viáticos a los servidores que tengan una (01) rendición de cuentas pendiente, salvo que estén dentro del plazo establecido en el numeral 6.4.2 de la presente directiva. Las planillas de viáticos observadas por este concepto, son recepcionadas y devueltas por la Coordinación Financiera de la OCCP. 5.14. Los viáticos se hacen efectivos mediante: a) Abono en cuenta o depósito en la cuenta bancaria del comisionado, para ello DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 11 de 36 el comisionado debe consignar en la planilla de viáticos el número de CCI o la cuenta de ahorros, señalando la entidad bancaria, bajo responsabilidad. Entidad Financiera Cuenta de ahorro N° CCI Banco de la Nación 11 dígitos 20 dígitos Otra entidad financiera De acuerdo a la entidad financiera 20 dígitos b) Abono mediante OPE, el cual debe ser requerido por la unidad de organización solicitante en la planilla de viáticos. 5.15. El desplazamiento temporal del comisionado, implica ir de una provincia a otra, con excepción del desplazamiento realizado entre Lima y Callao, que es considerada como una sola unidad urbana. 6. DISPOSICIONES ESPECÍFICAS 6.1. DE LAS ACCIONES ADMINISTRATIVAS PARA EL REQUERIMIENTO DE VIÁTICOS, PASAJES Y OTROS GASTOS DE VIAJE 6.1.1. La unidad de organización que formule una solicitud de viáticos verifica previamente si cuenta con recursos presupuestarios, en los siguientes clasificadores de gastos que se detallan a continuación: Clasificador de gastos Únicamente para efectuar gastos en: 1) 23.21.2 2 Viáticos 2) 23.21.2 1 Pasajes aéreos, terrestres y/o fluviales 3) 23.13.1 1 Combustibles 4) 23.27.11. 99 Cochera, lavado de vehículos, parchado de llantas y/o peajes En caso se requiera gestionar pasajes aéreos realizar las acciones correspondientes en el numeral 6.3. 6.1.2. El Plan de Trabajo Diario es elaborado por el comisionado, consignando la siguiente información: unidad ejecutora, fecha de elaboración del documento, nombre completo del comisionado, lugar de origen y de destino de la comisión, fecha y hora de la salida y retorno, motivo de la comisión de servicio, y el detalle de las tareas programadas a realizar por cada día en el lugar de destino. Luego debe ser firmado por el comisionado y el jefe de la unidad de organización, y con el Visto Bueno del coordinador administrativo o quien haga sus veces, en señal de conformidad. 6.1.3. Para efectos del cálculo",
       "embedding": [
         -0.013359767384827137,
@@ -4017,6 +4035,8 @@
         -0.05389665439724922
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 10,
       "pagina_fin": 11,
       "tipo": "texto_general",
@@ -4029,7 +4049,7 @@
       }
     },
     {
-      "chunk_id": "f31dee3282a7f469dbbc719bc66767c5adb982c2f27ccb3e402d7f26306aed8f",
+      "chunk_id": "18a87aed9576795a8feb1d1a374029472e20739952fa41b0011931e7c354adcd",
       "texto": "del inicio y culminación de la duración de las horas de la comisión de servicios, se consigna el tiempo efectivo de la misma; considerando lo siguiente: DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 12 de 36 a) Para el caso de traslado aéreo, tres (3) horas antes del inicio del viaje y dos (2) horas después de la culminación del viaje, teniendo en cuenta lo indicado en el itinerario de la reserva (tarjetas de embarque o ticket electrónico). b) Para el caso de traslado terrestre, dos (2) horas antes del inicio del viaje y una (1) hora después de la culminación del viaje, teniendo en cuenta el horario de partida y de llegada del bus señalado en el boleto de viaje. c) Para el caso de traslados terrestres en una movilidad del MINEDU, el cálculo del inicio y culminación de la duración de las horas de comisión de servicios se computa desde que la unidad móvil sale de las instalaciones del MINEDU y retorna a las instalaciones del MINEDU (se toma en cuenta el horario de la papeleta de salida de la Coordinación de Transportes). 6.1.4. La Solicitud de Viáticos, la Planilla de Viáticos y la Solicitud de Seguro, se registra y emite por el coordinador administrativo o quien haga sus veces en el aplicativo SIGA-VIÁTICOS, con los datos del Plan de Trabajo Diario. 6.1.5. El coordinador administrativo o quien haga sus veces de la unidad de organización solicitante registra y emite en el aplicativo SIGA-VIÁTICOS, el Compromiso de Devolución de Viáticos por Comisión al Interior del País, para ser firmado por el comisionado, a efectos de que autorice la aplicación de las sanciones que correspondan, en caso de no cumplir en los plazos establecidos con la rendición de cuenta documentada de los viáticos recibidos. 6.1.6. Para el requerimiento de viáticos, pasajes terrestres y otros gastos de viaje, el coordinador administrativo o quien haga sus veces de la unidad de organización solicitante , consigna su Visto Bueno en la Solicitud de Viáticos (Anexo N° 1), la Planilla de Viáticos (Anexo N° 2) y el Plan de Trabajo Diario (Anexo N° 6), en señal de conformidad de que el expediente de requerimiento de viáticos ha sido revisado y adjunta toda la documentación sustentatoria, de acuerdo a lo establecido en la presente directiva. 6.1.7. Para",
       "embedding": [
         -0.02799033373594284,
@@ -4418,6 +4438,8 @@
         -0.04377366229891777
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 11,
       "pagina_fin": 12,
       "tipo": "texto_general",
@@ -4430,7 +4452,7 @@
       }
     },
     {
-      "chunk_id": "c6ac959c40901ecb71f13a625dd8ff8fd7fb2001ea32f86072cdb82a564a1608",
+      "chunk_id": "2e7ef80b5800a36b785c3029ebfbcc38b38753af30f0d2a0469cd979ceb3c4a1",
       "texto": "el requerimiento de viáticos, pasajes terrestres, fluviales y otros gastos de viaje, el jefe de la unidad de organización, remite a la Coordinación Financiera de la OCCP, con cinco (05) días hábiles anteriores a la fecha prevista de la comisión de servicios, la siguiente documentación: a) Solicitud de Viáticos (Anexo N° 1). b) Planilla de Viáticos (Anexo N° 2). c) Solicitud de Seguro (Anexo N° 3). d) Compromiso de Devolución de Viáticos por Comisión al Interior del país (Anexo N° 4). e) Plan de Trabajo Diario (Anexo N° 6). f) Certificación de Crédito Presupuestal g) Para el caso de locadores de servicios, deben presentar además copia de la Orden de Servicio vigente y el Seguro Complementario de Trabajo de Riesgo – SCTR y Términos de Referencia. DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 13 de 36 6.1.8. La OCCP, previamente al otorgamiento de viáticos, verifica las programaciones de viajes que le fueran remitidas conforme a lo señalado en el numeral 5.2 de la presente directiva. 6.1.9. De existir alguna observación en el expediente de solicitud de viáticos y/o de no contar con saldo suficiente en el certificado de crédito presupuestario, dicho expediente es recepcionado y devuelto por la Coordinación Financiera de la OCCP a la unidad de organización solicitante. 6.1.10. La unidad de organización solicitante comunica oportunamente a la Oficina General de Recursos Humanos la relación de servidores con vínculo laboral, previo al inicio de su comisión de servicios. 6.2. DEL OTORGAMIENTO DE VIÁTICOS, PASAJES Y OTROS GASTOS DE VIAJE 6.2.1. La Coordinación Financiera de la OCCP, de encontrar conformes los documentos solicitados en el numeral 6.1.7, así como de no presentar la restricción señalada en el numeral 5.13 de la presente directiva, gestiona la aprobación de los viáticos, pasajes y otros gastos solicitados, para lo cual registra el Compromiso Anual, la fase Gasto-Compromiso y Gasto- Devengado en el aplicativo SIGA-VIÁTICOS, con interfaz en el aplicativo SIAF. 6.2.2. Una vez aprobada la fase del Gasto-Devengado, el expediente es remitido a la OT para el registro de la fase del Gasto-Girado en el SIAF. Luego de su aprobación y previa contabilización del gasto por la OCCP, se genera la Nota de Pago. 6.2.3. Aprobada la fase del Gasto-Girado, en el plazo de dos (02) días hábiles la OT informa vía correo electrónico institucional, a",
       "embedding": [
         -0.01072145625948906,
@@ -4819,6 +4841,8 @@
         -0.07904023677110672
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 12,
       "pagina_fin": 13,
       "tipo": "texto_general",
@@ -4831,7 +4855,7 @@
       }
     },
     {
-      "chunk_id": "dfb86d5788b6aecc8885adb019b98a81e5946ba3399c29d9facd0b8231e85c23",
+      "chunk_id": "84424275c1aac1c869342cd72447fe4004a1d0eae3711995c3691f025fa3a594",
       "texto": "la Coordinación Administrativa de la unidad de organización solicitante, los gastos-girados por planilla de viáticos, adjuntando copia escaneada de la Nota de pago emitida, siendo responsabilidad del coordinador administrativo o quien haga sus veces en la unidad de organización, remitir dicho documento al comisionado. 6.3. DEL REQUERIMIENTO DE PASAJES AÉREOS 6.3.1. La unidad de organización solicita a la OL la adquisición de los pasajes aéreos con cinco (05) días hábiles de anticipación a la fecha programada para el viaje, salvo caso fortuito o fuerza mayor u otra situación excepcional la cual debe ser debidamente justificada. Para requerimientos cuya cantidad supere cien (100) pasajes, la solicitud deberá presentarse con una anticipación mínima de diez (10) días hábiles antes de la fecha de inicio del viaje. 6.3.2. Todos los requerimientos de pasajes aéreos deben ser autorizados por el jefe de la unidad de organización solicitante, según corresponda, para lo cual remite lo siguiente: DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 14 de 36 a) Memorando y/o informe de solicitud de requerimiento, en el cual se consigne el nombre y correo electrónico del coordinador administrativo o quien haga sus veces de la unidad de organización al cual se notifica el boleto o ticket electrónico. b) Pedido de servicio SIGA, debidamente suscrito por la unidad de organización solicitante y por el jefe de la unidad de organización que autoriza la contratación. c) Cuadro de Lista de Comisionados (Anexo N° 12). d) Para el caso de talleres y/o eventos, debe adjuntar la Resolución Ministerial de autorización. e) Para el caso de reprogramaciones remitir el o los boletos inicialmente contratados. f) Adjuntar la Certificación de Crédito Presupuestario con saldo suficiente para la adquisición. 6.3.3. Los horarios comprendidos en el Cuadro de Listado de Comisionados, (Anexo N° 12), están sujetos a variación en un rango de (03) tres horas antes o después del horario solicitado. En caso de existir casos extraordinarios en los cuales los horarios especificados sean inamovibles, el jefe de la unidad de organización solicitante debe consignar el sustento correspondiente en el documento requerido en el numeral 6.3.2, literal a) de la presente directiva. 6.3.4. Los pasajes aéreos que se adquieran, son sin excepción, en clase económica. 6.3.5. Para la oportuna provisión de pasajes aéreos, la OL concreta la reserva y/o compra, según corresponda, a través de: (i)",
       "embedding": [
         0.006658995524048805,
@@ -5220,6 +5244,8 @@
         -0.015594910830259323
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 13,
       "pagina_fin": 14,
       "tipo": "texto_general",
@@ -5232,7 +5258,7 @@
       }
     },
     {
-      "chunk_id": "55d9e184ed968bbb3bb20b22e6aef760161f089f7f4bf6024811fd11db0739ab",
+      "chunk_id": "35932f97c02ca16ceb945979ad6ec90ccc2465420597f503b25607a4ff002d18",
       "texto": "Acuerdo Marco, o (ii) Contrato de Agenciamiento de Pasajes Aéreos. 6.3.6. Efectuada la compra de los pasajes aéreos, la OL remite al coordinador administrativo o quien haga sus veces de la unidad de organización solicitante, vía correo electrónico institucional, el boleto o ticket electrónico para dar la conformidad por la misma vía, de los datos consignados en el boleto o ticket electrónico, durante el día de notificación, , y comunicárselo al comisionado. De no hacerlo, se asume la conformidad respectiva, bajo responsabilidad. Para los casos de reprogramaciones y cambios de itinerarios, se debe seguir con lo establecido en el numeral 6.3.1. en adelante. 6.3.7. El comisionado realiza el “registro de ingreso” (Check in) y obtiene la “Tarjeta de Embarque” (Boarding Pass), con veinticuatro (24) horas de anticipación a la hora de viaje. 6.3.8. En casos de urgencia, en los cuales se requiera la adquisición de pasajes o tickets aéreos fuera del horario laboral, el jefe de la unidad de organización solicitante, debe remitir a la OL, dicha solicitud mediante correo electrónico institucional, para su evaluación y autorización de compra. La documentación que sustente la adquisición debe ser remitida el primer día hábil siguiente a la adquisición, bajo responsabilidad. DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 15 de 36 6.3.9. El comisionado debe cautelar que el uso de los pasajes o tickets aéreos, se efectúen en los horarios y condiciones establecidos en ellos, de ser el caso que no fueran utilizados, debe solicitar la reprogramación o reembolso según corresponda, antes de la fecha de vencimiento consignada en el boleto de viaje o ticket aéreo, asumiendo el costo de las penalidades que hubiere lugar, salvo causas debidamente justificadas. 6.3.10. Excepcionalmente, en el caso en que el comisionado requiera desplazarse al interior de las provincias, en las cuales la OL informa que no es posible obtener pasajes conforme a lo establecido en el numeral 6.3.5 de la presente directiva, el comisionado efectúa la compra directa del pasaje aéreo, siempre y cuando se encuentre considerado y autorizado en la Planilla de Viáticos correspondiente. La compra de este pasaje debe sustentarse con comprobantes de pago emitidos a nombre de la Unidad Ejecutora que corresponda, no se admite Declaración Jurada. 6.4. DE LA RENDICIÓN DE CUENTAS 6.4.1. Los gastos incurridos por el comisionado deben ser razonables, coherentes y proporcionales,",
       "embedding": [
         -0.020338403061032295,
@@ -5621,6 +5647,8 @@
         -0.05736988037824631
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 14,
       "pagina_fin": 15,
       "tipo": "texto_general",
@@ -5633,7 +5661,7 @@
       }
     },
     {
-      "chunk_id": "16c404f98d1b76bc7e13d147cbe0d33aa3722baf58d010c7551f7299f1c5ba7b",
+      "chunk_id": "e05c7a90f13d9a38fc430e52bc6461a2632bcb4104b2ba11c331b1c580512cff",
       "texto": "debiendo guardar relación al periodo y ubicación geográfica donde se realiza la comisión de servicios. 6.4.2. Dentro de los diez (10) días hábiles de finalizado el viaje, el comisionado efectúa todas las acciones para concluir con la rendición de cuentas. 6.4.3. La rendición de cuentas se inicia con el registro en el aplicativo SIGA- VIATICOS o a través del SIGA VIATICOS vía WEB por parte del coordinador administrativo o quien haga sus veces de la unidad de organización solicitante, del detalle de los gastos realizados con cargo a viáticos, pasajes y otros gastos de viaje, con sujeción a las partidas y montos detallados en el comprobante de pago, a fin de obtener los anexos y formatos para continuar con la rendición de cuentas, sin superar el importe del viático diario otorgado. El coordinador administrativo o quien haga sus veces de la unidad de organización solicitante realiza un “Reingreso” en el expediente E-SINAD que generó al solicitar la planilla de viáticos, y remite a la Coordinación de Control Previo de la OCCP la rendición de cuentas debidamente firmada y visada (según corresponda), por el comisionado, por el jefe de la unidad de organización que autorizó la comisión y por el propio coordinador administrativo o quien haga sus veces, en el siguiente orden, para su revisión: a) Rendición de Cuentas por Comisión de Servicios (Anexo N° 8), el cual es firmado por el jefe de la unidad de organización que autorizó el viaje y con el Visto Bueno del coordinador administrativo o quien haga sus veces de la unidad de organización solicitante. b) Planilla de Viáticos (Anexo N° 2). c) Declaración Jurada (Anexo N° 9), registrada cronológicamente. DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 16 de 36 d) Plan de Trabajo Diario (Anexo N° 6). e) Informe de Comisión de la Planilla de Viáticos, presentado por el comisionado ante el jefe de la unidad de organización que autorizó la comisión de servicios, en el cual se debe describir al detalle las tareas programadas en el plan de trabajo, considerando actividades, coordinaciones, supervisiones, y/o trabajos realizados (Anexo N° 7). f) Formato de Alertas sobre Situaciones que requieren atención prioritaria por los Actores del Sector Educación (Anexo N° 5). g) Constancia en Comisión de Servicio, la cual debe ser debidamente firmada por el servidor civil de la",
       "embedding": [
         -0.006404914893209934,
@@ -6022,6 +6050,8 @@
         -0.047922831028699875
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 15,
       "pagina_fin": 16,
       "tipo": "texto_general",
@@ -6034,7 +6064,7 @@
       }
     },
     {
-      "chunk_id": "2b2027d327c6e13077bceca90c907a5e1e70f7d583d40d09de4041fb822b2f0d",
+      "chunk_id": "508bf3f420c2328f8dbe3537f4c4d7404a322a7f6f8dca620d8d1585ed031431",
       "texto": "unidad de organización de la institución donde se realizó la comisión (Anexo N° 10). h) De corresponder, se presenta la Constancia en Comisión de Servicio - Supervisión, Monitoreo, y Similares, consignando la fecha, lugar, firma y sello del servidor de la institución o instituciones donde se realizó las acciones de supervisión, monitoreo y/o similares (Anexo N° 11). i) Tarjeta de Embarque (Boarding Pass) de salida y retorno en el caso de pasajes aéreos. j) El sustento documentario debidamente ordenado cronológicamente, cada Comprobante de Pago en original debe sujetarse a los requisitos exigidos por el Reglamento de Comprobantes de Pago de la SUNAT, adjuntando la validación SUNAT. k) Pasajes terrestres y/o aéreos (Ticket electrónico o boleto de viaje), Boletos o Comprobantes de Pago para los viajes por vía fluvial. l) De corresponder, se adjunta copia de la constancia de depósito en el Banco de la Nación (según cuentas corrientes detalladas en el numeral 6.4.20 de la presente directiva), por la devolución del saldo no utilizado del viatico otorgado. Esta copia debe contener el Visto Bueno de la Caja de Recaudación de la OT. m) De corresponder, se adjunta el Recibo de Ingresos emitido por Caja de Recaudación de la OT, correspondiente al depósito de Retenciones (3% de IGV), aplicado según lo establecido en el numeral 4.1.13 de la presente directiva. 6.4.4. La Coordinación de Control Previo revisa la rendición presentada y visa las rendiciones que no tengan observaciones, en señal de conformidad, a fin de que se encuentre liberado en el aplicativo SIGA VIATICOS o en el SIGA VIATICOS vía WEB y apto para un nuevo requerimiento; en el caso de presentar observaciones, se remite al comisionado (vía E-SINAD) el expediente de rendición de cuentas debidamente liquidado, a fin que subsane las observaciones y de corresponder, deposite los viáticos no utilizados. El comisionado debe cautelar que el trámite de la rendición de cuentas “sin observaciones”, se culmine dentro de los diez (10) días hábiles de finalizado el viaje de comisión de servicios, a fin de que se encuentre liberado en el aplicativo SIGA-VIATICOS y apto para un nuevo requerimiento. 6.4.5. Los expedientes de rendiciones de cuentas debidamente visados por la Coordinación de Control Previo, en señal de conformidad, se registran en el módulo administrativo del SIAF y posteriormente derivados a la OT para su archivo definitivo. DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y",
       "embedding": [
         -0.014897194691002369,
@@ -6423,6 +6453,8 @@
         -0.024838995188474655
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 16,
       "pagina_fin": 17,
       "tipo": "texto_general",
@@ -6435,7 +6467,7 @@
       }
     },
     {
-      "chunk_id": "60ca57f4841883eb97b387b55676ea7319d6672ea412df27dab33e467a6e23a9",
+      "chunk_id": "db6a6f1a383cf03f6da7050766e57afdee3b4d7a774e491da30ba6c4747c4bf5",
       "texto": "otros gastos de viaje en el territorio nacional” Página 17 de 36 6.4.6. En caso de que la Coordinación de Control Previo, detecte la presentación de comprobantes de pago falsos, sobrevaluados, simulados o adulterados en la rendición de cuenta documentada, informa sobre dicha situación a la OGA, a fin de que los antecedentes debidamente documentados sean remitidos a la STOIPAD y a la Procuraduría Pública del MINEDU para las acciones que correspondan de acuerdo a sus competencias. 6.4.7. La rendición de cuentas debidamente sustentada con los comprobantes de pago por los servicios de movilidad, alimentación y hospedaje obtenidos hasta por un porcentaje no menor al setenta por ciento (70%) del monto otorgado. El saldo resultante, no mayor al treinta por ciento (30%) puede sustentarse mediante Declaración Jurada (Anexo N° 9), siempre que no sea posible obtener comprobantes de pago reconocidos y emitidos de conformidad con lo establecido por la SUNAT. La declaración jurada solo se aplica a los viáticos y no a otro concepto de gasto. 6.4.8. Los comprobantes de pago originales (facturas, boletas de venta, ticket factura, factura y/o boleta electrónica, boletos de viaje, ticket electrónico) deben ser emitidos a nombre de la unidad ejecutora que corresponda, y presentarse sin borrones ni enmendaduras, consignando el R.U.C. respectivo, de acuerdo al siguiente detalle: Adicionalmente, cuando se trate de facturas, se debe consignar como dirección fiscal “Calle El Comercio 193 San Borja”, para las tres unidades ejecutoras descritas en el cuadro del párrafo precedente. 6.4.9. En el caso de ausencia del jefe de la unidad de organización solicitante que autorizó la comisión de servicios, se adjunta la resolución de encargatura de funciones, o en su defecto el documento de delegación de firma que autoriza al servidor delegado a suscribir la rendición de cuentas. 6.4.10. No se admiten como comprobantes de pago para las rendiciones de cuenta, los emitidos por las transacciones de pago con tarjetas de crédito; de manera excepcional el jefe de la unidad de organización solicitante, puede aprobar el gasto con tarjeta de crédito, el cual se precisa en el Informe de Comisión de la Planilla de Viáticos. 6.4.11. Los comprobantes de pago que sustentan los gastos de alimentación por el consumo personal del comisionado se consigna el detalle de los mismos. No se aceptan documentos que consignen “por consumo” o “por alimentación”. 6.4.12. Los comprobantes de pago que sustentan gastos por hospedaje deben indicar de forma expresa la",
       "embedding": [
         0.023139799013733864,
@@ -6824,6 +6856,8 @@
         -0.016709325835108757
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 17,
       "pagina_fin": 17,
       "tipo": "texto_general",
@@ -6836,7 +6870,7 @@
       }
     },
     {
-      "chunk_id": "1f83ab611ee526e6ece5de5375839ecfe75f90659970f5ccb7c96217d4600fc2",
+      "chunk_id": "54a4d3123965c56f7ba76fca833ed52d4f5641c83a811cb8c334dd546cc29210",
       "texto": "fecha de ingreso y fecha de salida; debiendo tener en cuenta UE 024: MINISTERIO DE EDUCACIÓN UE 026: PROGRAMA EDUCACIÓN BÁSICA PARA TODOS UE 116: COLEGIO MAYOR SECUNDARIO “PRESIDENTE DEL PERÚ” RUC N° 20131370998 RUC N° 20380795907 RUC N° 20546369383 DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 18 de 36 los montos para la aplicación de las retenciones de I.G.V., de ser el caso, se adjunta el Comprobante de Retención Electrónico y el Recibo de Caja por la retención realizada. 6.4.13. No se aceptan comprobantes de pago en los que se registren bebidas alcohólicas, así como artículos de uso personal (vestimenta, calzado, medicinas, artículos de limpieza o tocador), regalos, servicio de lavandería, tarjetas telefónicas, copias, productos ornamentales, equipos menores, y otros que no se ciñan a lo establecido en los numerales 4.1.7., 4.1.8 y 4.1.17. 6.4.14. Los comprobantes de pago por movilidad (facturas y/o boletas de venta) deben precisar el detalle del itinerario. 6.4.15. En el caso de transportes interprovinciales se hace uso de los servicios públicos o de las salidas regulares, quedando restringida la utilización de movilidades tipo “expreso” o de alquiler-espera, con excepción de las situaciones en que el costo beneficio lo justifique, para lo cual se presenta un informe debidamente sustentado y ser autorizado por el jefe de la unidad de organización solicitante. 6.4.16. En el caso de gastos por consumo de víveres solo procede cuando la comisión de servicios se realice en zona rural o lugares inhóspitos, cuyos comprobantes de pago deben ser visados por el jefe de la unidad de organización que autorizó la comisión de servicios, en señal de conformidad y detallados en el Informe correspondiente. 6.4.17. La Declaración Jurada (Anexo N° 9), únicamente se presenta cuando al comisionado no le resulte posible obtener comprobantes de pago autorizados y emitidos de acuerdo a lo establecido en el Reglamento de Comprobantes de Pago de la SUNAT, por un monto que no debe exceder el treinta por ciento (30%) del monto total de los viáticos asignados para viajes en comisión de servicios dentro del territorio nacional. 6.4.18. Para el caso de los gastos de movilidad que se rindan mediante Declaración Jurada, deben sujetarse a los montos que se indican a continuación: * Los traslados vía fluvial se ajustan a los costos establecidos en cada localidad. **Los montos establecidos deben",
       "embedding": [
         0.03391972556710243,
@@ -7225,6 +7259,8 @@
         -0.019607307389378548
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 17,
       "pagina_fin": 18,
       "tipo": "texto_general",
@@ -7237,7 +7273,7 @@
       }
     },
     {
-      "chunk_id": "38e3722b2fc2c82d0504d2808a5b481d0bf7679de250c58a047e7863fea81d5e",
+      "chunk_id": "c5de0d035c11cf9e9cfcfcc70b29edabfa7b1a116ecc72b7ddee6f9dbdcb8120",
       "texto": "ser revisados y/o actualizados anualmente por la OGA, y en caso de que se efectúen modificaciones, deben ser puestos en N° CONCEPTO LIMA REGIONES 1 Traslado del domicilio, hotel u hospedaje, al aeropuerto y viceversa No aplicable Hasta S/ 35,00 por servicio** 2 Traslado del domicilio, hotel u hospedaje, al Terrapuerto y viceversa No aplicable Hasta S/ 25,00 por servicio** 3 Movilidad local en lugar de destino* Hasta S/ 45,00 por día** Hasta S/ 30,00 por día** DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 19 de 36 conocimiento de las unidades de organización al inicio de cada ejercicio fiscal. 6.4.19. En el caso de robo o extravío de comprobantes de pago, dentro de los diez (10) días hábiles de culminada la comisión de servicios, el comisionado adjunta lo siguiente: a) Copia certificada de la denuncia policial que incluya detalle sobre robo o extravío de los comprobantes de pago. b) Copia electrónica o copia fotostática de cada Comprobante de pago (emisor) donde se realizó el servicio o consumo, para este último caso se consignan los datos del representante legal (nombres y apellidos, documento de identidad, fecha de entrega y de ser el caso el sello de la empresa) 6.4.20. Las devoluciones del comisionado por los saldos no utilizados de los viáticos otorgados, se efectúan en las Cuentas Corrientes de las respectivas Unidades Ejecutoras, según el siguiente detalle: Cuentas Corrientes para devoluciones de saldos no utilizados 6.4.21. De no realizarse la comisión de servicios, habiéndose efectuado el abono correspondiente, el jefe de la unidad de organización que autorizó la comisión, presenta a la OGA un documento indicando las razones por las cuales no se ejecutó la comisión de servicios, al que se adjunta la Rendición de Cuentas de Viáticos y Gastos de Viaje, la Nota de Pago (proporcionada por la OT), el original de la constancia de depósito en el Banco de la Nación y recibo de ingreso emitido por la OT (según cuentas corrientes detalladas en el numeral 6.4.20. de la presente directiva), por la devolución del viático otorgado, lo cual se efectúa en un plazo que no exceda las veinticuatro (24) horas de haberse hecho efectivo el depósito en la cuenta bancaria del comisionado, bajo responsabilidad. 6.4.22. Cada unidad de organización programa, controla y realiza el seguimiento estricto de los Certificados de Crédito",
       "embedding": [
         0.051781922578811646,
@@ -7626,6 +7662,8 @@
         -0.05058921501040459
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 18,
       "pagina_fin": 19,
       "tipo": "texto_general",
@@ -7638,7 +7676,7 @@
       }
     },
     {
-      "chunk_id": "8b9a642b2fb4edc94eccccba0eaa06eb611f494eaeca93ec567e8ab83fd9d001",
+      "chunk_id": "651df9c9006095691c4b6975706640092f23b76b12ade32b46e3b45a3e392da2",
       "texto": "Presupuestario con el CCMN Proyectado de viáticos, así como las modificaciones de estos. 6.5. DE LAS REPROGRAMACIONES DE OTORGAMIENTO DE VIATICOS 6.5.1. En los casos que sea necesario reprogramar el plazo inicial de otorgamiento de viáticos, o la ruta inicial, se presenta un documento de sustento suscrito por UNIDAD EJECUTORA N° CUENTA CORRIENTE DENOMINACIÓN ENTIDAD BANCARIA MONEDA 024 Sede Central 00-068-348331 Sede Central – Viáticos y Encargos no utilizados Banco de la Nación S/. 026 Programa Educación Básica Para Todos 00-068-348358 PEBT - Viáticos y Encargos no utilizados Banco de la Nación S/. 116 Colegio Mayor Secundario “Presidente del Perú” 00-068-364728 UE 116 – Otros Depósitos Banco de la Nación S/. DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 20 de 36 el jefe de la unidad de organización solicitante dirigido a la Jefatura de la OGA, teniendo en cuenta lo siguiente: a) Sólo es posible reprogramar por única vez el plazo de inicio por la misma cantidad de días que se programaron en la Planilla de Viáticos inicial, siempre y cuando el viático aún no ha sido abonado al comisionado. b) Una vez abonado el viático en la cuenta del comisionado, éste efectúa su devolución dentro de las veinticuatro (24) horas siguientes, a las cuentas detalladas en el numeral 6.4.20 y se comunica a la OT para proceder a la solicitud de un nuevo otorgamiento de viáticos, pasajes y otros gastos. De incumplir lo indicado en el párrafo anterior, la OCCP, pone en conocimiento del jefe de la unidad de organización que autorizó los viáticos, para las acciones disciplinarias que correspondan y a la Secretaría Técnica de los Órganos Instructores del Procedimiento Administrativo Disciplinario, a fin de que disponga las acciones pertinentes y/o sanciones del caso. c) De requerirse cambio de fecha de salida o retorno una vez adquirido el pasaje aéreo, se solicita detallar la justificación correspondiente en el documento señalado en el literal a) del numeral 6.3.2, de la presente directiva. Los costos adicionales que se generen por la modificación solicitada son asumidos íntegramente por el comisionado, excepto cuando dichas modificaciones respondan a causas debidamente sustentadas en el documento a que se refiere el párrafo precedente. 6.5.2. Excepcionalmente, si el comisionado se encuentra en comisión de servicios y se requiera ampliar el periodo o variar la ruta inicial establecida en la",
       "embedding": [
         0.006224362179636955,
@@ -8027,6 +8065,8 @@
         -0.05167258530855179
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 19,
       "pagina_fin": 20,
       "tipo": "texto_general",
@@ -8039,7 +8079,7 @@
       }
     },
     {
-      "chunk_id": "d9bc80c08bbd4020769bf3b4aeca3fba92633078889acbfcbd086ef13458da6b",
+      "chunk_id": "473b3e8dd6aeca839a19dfcb8ad2194ec351c3b550be4a2d4bf4dd889ded62a0",
       "texto": "planilla de viáticos, el coordinador administrativo o quien haga sus veces de la unidad de organización solicitante, solicita una Planilla Adicional en el aplicativo SIGA- VIÁTICOS o a través del SIGA-VIÁTICOS vía WEB, por el mayor gasto a realizar, con una anticipación de un (1) día de iniciarse la ampliación de la comisión y previa autorización del jefe de la unidad de organización, adjuntando la documentación señalada en el numeral 6.1.7 de la presente directiva. 6.5.3. La ampliación de la reprogramación de fechas autorizadas, debe ser precisada por el comisionado en el Informe de Comisión (Anexo N° 7). 6.6. DE LOS REEMBOLSOS POR MAYOR GASTO 6.6.1. El reembolso por mayor gasto, se otorga de manera excepcional cuando el comisionado efectúa otros gastos en comisión de servicios, por una necesidad o condición sobreviniente del servicio que no fue previsto ni incluido en la planilla de viáticos o cuando se amplía la comisión de servicios, DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 21 de 36 el reembolso por mayor gasto debe ser justificado por el comisionado y contar con la validación del superior inmediato del comisionado. 6.6.2. Los requerimientos de reembolso por mayor gasto se presentan a la OGA, con la documentación requerida en el numeral 6.4.3 (a excepción de los literales b y l), adjuntando el informe técnico que sustenta el motivo del reembolso, el Certificado de Crédito Presupuestario aprobado y la autorización expresa del jefe de la unidad de organización correspondiente. 6.6.3. El plazo para la presentación de los requerimientos de reembolso por mayor gasto se presenta a la OGA, con plazo no mayor de diez (10) días hábiles, contados desde el día siguiente de la fecha que concluye la comisión, a fin de emitir la Resolución Jefatural que dé inicio al trámite de pago correspondiente. No se atienden reembolsos presentados de forma posterior. 6.6.4. No procede la regularización y el reembolso por compra de pasajes aéreos gestionado por las unidades de organización, bajo responsabilidad del jefe de la unidad de organización que autorizó su adquisición, a excepción de lo establecido en el numeral 6.3.10 de la presente directiva. 6.7. DE LA RECUPERACIÓN DE LOS VIATICOS NO RENDIDOS 6.7.1. Cumplido el plazo máximo sin que el comisionado inicie el trámite de rendición de cuentas por los viáticos recibidos o habiéndolo iniciado no cumple",
       "embedding": [
         -0.03533226624131203,
@@ -8428,6 +8468,8 @@
         -0.07277083396911621
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 20,
       "pagina_fin": 21,
       "tipo": "texto_general",
@@ -8440,7 +8482,7 @@
       }
     },
     {
-      "chunk_id": "00dc65b20c5716a23f1830be2262eeef000449417f2416e6e34208d7b13e9ece",
+      "chunk_id": "a2eb6c7fb7c7891a16ed2c318baa652e6abf86bed3505e2c65f35dca52a5bc7b",
       "texto": "con levantar las observaciones que le fueran formuladas, corresponde tomar las siguientes acciones, bajo responsabilidad: a) La Coordinación Financiera de la OCCP, vencido el plazo para que el comisionado inicie el trámite de rendición de cuentas por los viáticos recibidos o habiéndolo iniciado no cumple con levantar las observaciones, notifica al comisionado mediante correo electrónico consignado en el Plan de Trabajo Diario, con copia al jefe/director de la unidad de organización y al coordinador administrativo o quien haga sus veces, otorgándole un plazo adicional por única vez de 72 horas. b) Si la Coordinación de Control Previo de la OCCP no ha recepcionado la rendición respectiva, cumplido el plazo señalado en el párrafo precedente, la Coordinación Financiera remite por escrito a la OGA la relación de los comisionados que se encuentran omisos de presentar la Rendición de Cuentas de Viáticos y Gastos de Viaje o que presentadas se encuentren con observaciones. c) La OGA remite dicha relación a la unidad de organización que solicitó los viáticos a fin que requiera al comisionado la presentación o la subsanación de observaciones dentro de las veinticuatro (24) horas de notificada. De subsanada o presentada la rendición de cuenta, la OGA traslada a la OCCP para su evaluación y verificación de documentos. La unidad de organización designada informa a la OGA, sobre el cumplimiento o incumplimiento de la presentación o subsanación de la DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 22 de 36 rendición de cuentas. d) De persistir el incumplimiento y vencido el plazo indicado en el literal anterior, la OCCP informa a OGA, para su remisión a la STOIPAD y se inicien las acciones que le corresponden de acuerdo a su competencia. Asimismo, la OCCP notifica al comisionado mediante correo electrónico institucional, consignado en el Plan de Trabajo Diario, e informa que se agotan las acciones administrativas de recupero. e) La OCCP prepara todos los actuados y la OGA los remite a la Procuraduría Publica del MINEDU, para las acciones que corresponden de acuerdo a su competencia. 7. RESPONSABILIDADES 7.1. Los comisionados, en atención a su competencia funcional, están obligados a cumplir y hacer cumplir la presente directiva. 7.2. El proceso de rendición de cuentas es responsabilidad plena y directa del comisionado y constituye una declaración de responsabilidad por la documentación sustentatoria del gasto que",
       "embedding": [
         0.033908627927303314,
@@ -8829,6 +8871,8 @@
         -0.0765172615647316
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 21,
       "pagina_fin": 22,
       "tipo": "texto_general",
@@ -8841,7 +8885,7 @@
       }
     },
     {
-      "chunk_id": "85fd3805151a809f5aa969ac24d3903b4fd9b3b72ed974761afed31ca9a47635",
+      "chunk_id": "2bc846233d578f7e5012a44b41aad1fcddf25e0e920b1c8b0c6a608cbc70f1cc",
       "texto": "presenta, las cuales son efectuadas bajo el principio de legalidad y el principio de presunción de veracidad, señalados en el Texto Único Ordenado de la Ley N° 27444, Ley del Procedimiento Administrativo General, aprobado por Decreto Supremo N° 004-2019-JUS, y en cumplimiento del deber de “Uso adecuado de los bienes del Estado”, señalado en el Código de Ética del Ministerio de Educación aprobado por Resolución Ministerial N° 548-2018-MINEDU, sin perjuicio de las acciones de fiscalización posterior que la OCCP disponga. 7.3. El coordinador administrativo o quien haga sus veces asiste al comisionado de la unidad de organización a la que pertenece, en la rendición de cuentas de viáticos otorgados en comisión de servicios; asimismo, consigna el Visto Bueno en el Anexo N° 8 “Rendición de Cuentas por Comisión de Servicios”, en señal de conformidad de que el expediente de rendición de cuentas ha sido revisado y adjunta toda la documentación sustentatoria, de acuerdo a lo establecido en la presente directiva. 7.4. La OCCP y la OT, concilian mensualmente las devoluciones y/o recupero de efectivo y saldos por rendir relacionados a los viáticos otorgados, mediante la suscripción de un acta. 8. DISPOSICIONES COMPLEMENTARIAS 8.1. Excepcionalmente, se atienden gastos por concepto de viáticos con cargo a los fondos asignados a la Caja Chica, únicamente para los casos solicitados por los jefes de las unidades de organización de Alta Dirección y por los servidores de la Oficina de Defensa Nacional y de Gestión del Riesgo de Desastres (ODENAGED) y otros que sean debidamente autorizados por la OGA. 8.2. El retorno anticipado implica la devolución de los viáticos por el total de los DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 23 de 36 días no utilizados. 8.3. Los comisionados del Órgano de Control Institucional y de los órganos de la Alta Dirección se encuentran exceptuados de la presentación del “Plan de Trabajo, del Informe de Actividades, y del Formato de Alertas sobre Situaciones que requieren atención prioritaria por los Actores del Sector Educación; así como, de las Constancias en Comisión de Servicios, en la rendición de cuenta de viáticos. 8.4. Los jefes de las unidades de organización, se encuentran exceptuados de la presentación de las Constancias de Comisión de Servicios en la rendición de cuentas de viáticos. 8.5. Pueden otorgarse viáticos a quienes brinden servicios de consultoría,",
       "embedding": [
         0.02716393768787384,
@@ -9230,6 +9274,8 @@
         -0.05963285639882088
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 22,
       "pagina_fin": 23,
       "tipo": "texto_general",
@@ -9242,7 +9288,7 @@
       }
     },
     {
-      "chunk_id": "955c4785c831ed4fe3c466a580b8f2d3b747da78c0e676506b7a62bd9311d9d0",
+      "chunk_id": "c2f7f807777072a6ac070c7117213815ecaab45612c902d17ba64afdf40b7d0c",
       "texto": "siempre y cuando su contrato así lo establezca; sujetándose a las disposiciones establecidas en la presente directiva. 8.6. Pueden otorgarse viáticos a locadores de servicio que mantengan vínculo contractual vigente, hasta la culminación de su comisión de servicios. La OCCP informa a la OL la relación de locadores pendientes de rendición de cuentas el primer día hábil de cada mes. 8.7. La OCCP realiza las modificaciones del centro de costo registrado en el aplicativo SIGA VIATICOS, previo requerimiento del jefe de la unidad de organización. 8.8. La modificación de la cuenta bancaria consignada en la planilla de viáticos y/o modalidad de abono al comisionado debe ser requerida mediante documento a la OT, por el jefe de la unidad de organización. 8.9. Las situaciones no previstas en la presente directiva son evaluadas por el jefe de la OGA, quien determina los procedimientos correspondientes. 9. ANEXOS Anexo N° 1: Solicitud de Viáticos. Anexo N° 2: Planilla de Viáticos. Anexo N° 3: Solicitud de Seguro. Anexo N° 4: Compromiso de Devolución de Viáticos por Comisión al Interior del País. Anexo N° 5: Alertas sobre Situaciones que requieren atención prioritaria por los Actores del Sector Educación (Según Modelo N° 5). Anexo N° 6: Plan de Trabajo Diario. Anexo N° 7: Informe de Comisión de la Planilla de Viáticos. Anexo N° 8: Rendición de Cuentas por Comisión de Servicios. Anexo N° 9: Declaración Jurada. Anexo N° 10: Constancia en Comisión de Servicios Anexo N° 11: Constancia en Comisión de Servicio, Supervisión, Monitoreo y Similares. Anexo N° 12: Cuadro de Listado de Comisionados. Anexo N°13: Diagrama de requerimiento, otorgamiento y rendición de cuentas de viáticos, pasajes y otros gastos de viajes en el territorio nacional. DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 24 de 36 ANEXO N° 1: Solicitud de Viáticos DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 25 de 36 ANEXO N° 2: Planilla de Viáticos DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 26 de 36 ANEXO N° 3: Solicitud de Seguro DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio",
       "embedding": [
         -0.032984573394060135,
@@ -9631,6 +9677,8 @@
         -0.07742826640605927
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 23,
       "pagina_fin": 27,
       "tipo": "anexo",
@@ -9643,7 +9691,7 @@
       }
     },
     {
-      "chunk_id": "93c897a423f0bb12e1d952fb79ab61a1f470108e3b8c0dd16dd00580509ce390",
+      "chunk_id": "03b4f47e7caadd8ab199b909328aff1d835993ebc5231fbd9ba508bc6d9922ae",
       "texto": "nacional” Página 27 de 36 ANEXO N° 4: Compromiso de Devolución de Viáticos por Comisión al Interior del País DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 28 de 36 ANEXO N° 5: Alertas sobre situaciones que requieran atención prioritaria por los Actores del Sector Educación DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 29 de 36 ANEXO N° 6: Plan de Trabajo Diario UE: FECHA *Mediante la suscripcion del presente documento, autorizo a que se me notifique cualquier comunicación al correo electronicó que consigno voluntariamente, por lo cual me comprometo a revisarlo permanentemente O UNIDAD ORGÁNICA V° B° JEFE DEL ÓRGANO FIRMA DEL COMISIONADO Tarea Programada : <Detalle de la tarea Programada> DÍA : <Segundo día programada> Tarea Programada : <Detalle de la tarea Programada> DÍA : <Tercer día programada> <DL 1057/DL 276/DL 728/LOCADOR DE SERVICIOS/OTROS> DÍA : <Primer día programada> Tarea Programada : <Detalle de la tarea Programada> MODALIDAD CONTRACTUAL: CORREO ELECTRONICO*: LUGAR : < Origen - Destino - Origen> FECHA Y HORA : < Fecha y hora de Salida al Fecha y hora del retorno> MOTIVO : <Motivo del viaje> PLAN DE TRABAJO DIARIO ANEXO N° 01 COMISIONADOS : < Nombre del Comisionado> DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 30 de 36 ANEXO N° 7: Informe de Comisión de la Planilla de Viáticos DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 31 de 36 ANEXO N° 8: Rendición de Cuentas por Comisión de Servicios DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 32 de 36 ANEXO N° 9: Declaración Jurada DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 33 de 36 ANEXO N° 10: Constancia en Comisión de Servicios DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 34 de 36 ANEXO N° 11:",
       "embedding": [
         -0.012639524415135384,
@@ -10032,6 +10080,8 @@
         -0.04076438024640083
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 27,
       "pagina_fin": 34,
       "tipo": "anexo",
@@ -10044,7 +10094,7 @@
       }
     },
     {
-      "chunk_id": "ab9c80c2de5914a836971f6321649fa685ef453325878f4a515e050494465d02",
+      "chunk_id": "22c8038ac4923215960a3a83c9cfcb81d888eef121d37e81c055b18f723390fc",
       "texto": "Constancia en Comisión de Servicio, Supervisión, Monitoreo y Similares DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 35 de 36 ANEXO N° 12: Cuadro de Listado de Comisionados N° DE PEDIDO DE SERVICIO UNIDAD DE ORGANIZACIÓN: SINAD Ciudad de Origen Fecha de Salida Hora Ciudad de Destino Fecha de Retorno Hora Apellido Paterno Apellido Materno Nombre N° de DNI Fecha de Nacimiento Correo Electrónico Teléfono Celular Modalidad de Contrato Motivo de Viaje Peso de Equipaje Detallar los datos del contacto con quien se coordinará la contratación (nombre, anexo, correo) ………………………………………… Detallar otras observaciones como “Horarios Inamovibles” especificando la razón……………. Finalmente debe contar con la firma del director y/o jefe de la unidad de organización que solicita la contratación. LISTA DE COMISIONADOS PARA LA CONTRATACIÓN DEL SERVICIO DE EMISIÓN DE BOLETOS AÉREOS NACIONAL, BAJO LA MODALIDAD DE ACUERDO MARCO – PERÚ DIRECTIVA CÓDIGO “Disposiciones y procedimientos para requerir, otorgar, y rendir cuenta de viáticos, pasajes y otros gastos de viaje en el territorio nacional” Página 36 de 36 ANEXO N° 13: Diagrama de requerimiento, otorgamiento y rendición de cuentas de viáticos, pasajes y otros gastos de viajes en el territorio nacional",
       "embedding": [
         -0.03861499950289726,
@@ -10433,6 +10483,8 @@
         -0.05066436901688576
       ],
       "archivo": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 34,
       "pagina_fin": 36,
       "tipo": "anexo",
@@ -10445,7 +10497,7 @@
       }
     },
     {
-      "chunk_id": "ddbb61142aab61346806f2465fe8a7fd7f75342ab0f03c1552d38997d1809212",
+      "chunk_id": "c9174ddc87bd91a07af34725d00838d2bc0e51d20b8b67fc067670a5b2ba101d",
       "texto": "Documento electrónico firmado digitalmente en el marco de la Ley N° 27269, Ley de Firmas y Certificados Digitales, su Reglamento y modificatorias. La integridad del documento y la autoría de la(s) firma(s) pueden ser verificadas en https://apps.firmaperu.gob.pe/web/validador.xhtml EXPEDIENTE: OCCP2026-INT-0292733 CLAVE: 85B8E7 Esto es una copia auténtica imprimible de un documento electrónico archivado en el Ministerio de Educación, aplicando lo dispuesto por el Art. 25 de D.S. 070- 2013-PCM y la Tercera Disposición Complementaria Final del D.S. 026-2016- PCM. Su autenticidad e integridad pueden ser contrastadas a través de la siguiente dirección web: https://esinad.minedu.gob.pe/e_sinadmed_3/VDD_ConsultaDocumento.aspx \"Decenio de la Igualdad de oportunidades para mujeres y hombres\" “Año de la Esperanza y el Fortalecimiento de la Democracia” Lima, 11 de marzo de 2026 OFICIO MÚLTIPLE N.º 00016-2026-MINEDU/SG-OGA Señores/as DESPACHO MINISTERIAL VICEMINISTERIO DE GESTIÓN INSTITUCIONAL VICEMINISTERIO DE GESTIÓN PEDAGÓGICA SECRETARÍA DE PLANIFICACIÓN ESTRATÉGICA SECRETARÍA GENERAL ÓRGANO DE CONTROL INSTITUCIONAL PROCURADURÍA PÚBLICA CONSEJO NACIONAL DE EDUCACIÓN SECRETARÍA NACIONAL DE LA JUVENTUD CASA DE LA LITERATURA FONDO NACIONAL DE DESARROLLO DE LA EDUCACIÓN PERUANA DIRECTORES GENERALES DIRECTORES JEFES DE OFICINAS GENERALES JEFES DE OFICINAS JEFES DE UNIDAD Presente.- Asunto : Precisiones para la aplicación de la actualización 2026 de la Directiva DI-003-01-MINEDU Referencia : a) Directiva DI-003-01-MINEDU “Disposiciones y procedimientos para requerir, otorgar y rendir cuenta de viáticos, pasajes y otros gastos de viaje, por comisiones de servicio en el territorio nacional”. b) Oficio Múltiple N.º 00010-2026-MINEDU/SG-OGA De mi consideración: Tengo el agrado de dirigirme a ustedes, en atención a la Directiva DI-003-01-MINEDU de la referencia a), en adelante la Directiva, la cual establece las disposiciones para el requerimiento, otorgamiento y rendición de viáticos, pasajes y otros gastos de viaje por comisiones de servicio dentro del país. Al respecto, para la adecuada aplicación de lo dispuesto en la citada Directiva, se deberán tener en cuenta las siguientes precisiones respecto al requerimiento y rendición de cuentas: 1. La variación de rangos de horarios comprendidos en el cuadro de listado de comisionados, de (03) tres horas antes o después del horario solicitado, establecida en el numeral 6.3.3 de la Directiva, se refiere a tres horas antes del horario solicitado para el inicio de la comisión y hasta tres horas después del Documento electrónico firmado digitalmente en el marco de la Ley N° 27269, Ley de Firmas y Certificados Digitales, su Reglamento y modificatorias. La integridad del documento y la autoría de la(s) firma(s) pueden ser verificadas en https://apps.firmaperu.gob.pe/web/validador.xhtml EXPEDIENTE:",
       "embedding": [
         -0.07090406864881516,
@@ -10834,6 +10886,8 @@
         -0.027318457141518593
       ],
       "archivo": "OFICIO_MULTIPLE-00016-2026-MINEDU-SG-OGA_condición Activo y Habido.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 1,
       "pagina_fin": 2,
       "tipo": "texto_general",
@@ -10846,7 +10900,7 @@
       }
     },
     {
-      "chunk_id": "7ec1c2ce9760321c8ccb339af28561addb04b6561325a3a7b2daf1b4802ed01a",
+      "chunk_id": "f0afbdc8edf36fcd8a9ec1d4f0ea3e2f83cf90f3d5a116eae93cac4aa44df9c1",
       "texto": "OCCP2026-INT-0292733 CLAVE: 85B8E7 Esto es una copia auténtica imprimible de un documento electrónico archivado en el Ministerio de Educación, aplicando lo dispuesto por el Art. 25 de D.S. 070- 2013-PCM y la Tercera Disposición Complementaria Final del D.S. 026-2016- PCM. Su autenticidad e integridad pueden ser contrastadas a través de la siguiente dirección web: https://esinad.minedu.gob.pe/e_sinadmed_3/VDD_ConsultaDocumento.aspx horario solicitado para el retorno de la comisión; siempre que dicho horario cuente con la aprobación de la Unidad Orgánica solicitante. 2. El requerimiento de la validación SUNAT establecido en el literal j) del numeral 6.4.3, de la Directiva, corresponde a la consulta del Registro Único de Contribuyentes – RUC, mediante la cual se valida que el contribuyente que brindó el servicio se encuentre en condición de Activo y Habido, dicha validación puede realizarse a través del siguiente enlace: https://e- consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp . Hago propicia la oportunidad para expresarles los sentimientos de mi especial consideración. Atentamente, FIRMADO DIGITALMENTE ____________________________________ TERESA ZENAIDA QUIROZ SILVA Jefa de la Oficina de General de Administración MINISTERIO DE EDUCACION TQS/MARV ROBLES VIZCARRA Miguel Angel FAU 20131370998 hard Jefe de la Oficina de Contabilidad y Control Previo Doy V° B° 2026/03/11 15:25:26 QUIROZ SILVA Teresa Zenaida FAU 20131370998 hard JEFA DE LA OFICINA GENERAL DE ADMINISTRACIÓN - MINEDU En señal de conformidad 2026/03/11 16:08:08",
       "embedding": [
         -0.049433495849370956,
@@ -11235,6 +11289,8 @@
         -0.02495461143553257
       ],
       "archivo": "OFICIO_MULTIPLE-00016-2026-MINEDU-SG-OGA_condición Activo y Habido.pdf",
+      "dominio": "",
+      "tipo_doc": "",
       "pagina": 2,
       "pagina_fin": 2,
       "tipo": "texto_general",
