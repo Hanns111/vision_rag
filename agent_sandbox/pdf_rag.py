@@ -1,5 +1,8 @@
 """Corpus PDF multi-documento: chunks con metadatos y citas, índice en JSON local, ranking híbrido.
 
+**Índice JSON schema 3:** cada chunk incluye ``dominio`` y ``tipo_doc`` derivados de la ruta
+relativa al corpus (primera y segunda carpeta); PDF en la raíz → ambos vacíos.
+
 Campo ``confidence`` (índice JSON, :class:`ChunkIndizado`, :class:`Fragmento`):
     Representa **únicamente** una heurística de **calidad de extracción** del fragmento
     (texto obtenido del PDF vía PyMuPDF y patrones detectables), no otra cosa.
@@ -12,6 +15,9 @@ Campo ``confidence`` (índice JSON, :class:`ChunkIndizado`, :class:`Fragmento`):
     luego multiplicadores por ``tipo`` de chunk (p. ej. penalizar ``indice``, reforzar
     ``objetivo`` / ``articulo``), y por último un *boost* léxico si la pregunta nombra
     explícitamente ``objetivo`` / ``artículo`` / ``numeral`` y el chunk coincide en ``tipo``.
+    Tras el orden global, solo sobre los primeros ``TOP_K`` resultados se aplica un
+    *re-ranking* local (cobertura léxica, anclas numerales, página explícita en la pregunta,
+    señal oficio/directiva) **sin** modificar embeddings.
     ``confidence`` es metadato de trazabilidad / auditoría.
 
     **Diseño futuro (no implementado):** separar señales explícitas, p. ej.
@@ -24,17 +30,20 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import re
 import unicodedata
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
 from embeddings import MODEL_ID, _embed_batch, embed_text
 
-INDEX_SCHEMA_VERSION = 2
+INDEX_SCHEMA_VERSION = 3
+
+_LOG = logging.getLogger(__name__)
 
 # Tipos de chunk (heurísticas sin LLM). Debe coincidir con serialización y ranking.
 TIPO_OBJETIVO = "objetivo"
@@ -42,6 +51,8 @@ TIPO_ARTICULO = "articulo"
 TIPO_NUMERAL = "numeral"
 TIPO_INDICE = "indice"
 TIPO_ANEXO = "anexo"
+TIPO_LISTADO = "listado"
+TIPO_DEFINICION = "definicion"
 TIPO_TEXTO_GENERAL = "texto_general"
 TIPOS_VALIDOS = frozenset(
     {
@@ -50,15 +61,19 @@ TIPOS_VALIDOS = frozenset(
         TIPO_NUMERAL,
         TIPO_INDICE,
         TIPO_ANEXO,
+        TIPO_LISTADO,
+        TIPO_DEFINICION,
         TIPO_TEXTO_GENERAL,
     }
 )
 # Desempate al agrupar palabras en un chunk (~400 palabras): preferir valor normativo.
 _TIPO_PRIORIDAD_RANK = (
     TIPO_OBJETIVO,
+    TIPO_DEFINICION,
     TIPO_ARTICULO,
     TIPO_NUMERAL,
     TIPO_ANEXO,
+    TIPO_LISTADO,
     TIPO_TEXTO_GENERAL,
     TIPO_INDICE,
 )
@@ -108,13 +123,31 @@ def _score_final_hibrido(score_semantico: float, chunk_texto: str, terminos: lis
     return score_semantico + KEYWORD_WEIGHT * sk
 
 
-def _ajustar_score_por_tipo(score: float, tipo: str) -> float:
+def _pregunta_menciona_anexo(pregunta: str) -> bool:
+    """Palabra 'anexo' en la consulta (sin LLM). Si True, no se aplica penalización por tipo anexo."""
+    q = (pregunta or "").lower()
+    qn = unicodedata.normalize("NFD", q)
+    q_fold = "".join(c for c in qn if unicodedata.category(c) != "Mn")
+    return bool(re.search(r"\banexo\b", q_fold, flags=re.IGNORECASE))
+
+
+def _ajustar_score_por_tipo(score: float, tipo: str, pregunta: str | None = None) -> float:
     """Tras score semántico + keywords, ponderar por tipo estructural del chunk."""
     t = (tipo or TIPO_TEXTO_GENERAL).strip().lower()
     if t == TIPO_INDICE:
         return score * 0.3
-    if t in (TIPO_OBJETIVO, TIPO_ARTICULO):
+    if t == TIPO_ANEXO:
+        if pregunta and _pregunta_menciona_anexo(pregunta):
+            return score
+        return score * 0.6
+    if t == TIPO_LISTADO:
+        return score * 0.7
+    if t == TIPO_OBJETIVO:
         return score * 1.2
+    if t == TIPO_ARTICULO:
+        return score * 1.1
+    if t == TIPO_DEFINICION:
+        return score * 1.1
     return score
 
 
@@ -123,10 +156,26 @@ def _intencion_consulta(query: str) -> dict[str, bool]:
     q = (query or "").lower()
     qn = unicodedata.normalize("NFD", q)
     q_fold = "".join(c for c in qn if unicodedata.category(c) != "Mn")
+    # "cómo" como palabra (evita falsos positivos en otras cadenas).
+    tiene_como = bool(re.search(r"\bcomo\b", q_fold, flags=re.IGNORECASE))
     return {
         "objetivo": "objetivo" in q_fold,
         "articulo": "articulo" in q_fold,
         "numeral": "numeral" in q_fold,
+        # Priorizar sección OBJETIVO / alcance normativo (además de la palabra literal "objetivo").
+        "seccion_objetivo": (
+            "objetivo" in q_fold
+            or "finalidad" in q_fold
+            or "que dice la norma" in q_fold
+        ),
+        "requisitos_o_condiciones": (
+            "requisitos" in q_fold or "condiciones" in q_fold
+        ),
+        "procedimiento_rendicion_como": (
+            tiene_como
+            or "procedimiento" in q_fold
+            or "rendicion" in q_fold
+        ),
     }
 
 
@@ -136,6 +185,10 @@ def _intencion_consulta(query: str) -> dict[str, bool]:
 _BOOST_INTENCION_OBJETIVO = 2.55
 _BOOST_INTENCION_ARTICULO = 1.8
 _BOOST_INTENCION_NUMERAL = 1.6
+# Refuerzo léxico adicional (intención de sección).
+_BOOST_LEX_SECCION_OBJETIVO = 1.3
+_BOOST_LEX_REQUISITOS_ARTICULO = 1.15
+_BOOST_LEX_PROCEDIMIENTO_TEXTO_GENERAL = 1.15
 
 
 def _boost_score_por_intencion(
@@ -150,6 +203,187 @@ def _boost_score_por_intencion(
         out *= _BOOST_INTENCION_ARTICULO
     if intencion.get("numeral") and t == TIPO_NUMERAL:
         out *= _BOOST_INTENCION_NUMERAL
+    # ``seccion_objetivo`` incluye "qué dice la norma" / finalidad sin la palabra "objetivo".
+    # Un ×1.3 solo no compite con ``texto_general`` de alta similitud; si no hay "objetivo"
+    # literal, aplicamos el mismo refuerzo que la intención explícita (2.55). Con "objetivo"
+    # en la pregunta ya se multiplicó arriba; aquí solo el refuerzo léxico adicional (1.3).
+    if intencion.get("seccion_objetivo") and t == TIPO_OBJETIVO:
+        if intencion.get("objetivo"):
+            out *= _BOOST_LEX_SECCION_OBJETIVO
+        else:
+            out *= _BOOST_INTENCION_OBJETIVO
+    if intencion.get("requisitos_o_condiciones") and t == TIPO_ARTICULO:
+        out *= _BOOST_LEX_REQUISITOS_ARTICULO
+    if intencion.get("procedimiento_rendicion_como") and t == TIPO_TEXTO_GENERAL:
+        out *= _BOOST_LEX_PROCEDIMIENTO_TEXTO_GENERAL
+    return out
+
+
+# Re-ranking **local** solo sobre los primeros TOP_K candidatos (sin tocar embeddings).
+_RERANK_KW_COVER = 0.22
+_RERANK_PAGE_PEN = 0.022
+_RERANK_PAGE_MAX_DIST = 14
+_RERANK_NUMERAL_HIT = 0.13
+_RERANK_NUMERAL_CAP = 0.28
+_RERANK_ESTE_DOC_OFICIO_BONUS = 0.28
+_RERANK_DOC_DIRECTIVA_BONUS = 0.11
+_RERANK_DOC_MISMATCH_PEN = 0.14
+# Consultas tipo «enlace RUC / SUNAT» (re-ranking local; el oficio suele citar el enlace).
+_RERANK_RUC_SUNAT_CHUNK_BONUS = 0.27
+
+
+def _q_fold(pregunta: str) -> str:
+    q = (pregunta or "").lower()
+    qn = unicodedata.normalize("NFD", q)
+    return "".join(c for c in qn if unicodedata.category(c) != "Mn")
+
+
+def _extraer_pagina_explicita(q_fold: str) -> int | None:
+    m = re.search(
+        r"(?:pagina|pag\.|pág\.?)\s*(\d{1,3})\b",
+        q_fold,
+        flags=re.IGNORECASE,
+    )
+    if m:
+        try:
+            return int(m.group(1))
+        except ValueError:
+            return None
+    return None
+
+
+def _extraer_patrones_numeral_desde_pregunta(q_fold: str) -> list[str]:
+    seen: set[str] = set()
+    out: list[str] = []
+    for m in re.finditer(r"\b\d{1,2}\.\d{1,2}(?:\.\d{1,2})?\b", q_fold):
+        s = m.group(0)
+        if s not in seen:
+            seen.add(s)
+            out.append(s)
+    return out
+
+
+def _senal_documento_para_rerank(q_fold: str) -> tuple[str | None, bool]:
+    """
+    (modo, aplicar_penalidad_a_directiva): modo ``este_documento_oficio`` si la consulta
+    ancla un oficio o «este documento»; en ese caso se prefiere un PDF de oficio.
+    """
+    este_doc = bool(
+        re.search(
+            r"\b(segun este documento|segun este documento|según este documento)\b",
+            q_fold,
+            flags=re.IGNORECASE,
+        )
+    )
+    en_oficio = bool(
+        re.search(
+            r"\b(en el oficio|este oficio|el oficio|oficio multiple|oficio\s+multiple)\b",
+            q_fold,
+            flags=re.IGNORECASE,
+        )
+    )
+    if este_doc or en_oficio:
+        return ("este_documento_oficio", True)
+    if re.search(r"\bdirectiva\b", q_fold, flags=re.IGNORECASE):
+        return ("directiva", False)
+    return (None, False)
+
+
+def _archivo_es_oficio(nombre: str) -> bool:
+    n = nombre.lower()
+    return "oficio" in n or "multiple" in n
+
+
+def _archivo_es_directiva_viaticos(nombre: str) -> bool:
+    n = nombre.lower()
+    return "directiva" in n or "di-00" in n or "viaticos" in n
+
+
+def _bonus_senal_documento(fr: Fragmento, modo: str | None, penalizar_mix: bool) -> float:
+    name = Path(fr.archivo).name
+    b = 0.0
+    if modo == "este_documento_oficio":
+        if _archivo_es_oficio(name):
+            b += _RERANK_ESTE_DOC_OFICIO_BONUS
+        elif penalizar_mix and _archivo_es_directiva_viaticos(name):
+            b -= _RERANK_DOC_MISMATCH_PEN
+    elif modo == "directiva":
+        if _archivo_es_directiva_viaticos(name):
+            b += _RERANK_DOC_DIRECTIVA_BONUS
+    return b
+
+
+def _rerank_score_local(
+    pregunta: str,
+    fr: Fragmento,
+    terminos: list[str],
+    pagina_explicita: int | None,
+    patrones_numeral: list[str],
+    senal_doc: tuple[str | None, bool],
+) -> float:
+    """Score efectivo solo para ordenar dentro del top-K."""
+    s = fr.score
+    low = (fr.texto or "").lower()
+    q_fold_q = _q_fold(pregunta)
+
+    if terminos:
+        cubiertos = sum(
+            1
+            for t in terminos
+            if re.search(r"\b" + re.escape(t) + r"\b", low, flags=re.IGNORECASE)
+        )
+        ratio = cubiertos / len(terminos)
+        s += _RERANK_KW_COVER * ratio
+
+    nh = 0.0
+    for pat in patrones_numeral:
+        if pat in low:
+            nh += _RERANK_NUMERAL_HIT
+    s += min(nh, _RERANK_NUMERAL_CAP)
+
+    if pagina_explicita is not None:
+        mid = (fr.pagina + fr.pagina_fin) / 2.0
+        dist = abs(mid - float(pagina_explicita))
+        s -= _RERANK_PAGE_PEN * min(dist, float(_RERANK_PAGE_MAX_DIST))
+
+    modo, penalizar = senal_doc
+    s += _bonus_senal_documento(fr, modo, penalizar)
+
+    # Enlace RUC de consulta SUNAT (no confundir con menciones genéricas a SUNAT en comprobantes).
+    if "ruc" in q_fold_q and (
+        "consultaruc" in low
+        or "e-consultaruc" in low
+        or "framecriterio" in low
+    ):
+        s += _RERANK_RUC_SUNAT_CHUNK_BONUS
+
+    return s
+
+
+def _rerank_top_k_fragmentos(
+    pregunta: str,
+    candidatos: list[Fragmento],
+    terminos: list[str],
+) -> list[Fragmento]:
+    """Segunda fase: reordena solo los primeros candidatos ya rankeados globalmente."""
+    if len(candidatos) <= 1:
+        return candidatos
+    q_fold = _q_fold(pregunta)
+    pag_exp = _extraer_pagina_explicita(q_fold)
+    pats = _extraer_patrones_numeral_desde_pregunta(q_fold)
+    senal = _senal_documento_para_rerank(q_fold)
+
+    scored: list[tuple[float, Fragmento]] = []
+    for fr in candidatos:
+        nuevo = _rerank_score_local(
+            pregunta, fr, terminos, pag_exp, pats, senal
+        )
+        scored.append((nuevo, fr))
+
+    scored.sort(key=lambda x: (-x[0], x[1].archivo.lower(), x[1].pagina))
+    out: list[Fragmento] = []
+    for nuevo, fr in scored:
+        out.append(replace(fr, score=nuevo))
     return out
 
 
@@ -283,6 +517,9 @@ class ChunkIndizado:
     texto: str
     embedding: list[float]
     archivo: str
+    # Derivados de la ruta relativa al corpus (carpeta / subcarpeta / archivo).
+    dominio: str
+    tipo_doc: str
     pagina: int
     pagina_fin: int
     tipo: str
@@ -302,6 +539,8 @@ class Fragmento:
     texto: str
     score: float
     archivo: str
+    dominio: str
+    tipo_doc: str
     pagina: int
     pagina_fin: int
     tipo: str
@@ -325,6 +564,23 @@ def ruta_index_json() -> Path:
     if env:
         return Path(env).expanduser().resolve()
     return Path(__file__).resolve().parent / "index" / "index.json"
+
+
+def _derivar_dominio_tipo_doc(archivo_relativo: str) -> tuple[str, str]:
+    """
+    Metadata desde la ruta relativa al corpus (sin valores manuales).
+
+    - ``viaticos/directivas/foo.pdf`` → (\"viaticos\", \"directivas\")
+    - ``viaticos/foo.pdf`` → (\"viaticos\", \"\")
+    - ``foo.pdf`` en raíz → (\"\", \"\")
+    """
+    parts = Path(archivo_relativo).parts
+    if len(parts) < 2:
+        return "", ""
+    dom = parts[0]
+    if len(parts) == 2:
+        return dom, ""
+    return dom, parts[1]
 
 
 def _fuentes_pdf(root: Path, pdfs: list[Path]) -> list[dict[str, Any]]:
@@ -400,11 +656,19 @@ def _chunk_json_a_indizado(obj: dict[str, Any]) -> ChunkIndizado | None:
             confidence = float(min(1.0, max(0.0, float(conf_raw))))
         else:
             confidence = _confidence_por_chunk(texto, citas_dict)
+        arch_s = str(archivo)
+        dom_raw, td_raw = obj.get("dominio"), obj.get("tipo_doc")
+        if isinstance(dom_raw, str) and isinstance(td_raw, str):
+            dominio, tipo_doc = dom_raw, td_raw
+        else:
+            dominio, tipo_doc = _derivar_dominio_tipo_doc(arch_s)
         return ChunkIndizado(
             chunk_id=chunk_id,
             texto=texto,
             embedding=[float(x) for x in emb],
-            archivo=str(archivo),
+            archivo=arch_s,
+            dominio=dominio,
+            tipo_doc=tipo_doc,
             pagina=pagina,
             pagina_fin=pagina_fin,
             tipo=tipo,
@@ -484,6 +748,8 @@ def _indizado_a_dict(ch: ChunkIndizado) -> dict[str, Any]:
         "texto": ch.texto,
         "embedding": ch.embedding,
         "archivo": ch.archivo,
+        "dominio": ch.dominio,
+        "tipo_doc": ch.tipo_doc,
         "pagina": ch.pagina,
         "pagina_fin": ch.pagina_fin,
         "tipo": ch.tipo,
@@ -531,7 +797,7 @@ def listar_pdfs_corpus(directorio: Path) -> list[Path]:
     if not directorio.is_dir():
         return []
     return sorted(
-        p for p in directorio.iterdir() if p.is_file() and p.suffix.lower() == ".pdf"
+        p.resolve() for p in directorio.rglob("*.pdf") if p.is_file()
     )
 
 
@@ -679,7 +945,7 @@ def _actualizar_estado_por_linea(
                     st.toc_tokens_diferidos = None
                 return
             if _coincide_encabezado_objetivo_normativo(combined):
-                print("SALIDA DE INDICE → NUEVO CHUNK OBJETIVO")
+                print("SALIDA DE INDICE -> NUEVO CHUNK OBJETIVO")
                 st.in_toc_block = False
                 st.active_tipo = TIPO_OBJETIVO
                 st.active_titulo = combined[:200]
@@ -793,7 +1059,7 @@ def _stream_palabras_etiquetadas(
                     if pref.strip():
                         _actualizar_estado_por_linea(st, pref, num_pagina)
                         _emit_palabras_linea(out, st, pref, num_pagina)
-                    print("SALIDA DE INDICE → NUEVO CHUNK OBJETIVO")
+                    print("SALIDA DE INDICE -> NUEVO CHUNK OBJETIVO")
                     st.in_toc_block = False
                     st.cortar_chunk_antes_siguiente_palabra = True
                     _actualizar_estado_por_linea(st, suf, num_pagina)
@@ -919,12 +1185,15 @@ def _construir_indice_desde_pdfs(root: Path, pdfs: list[Path]) -> list[ChunkIndi
         tit = (titulo or "")[:200]
         cid = _generar_chunk_id(archivo, pi, pf, ord_i, texto, tnorm, tit)
         conf = _confidence_por_chunk(texto, citas)
+        dom, td = _derivar_dominio_tipo_doc(archivo)
         indice.append(
             ChunkIndizado(
                 chunk_id=cid,
                 texto=texto,
                 embedding=vec,
                 archivo=archivo,
+                dominio=dom,
+                tipo_doc=td,
                 pagina=pi,
                 pagina_fin=pf,
                 tipo=tnorm,
@@ -969,6 +1238,8 @@ def _chunk_a_fragmento(ch: ChunkIndizado, score: float) -> Fragmento:
         texto=ch.texto,
         score=score,
         archivo=ch.archivo,
+        dominio=ch.dominio,
+        tipo_doc=ch.tipo_doc,
         pagina=ch.pagina,
         pagina_fin=ch.pagina_fin,
         tipo=ch.tipo,
@@ -980,7 +1251,11 @@ def _chunk_a_fragmento(ch: ChunkIndizado, score: float) -> Fragmento:
     )
 
 
-def buscar_en_corpus(pregunta: str, directorio: Path | None = None) -> list[Fragmento]:
+def buscar_en_corpus(
+    pregunta: str,
+    directorio: Path | None = None,
+    dominio: str | None = None,
+) -> list[Fragmento]:
     indice = construir_indice_en_memoria(directorio)
     if not indice:
         return []
@@ -992,12 +1267,29 @@ def buscar_en_corpus(pregunta: str, directorio: Path | None = None) -> list[Frag
     for ch in indice:
         sem = _coseno(q, ch.embedding)
         base = _score_final_hibrido(sem, ch.texto, terminos)
-        final = _ajustar_score_por_tipo(base, ch.tipo)
+        final = _ajustar_score_por_tipo(base, ch.tipo, pregunta)
         final = _boost_score_por_intencion(final, ch.tipo, intencion)
         puntuados.append(_chunk_a_fragmento(ch, final))
     # Orden por score (semántico + keyword + ajuste por tipo + boost intención); confidence no interviene.
     puntuados.sort(key=lambda f: (-f.score, f.archivo.lower(), f.pagina))
-    return puntuados[:TOP_K]
+
+    filtro = (dominio or "").strip()
+    if filtro:
+        filtrados = [f for f in puntuados if _fragmento_coincide_dominio(f, filtro)]
+        if not filtrados:
+            _LOG.warning(
+                "buscar_en_corpus: filtro dominio=%r sin resultados; fallback búsqueda global",
+                filtro,
+            )
+        else:
+            puntuados = filtrados
+    top = puntuados[:TOP_K]
+    return _rerank_top_k_fragmentos(pregunta, top, terminos)
+
+
+def _fragmento_coincide_dominio(fr: Fragmento, filtro: str) -> bool:
+    """Incluye el dominio pedido y siempre la carpeta ``transversal``."""
+    return fr.dominio == filtro or fr.dominio == "transversal"
 
 
 def buscar_fragmentos(pregunta: str, ruta_pdf: str) -> list[Fragmento]:
@@ -1023,6 +1315,8 @@ def buscar_fragmentos(pregunta: str, ruta_pdf: str) -> list[Fragmento]:
                 texto=texto,
                 embedding=vec,
                 archivo=nombre,
+                dominio="",
+                tipo_doc="",
                 pagina=pi,
                 pagina_fin=pf,
                 tipo=tnorm,
@@ -1040,9 +1334,10 @@ def buscar_fragmentos(pregunta: str, ruta_pdf: str) -> list[Fragmento]:
     for ch in tmp_chunks:
         sem = _coseno(q, ch.embedding)
         base = _score_final_hibrido(sem, ch.texto, terminos)
-        final = _ajustar_score_por_tipo(base, ch.tipo)
+        final = _ajustar_score_por_tipo(base, ch.tipo, pregunta)
         final = _boost_score_por_intencion(final, ch.tipo, intencion)
         puntuados.append(_chunk_a_fragmento(ch, final))
     # Misma política que buscar_en_corpus: orden por score de consulta, no por confidence.
     puntuados.sort(key=lambda f: (-f.score, f.pagina))
-    return puntuados[:TOP_K]
+    top = puntuados[:TOP_K]
+    return _rerank_top_k_fragmentos(pregunta, top, terminos)

@@ -19,6 +19,11 @@ from typing import Any
 from pdf_rag import buscar_en_corpus, directorio_corpus_defecto, listar_pdfs_corpus
 
 
+def _dominio_busqueda_desde_env() -> str | None:
+    v = (os.environ.get("AGENT_RAG_DOMINIO") or "").strip()
+    return v if v else None
+
+
 def _envelope(
     ok: bool,
     tool: str,
@@ -96,7 +101,7 @@ def buscar_en_pdf(pregunta: str) -> dict[str, Any]:
         )
 
     try:
-        fragmentos = buscar_en_corpus(pregunta, root)
+        fragmentos = buscar_en_corpus(pregunta, root, _dominio_busqueda_desde_env())
     except OSError as exc:
         return _envelope(
             False,
@@ -127,6 +132,8 @@ def buscar_en_pdf(pregunta: str) -> dict[str, Any]:
             "texto": f.texto,
             "score": round(float(f.score), 6),
             "archivo": f.archivo,
+            "dominio": f.dominio,
+            "tipo_doc": f.tipo_doc,
             "pagina": f.pagina,
             "tipo": f.tipo,
             "chunk_id": f.chunk_id,

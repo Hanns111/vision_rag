@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 from dataclasses import replace
 
@@ -59,6 +60,109 @@ def _formatear_rango_pagina(pi: object, pf: object) -> str:
     if pf is not None and pf != pi:
         return f"{pi}-{pf}"
     return str(pi)
+
+
+def _es_texto_legible(texto: str) -> bool:
+    """Sanidad superficial del extracto (no sustituye verificación jurídica del PDF)."""
+    if not texto:
+        return False
+    alnum = sum(c.isalnum() for c in texto)
+    ratio = alnum / max(len(texto), 1)
+    raros = sum(1 for c in texto if c in "|~¤")
+    raro_ratio = raros / max(len(texto), 1)
+    return len(texto) >= 40 and ratio > 0.7 and raro_ratio < 0.1
+
+
+def _modo_salida_rag() -> str:
+    """short = adaptativo; verbose|debug|full = salida completa (histórica)."""
+    m = (os.getenv("AGENT_OUTPUT_MODE") or "short").strip().lower()
+    if m in ("verbose", "debug", "full"):
+        return "verbose"
+    return "short"
+
+
+def _format_rag_verbose(
+    msg: str,
+    fr: dict[str, object],
+    frags: list[dict[str, object]],
+    texto_full: str,
+) -> str:
+    respuesta = _extraer_idea_clave_desde_texto(texto_full) or _fragmento_inicial_limpio(
+        texto_full
+    )
+    arch = fr.get("archivo", "?")
+    pi = fr.get("pagina")
+    pf = fr.get("pagina_fin", pi)
+    pag = _formatear_rango_pagina(pi, pf)
+    cid = fr.get("chunk_id", "")
+    conf = fr.get("confidence")
+
+    bloques: list[str] = [
+        msg,
+        "",
+        "Respuesta:",
+        "",
+        respuesta,
+        "",
+        "Fuente:",
+        f"{arch} - página {pag}",
+    ]
+    if cid:
+        bloques.append(f"chunk_id: {cid}")
+    if conf is not None:
+        bloques.append(f"confidence: {conf}")
+
+    lim_completo = 2400
+    tf = texto_full
+    bloques.extend(
+        [
+            "",
+            "---",
+            "Texto del fragmento principal (recuperado, sin reinterpretar):",
+            (
+                tf
+                if len(tf) <= lim_completo
+                else tf[: lim_completo - 1].rsplit(" ", 1)[0] + "…"
+            ),
+        ]
+    )
+    if len(frags) > 1:
+        bloques.extend(["", "Otros fragmentos recuperados (resumen):"])
+        for i, otro in enumerate(frags[1:], start=2):
+            sc = otro.get("score", otro.get("similitud", 0))
+            a = otro.get("archivo", "?")
+            p_i = otro.get("pagina")
+            p_f = otro.get("pagina_fin", p_i)
+            pags = _formatear_rango_pagina(p_i, p_f)
+            tip = otro.get("tipo", "")
+            suf = f" tipo={tip}" if tip else ""
+            bloques.append(f"  [{i}] score={sc} {a} p.{pags}{suf}")
+    return "\n".join(bloques).strip()
+
+
+def _format_rag_adaptive(fr: dict[str, object], texto_full: str) -> str:
+    idea = _extraer_idea_clave_desde_texto(texto_full)
+    fragmento = _fragmento_inicial_limpio(texto_full)
+    idea_valida = bool(idea) and _es_texto_legible(idea)
+    fragmento_valido = bool(fragmento) and _es_texto_legible(fragmento)
+    arch = fr.get("archivo", "?")
+    pi = fr.get("pagina")
+    pf = fr.get("pagina_fin", pi)
+    fuente_line = f"{arch} - página {_formatear_rango_pagina(pi, pf)}"
+
+    if idea_valida:
+        salida = f"Respuesta: {idea}\nFuente: {fuente_line}"
+        if not fragmento_valido:
+            frag_extra = (fragmento or texto_full[:400]).strip()
+            if frag_extra:
+                salida += f"\n\nFragmento:\n{frag_extra}"
+        return salida
+    if fragmento_valido:
+        return f"Fuente: {fuente_line}\n\nFragmento:\n{fragmento}"
+    fallback = (texto_full[:400] if texto_full else "").strip()
+    if not fallback:
+        fallback = "(sin texto recuperado en el chunk)"
+    return f"Fuente: {fuente_line}\n\nTexto:\n{fallback}"
 
 
 def _concat_respuesta(cuerpo: str, state: AgentState) -> str:
@@ -133,53 +237,10 @@ def output_node(state: AgentState) -> AgentState:
         else:
             fr = frags[0]
             texto_full = (fr.get("texto") or "").strip()
-            respuesta = _extraer_idea_clave_desde_texto(texto_full) or _fragmento_inicial_limpio(
-                texto_full
-            )
-            arch = fr.get("archivo", "?")
-            pi = fr.get("pagina")
-            pf = fr.get("pagina_fin", pi)
-            pag = _formatear_rango_pagina(pi, pf)
-            cid = fr.get("chunk_id", "")
-            conf = fr.get("confidence")
-
-            bloques: list[str] = [
-                msg,
-                "",
-                "Respuesta:",
-                "",
-                respuesta,
-                "",
-                "Fuente:",
-                f"{arch} - página {pag}",
-            ]
-            if cid:
-                bloques.append(f"chunk_id: {cid}")
-            if conf is not None:
-                bloques.append(f"confidence: {conf}")
-
-            lim_completo = 2400
-            tf = texto_full
-            bloques.extend(
-                [
-                    "",
-                    "---",
-                    "Texto del fragmento principal (recuperado, sin reinterpretar):",
-                    (tf if len(tf) <= lim_completo else tf[: lim_completo - 1].rsplit(" ", 1)[0] + "…"),
-                ]
-            )
-            if len(frags) > 1:
-                bloques.extend(["", "Otros fragmentos recuperados (resumen):"])
-                for i, otro in enumerate(frags[1:], start=2):
-                    sc = otro.get("score", otro.get("similitud", 0))
-                    a = otro.get("archivo", "?")
-                    p_i = otro.get("pagina")
-                    p_f = otro.get("pagina_fin", p_i)
-                    pags = _formatear_rango_pagina(p_i, p_f)
-                    tip = otro.get("tipo", "")
-                    suf = f" tipo={tip}" if tip else ""
-                    bloques.append(f"  [{i}] score={sc} {a} p.{pags}{suf}")
-            linea = "\n".join(bloques).strip()
+            if _modo_salida_rag() == "verbose":
+                linea = _format_rag_verbose(msg, fr, frags, texto_full)
+            else:
+                linea = _format_rag_adaptive(fr, texto_full)
     else:
         linea = msg
 

@@ -1,0 +1,114 @@
+{
+  "descripcion": "Ground truth manual para medir top-1 del RAG. pagina_aproximada: página del PDF donde está la respuesta esperada (tolerancia por defecto ±2).",
+  "margen_paginas_default": 2,
+  "preguntas": [
+    {
+      "pregunta": "¿Cuál es el objetivo de la directiva sobre viáticos nacionales?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 4,
+      "categoria": "objetivo"
+    },
+    {
+      "pregunta": "¿A quiénes aplica obligatoriamente esta directiva de viáticos?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 4,
+      "categoria": "objetivo"
+    },
+    {
+      "pregunta": "¿Qué requisitos de documentación se exigen para el requerimiento de viáticos antes de la comisión?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 13,
+      "categoria": "requisitos"
+    },
+    {
+      "pregunta": "¿Qué plazo tiene el comisionado para iniciar la rendición de cuentas después del viaje?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 16,
+      "categoria": "procedimiento"
+    },
+    {
+      "pregunta": "¿Cómo se define comisión de servicios en el glosario?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 6,
+      "categoria": "definiciones"
+    },
+    {
+      "pregunta": "¿Qué es la planilla de viáticos según las definiciones?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 7,
+      "categoria": "definiciones"
+    },
+    {
+      "pregunta": "¿Qué requisitos se mencionan para comprobantes de pago en la rendición?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 17,
+      "categoria": "requisitos"
+    },
+    {
+      "pregunta": "Describe el procedimiento general para reprogramaciones de otorgamiento de viáticos.",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 19,
+      "categoria": "procedimiento"
+    },
+    {
+      "pregunta": "¿En qué casos procede el reembolso por mayor gasto?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 20,
+      "categoria": "general"
+    },
+    {
+      "pregunta": "¿Qué pasa si el comisionado no presenta la rendición en plazo?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 22,
+      "categoria": "general"
+    },
+    {
+      "pregunta": "¿Dónde se detalla el formato de solicitud de viáticos como anexo?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 24,
+      "categoria": "procedimiento"
+    },
+    {
+      "pregunta": "¿Cuántas horas mínimas de comisión se consideran un día completo de viático?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 11,
+      "categoria": "general"
+    },
+    {
+      "pregunta": "¿Qué normas o leyes se citan en la base normativa de la directiva?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 4,
+      "categoria": "general"
+    },
+    {
+      "pregunta": "¿Qué documentación debe remitirse a la OCCP para el otorgamiento según el numeral 6.1.7?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 13,
+      "categoria": "requisitos"
+    },
+    {
+      "pregunta": "¿Cómo se calcula la duración de la comisión cuando el traslado es en movilidad del MINEDU?",
+      "archivo_correcto": "01_DIRECTIVA_DI-003-01-MINEDU_V03_05.02.2026_Viaticos_nacionales.pdf",
+      "pagina_aproximada": 12,
+      "categoria": "procedimiento"
+    },
+    {
+      "pregunta": "Resume en qué consiste la validación SUNAT de condición Activo y Habido mencionada en el oficio.",
+      "archivo_correcto": "OFICIO_MULTIPLE-00016-2026-MINEDU-SG-OGA_condición Activo y Habido.pdf",
+      "pagina_aproximada": 2,
+      "categoria": "general"
+    },
+    {
+      "pregunta": "¿Qué establece el numeral 6.3.3 en relación con la directiva de viáticos según este documento?",
+      "archivo_correcto": "OFICIO_MULTIPLE-00016-2026-MINEDU-SG-OGA_condición Activo y Habido.pdf",
+      "pagina_aproximada": 1,
+      "categoria": "general"
+    },
+    {
+      "pregunta": "¿Qué vínculo o enlace se indica para consultar el RUC del contribuyente?",
+      "archivo_correcto": "OFICIO_MULTIPLE-00016-2026-MINEDU-SG-OGA_condición Activo y Habido.pdf",
+      "pagina_aproximada": 2,
+      "categoria": "requisitos"
+    }
+  ]
+}

@@ -9,3 +9,5 @@ Construir un agente capaz de responder consultas normativas con evidencia verifi
 ## Estado actual
 
 Ver [CURRENT_STATE.md](CURRENT_STATE.md).
+
+**Al volver al proyecto:** lee primero [CURSOR_HANDOFF.md](CURSOR_HANDOFF.md) (contexto para Cursor y retomar el hilo).
