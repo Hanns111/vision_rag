@@ -23,3 +23,22 @@ COMMIT_MSG.txt
 # archivos grandes / dumps
 CLAUDE_SOURCE_FINAL_60MB.map
 *.map
+
+# Artefactos pesados y datos
+*.pdf
+*.zip
+*.7z
+*.rar
+agent_sandbox/corpus/
+agent_sandbox/logs/
+agent_sandbox/index/
+output/
+desktop.ini
+
+# Análisis / dumps grandes
+SANTO_GRIAL_ANALYSIS/
+CONSOLIDADO_PARA_COMPARTIR/
+PROJECT_INDEX.json
+DEPENDENCY_GRAPH.md
+PROJECT_TREE.md
+SYSTEM_BRAIN.md
