@@ -20,7 +20,7 @@ Contexto para retomar el trabajo en Cursor: [CURSOR_HANDOFF.md](CURSOR_HANDOFF.m
 
 - `agent_sandbox/` — núcleo RAG + agente
 - `scripts/` — utilidades (p. ej. OCR)
-- `data/` — datos locales (no versionado; ver `.gitignore`)
+- `data/` — datos locales (contenido no versionado; ver `data/README.md`)
 - `docs/` — documentación adicional
 - `tests/` — pruebas
 

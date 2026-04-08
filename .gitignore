@@ -29,8 +29,10 @@ agent_sandbox/corpus/
 agent_sandbox/index/
 agent_sandbox/logs/
 
-# Datos locales (no versionar; preparación AG-EVIDENCE)
-data/
+# Datos locales (preparación AG-EVIDENCE): versionar solo estructura
+data/*
+!data/.gitkeep
+!data/README.md
 
 # Dumps y logs
 *.log
