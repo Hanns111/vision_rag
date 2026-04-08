@@ -133,7 +133,7 @@ if __name__ == "__main__":
         except Exception:
             pass
 
-    ruta = r"C:\Users\Hans\Proyectos\vision-rag\VIÁTICO_DIPLAN2026-INT-0283297"
+    ruta = r"C:\Users\Hans\Proyectos\vision_rag\VIÁTICO_DIPLAN2026-INT-0283297"
 
     if os.path.isdir(ruta):
         archivos = sorted(os.listdir(ruta))

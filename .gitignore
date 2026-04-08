@@ -1,16 +1,20 @@
-# Python
+# Python / caches
 __pycache__/
+*.pyc
 *.py[cod]
 *.egg-info/
 .eggs/
 dist/
 build/
-.venv/
-venv/
+
+# Entorno
 .env
 .env.*
+.venv/
+venv/
 
-# Editor / OS
+# Sistema
+desktop.ini
 .DS_Store
 Thumbs.db
 *.swp
@@ -20,25 +24,35 @@ Thumbs.db
 
 COMMIT_MSG.txt
 
-# archivos grandes / dumps
+# Corpus / datos pesados (RAG)
+agent_sandbox/corpus/
+agent_sandbox/index/
+agent_sandbox/logs/
+
+# Datos locales (no versionar; preparación AG-EVIDENCE)
+data/
+
+# Dumps y logs
+*.log
+*.jsonl
 CLAUDE_SOURCE_FINAL_60MB.map
 *.map
 
-# Artefactos pesados y datos
+# Archivos comprimidos / binarios pesados
 *.pdf
 *.zip
 *.7z
 *.rar
-agent_sandbox/corpus/
-agent_sandbox/logs/
-agent_sandbox/index/
-output/
-desktop.ini
 
-# Análisis / dumps grandes
+# Salidas y análisis grandes
+output/
 SANTO_GRIAL_ANALYSIS/
 CONSOLIDADO_PARA_COMPARTIR/
 PROJECT_INDEX.json
 DEPENDENCY_GRAPH.md
 PROJECT_TREE.md
 SYSTEM_BRAIN.md
+
+# Carpetas locales fuera del núcleo RAG (evitar `git add .` accidental)
+DJ_ANUAL_CONTABILIDAD_SIETE_NOV_2025/
+CÓDIGO FUENTE _CLAUDE _ ME DA LA SOLUCIÓN/

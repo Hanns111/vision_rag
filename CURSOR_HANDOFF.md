@@ -6,7 +6,7 @@
 
 ## Raíz del workspace
 
-`C:\Users\Hans\Proyectos\vision-rag`
+`C:\Users\Hans\Proyectos\vision_rag`
 
 Todo lo demás es relativo a esta carpeta salvo que se indique lo contrario.
 

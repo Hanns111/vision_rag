@@ -1,13 +1,31 @@
-# SANTO GRIAL
+# vision_rag
 
-Sistema experimental para RAG normativo con trazabilidad completa y cero alucinación.
+Sistema de análisis documental basado en RAG para normativa.
 
-## Objetivo
+## Qué hace
 
-Construir un agente capaz de responder consultas normativas con evidencia verificable (archivo + página + fragmento).
+- Procesa documentos PDF
+- Extrae texto (OCR si necesario)
+- Indexa contenido
+- Permite consultas con trazabilidad
 
-## Estado actual
+## Estado
 
-Ver [CURRENT_STATE.md](CURRENT_STATE.md).
+Proyecto en desarrollo – fase de optimización de retrieval y ranking.
 
-**Al volver al proyecto:** lee primero [CURSOR_HANDOFF.md](CURSOR_HANDOFF.md) (contexto para Cursor y retomar el hilo).
+Documentación técnica viva: [CURRENT_STATE.md](CURRENT_STATE.md).  
+Contexto para retomar el trabajo en Cursor: [CURSOR_HANDOFF.md](CURSOR_HANDOFF.md).
+
+## Estructura
+
+- `agent_sandbox/` — núcleo RAG + agente
+- `scripts/` — utilidades (p. ej. OCR)
+- `data/` — datos locales (no versionado; ver `.gitignore`)
+- `docs/` — documentación adicional
+- `tests/` — pruebas
+
+## Próximos pasos
+
+- Evaluación benchmark
+- Mejora de ranking
+- Motor de reglas
