@@ -214,7 +214,8 @@ PyMuPDF, OpenCV, Tesseract, RAG en `pdf_rag.py`; bake-off: PaddleOCR, Docling, e
 | `CURSOR_HANDOFF.md` | Mapa repo |
 | `data/README.md` | Árbol `data/piloto_ocr/` |
 | `data/piloto_ocr/README.md` | Convenciones |
-| `data/piloto_ocr/PILOTO_OPERATIVO.md` | Poblar `raw/`, manifiesto, PASO 1 baseline |
+| `data/piloto_ocr/PILOTO_OPERATIVO.md` | Reglas y PASO 1 baseline |
+| `data/piloto_ocr/CHECKLIST_POBLADO.md` | Poblar piloto paso a paso |
 | `data/piloto_ocr/metrics/METRICAS_MINIMAS.md` | Métricas §4.3 |
 | `docs/DECISIONES_TECNICAS.md` | D-01…D-09 |
 | `docs/CURRENT_STATE_RAG.md` | Retrieval |

@@ -2,6 +2,8 @@
 
 Documento **operativo**; no sustituye `docs/ROADMAP_PROYECTO.md` §4.1 (solo lo ejecuta).
 
+**Checklist paso a paso (lo que debes hacer tú):** **[`CHECKLIST_POBLADO.md`](CHECKLIST_POBLADO.md)**.
+
 ---
 
 ## 1. Qué poner en `raw/`
@@ -36,7 +38,7 @@ Columnas (una fila por **archivo PDF**):
 | `archivo_raw_relativo` | Ruta desde `data/piloto_ocr/`, ej. `raw/fac-2025-001.pdf`. |
 | `paginas_en_pdf` | Total de páginas del archivo (según visor PDF). |
 | `paginas_en_piloto` | Cuántas de esas páginas entran en el piloto (≤ `paginas_en_pdf`). |
-| `indices_paginas_en_pdf` | Páginas **1-based** de este PDF que **sí** se etiquetan, separadas por comas. Ej.: `1,2,3` o `1,2,3,4,5,6,7,8,9,10`. Debe haber **exactamente** `paginas_en_piloto` índices. |
+| `indices_paginas_en_pdf` | Páginas **1-based** de este PDF que **sí** se etiquetan, separadas por comas **sin espacios** (`1,2,3`). Si Excel altera el CSV, entrecomillar el campo o guardar CSV UTF-8 desde editor. Debe haber **exactamente** `paginas_en_piloto` índices. |
 | `notas` | Libre (origen, tipo de doc, etc.). |
 
 **Regla de suma:** la suma de `paginas_en_piloto` de **todas** las filas debe ser **15**.

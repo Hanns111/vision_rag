@@ -8,7 +8,8 @@
 
 ## Instrucciones para poblar `raw/` y alinear manifiesto + labels
 
-**→ [`PILOTO_OPERATIVO.md`](PILOTO_OPERATIVO.md)** (nombres `{doc_id}.pdf`, suma 15 páginas, PASO 1 baseline).
+1. **[`CHECKLIST_POBLADO.md`](CHECKLIST_POBLADO.md)** — pasos numerados y checklist.  
+2. **[`PILOTO_OPERATIVO.md`](PILOTO_OPERATIVO.md)** — reglas y PASO 1 baseline.
 
 ## Árbol
 
