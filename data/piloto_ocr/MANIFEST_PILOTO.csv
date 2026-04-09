@@ -1,3 +1,2 @@
 doc_id,archivo_raw_relativo,paginas_en_pdf,paginas_en_piloto,indices_paginas_en_pdf,notas
-fac-lote-a,raw/fac-lote-a.pdf,10,10,"1,2,3,4,5,6,7,8,9,10",EJEMPLO reemplazar con datos reales; borrar filas o añadir filas hasta sumar 15 paginas piloto
-fac-lote-b,raw/fac-lote-b.pdf,5,5,"1,2,3,4,5",EJEMPLO segundo PDF; suma paginas_en_piloto = 15
+rhe-sojo-e001-71,raw/rhe-sojo-e001-71.pdf,38,1,1,"RHE E001-71 (SOJO). Suma piloto actual: 1/15 páginas; añadir PDFs/filas hasta completar 15."
