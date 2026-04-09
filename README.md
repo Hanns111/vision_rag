@@ -12,6 +12,7 @@ Sistema de análisis documental basado en RAG para normativa y, en paralelo, pip
 Documentación técnica viva: [CURRENT_STATE.md](CURRENT_STATE.md).  
 Handoff Cursor: [CURSOR_HANDOFF.md](CURSOR_HANDOFF.md).  
 **Roadmap ejecutable (PASO 0–7, N=15, bloqueos §5, checklist §9):** [docs/ROADMAP_PROYECTO.md](docs/ROADMAP_PROYECTO.md).  
+**Poblar piloto OCR (raw, manifest, 15 labels):** [data/piloto_ocr/CHECKLIST_POBLADO.md](data/piloto_ocr/CHECKLIST_POBLADO.md).  
 **Decisiones:** [docs/DECISIONES_TECNICAS.md](docs/DECISIONES_TECNICAS.md).  
 Taxonomía expedientes MINEDU: [docs/CONTROL_PREVIO_TAXONOMIA_EXPEDIENTES.md](docs/CONTROL_PREVIO_TAXONOMIA_EXPEDIENTES.md).  
 Normativa por categoría: [control_previo/README.md](control_previo/README.md).
