@@ -1,6 +1,6 @@
 {
   "schema_version": "piloto_ocr.v1",
-  "doc_id": "EJEMPLO-reemplazar",
+  "doc_id": "fac-lote-a",
   "page_index": 1,
   "etiquetado_por": "iniciales",
   "fecha_etiquetado": "2026-04-09",
@@ -17,5 +17,5 @@
     "razon_social_emisor": null,
     "requiere_revision": false
   },
-  "notas": ""
+  "notas": "Copiar a fac-lote-a_p1.json, fac-lote-a_p2.json, ... segun MANIFEST_PILOTO.csv"
 }

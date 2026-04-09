@@ -1,7 +1,7 @@
 # Handoff para Cursor (al volver al proyecto)
 
 **Propósito:** retomar el hilo sin el chat. Detalle RAG: `CURRENT_STATE.md`.  
-**Roadmap (PASO 0–7):** [`docs/ROADMAP_PROYECTO.md`](docs/ROADMAP_PROYECTO.md) · **PASO 0** (N=15, §4.1–4.3, checklist §9): `data/piloto_ocr/README.md`  
+**Roadmap (PASO 0–7):** [`docs/ROADMAP_PROYECTO.md`](docs/ROADMAP_PROYECTO.md) · **PASO 0 / raw + baseline:** [`data/piloto_ocr/PILOTO_OPERATIVO.md`](data/piloto_ocr/PILOTO_OPERATIVO.md) · `data/piloto_ocr/README.md`  
 **Decisiones:** [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md) (D-09 = etiquetado pendiente)  
 **Normativa / expedientes por categoría:** [`control_previo/README.md`](control_previo/README.md) · manifiestos: `control_previo/MANIFEST_INGESTION_TODO.csv` (regenerar con `python scripts/gen_control_previo_manifests.py`).
 

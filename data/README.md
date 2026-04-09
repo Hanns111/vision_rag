@@ -10,6 +10,7 @@ Datos locales: por defecto **no versionados** salvo lo que indica `.gitignore` (
 | `piloto_ocr/labels/` | Ground truth: `schema_version: piloto_ocr.v1`, un JSON por página. |
 | `piloto_ocr/metrics/` | CSV PASO 1–2 + `METRICAS_MINIMAS.md`. |
 | `piloto_ocr/MANIFEST_PILOTO.csv` | Inventario: qué PDFs y qué páginas cuentan hacia las 15. |
+| `piloto_ocr/PILOTO_OPERATIVO.md` | **Cómo** nombrar `raw/`, manifiesto y labels; PASO 1 baseline. |
 
 **Especificación única:** `docs/ROADMAP_PROYECTO.md` **§4.1–4.3** y **§9** (checklist de cierre).
 

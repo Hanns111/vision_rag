@@ -1,6 +1,6 @@
 # Métricas mínimas comparables (PASO 1–2)
 
-Alineado a **`docs/ROADMAP_PROYECTO.md` §4.3**. Los CSV deben poder **unirse** por `(doc_id, page_index, campo)`.
+Alineado a **`docs/ROADMAP_PROYECTO.md` §4.3** y **[`../PILOTO_OPERATIVO.md`](../PILOTO_OPERATIVO.md)** (mismas páginas que el manifiesto). Los CSV deben poder **unirse** por `(doc_id, page_index, campo)`.
 
 ## Columnas sugeridas por fila (CSV)
 

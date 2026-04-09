@@ -122,7 +122,7 @@ Las carpetas **`control_previo/01_viaticos`**, `02_os_oc_pautas`, etc. son **cat
 | PDFs del piloto | `data/piloto_ocr/raw/` |
 | Ground truth | `data/piloto_ocr/labels/` |
 | Métricas / manifests | `data/piloto_ocr/metrics/` |
-| Inventario del piloto | `data/piloto_ocr/MANIFEST_PILOTO.csv` (una fila por PDF o por página según rellenes `paginas_en_piloto`) |
+| Inventario del piloto | `data/piloto_ocr/MANIFEST_PILOTO.csv` (una fila por PDF; convención en `data/piloto_ocr/PILOTO_OPERATIVO.md`) |
 
 ### 4.3 Métricas mínimas comparables (PASO 1–2)
 
@@ -138,7 +138,7 @@ Definición única para poder comparar motores sobre las **mismas 15 páginas** 
 
 Plantilla de nombre de archivo de resultado: `metrics/baseline_paso1_YYYYMMDD.csv`, `metrics/bakeoff_paso2_motor_YYYYMMDD.csv`.
 
-Detalle operativo: `data/piloto_ocr/metrics/METRICAS_MINIMAS.md`.
+Detalle operativo: `data/piloto_ocr/metrics/METRICAS_MINIMAS.md` · población de `raw/` y baseline: `data/piloto_ocr/PILOTO_OPERATIVO.md`.
 
 ### 4.4 Resumen PASO 1–7 (referencia rápida)
 
@@ -214,6 +214,7 @@ PyMuPDF, OpenCV, Tesseract, RAG en `pdf_rag.py`; bake-off: PaddleOCR, Docling, e
 | `CURSOR_HANDOFF.md` | Mapa repo |
 | `data/README.md` | Árbol `data/piloto_ocr/` |
 | `data/piloto_ocr/README.md` | Convenciones |
+| `data/piloto_ocr/PILOTO_OPERATIVO.md` | Poblar `raw/`, manifiesto, PASO 1 baseline |
 | `data/piloto_ocr/metrics/METRICAS_MINIMAS.md` | Métricas §4.3 |
 | `docs/DECISIONES_TECNICAS.md` | D-01…D-09 |
 | `docs/CURRENT_STATE_RAG.md` | Retrieval |

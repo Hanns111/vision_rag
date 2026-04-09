@@ -1,2 +1,3 @@
-doc_id,archivo_raw_relativo,paginas_en_pdf,paginas_incluidas_en_piloto,indices_pagina_piloto,notas
-EJEMPLO-reemplazar,raw/ejemplo.pdf,1,1,1,copiar PDF real a raw/ y ajustar filas; total paginas en piloto debe sumar 15
+doc_id,archivo_raw_relativo,paginas_en_pdf,paginas_en_piloto,indices_paginas_en_pdf,notas
+fac-lote-a,raw/fac-lote-a.pdf,10,10,"1,2,3,4,5,6,7,8,9,10",EJEMPLO reemplazar con datos reales; borrar filas o añadir filas hasta sumar 15 paginas piloto
+fac-lote-b,raw/fac-lote-b.pdf,5,5,"1,2,3,4,5",EJEMPLO segundo PDF; suma paginas_en_piloto = 15
