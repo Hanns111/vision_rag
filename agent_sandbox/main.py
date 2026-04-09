@@ -45,6 +45,23 @@ def _pagina_esperada_cubre_top1(
     return _intervalos_solapan(pagina, pagina_fin, lo, hi)
 
 
+def _rank_gold_en_topk(
+    fragmentos: list,
+    arch_exp_n: str,
+    pag_exp_i: int,
+    margen: int,
+) -> int | None:
+    """Posición 1-based del chunk que coincide con gold (archivo + página), o None."""
+    for j, f in enumerate(fragmentos, 1):
+        if _normalizar_nombre_pdf(f.archivo) != arch_exp_n:
+            continue
+        p_lo = min(f.pagina, f.pagina_fin)
+        p_hi = max(f.pagina, f.pagina_fin)
+        if _pagina_esperada_cubre_top1(pag_exp_i, margen, p_lo, p_hi):
+            return j
+    return None
+
+
 def ejecutar_eval_rag_benchmark(
     path_json: Path,
     dominio: str | None = None,
@@ -172,7 +189,54 @@ def ejecutar_eval_rag_benchmark(
             print(
                 f"     esperado: {arch_exp_n}  p.~{pag_exp_i} (±{margen})"
             )
-            if not ok and verbose:
+            if not ok:
+                r_gold = _rank_gold_en_topk(
+                    fragmentos, arch_exp_n, pag_exp_i, margen
+                )
+                if r_gold is not None:
+                    print(
+                        f"     gold en top-{len(fragmentos)} (rerank): "
+                        f"posición #{r_gold}"
+                    )
+                else:
+                    print(
+                        f"     gold: ningún chunk coincide en top-{len(fragmentos)} "
+                        f"(sigue fuera de ventana o archivo distinto)"
+                    )
+                fr_top = fragmentos[0]
+                fr_hib = max(
+                    fragmentos,
+                    key=lambda f: (f.score, f.sim_semantica),
+                )
+                idx_hib = next(
+                    j
+                    for j, f in enumerate(fragmentos, 1)
+                    if f.chunk_id == fr_hib.chunk_id
+                )
+                sr_top = getattr(fr_top, "score_rerank", None)
+                sr_hib = getattr(fr_hib, "score_rerank", None)
+                mismo = fr_top.chunk_id == fr_hib.chunk_id
+                print(
+                    "     híbrido vs final: top por score (rerank local) está en "
+                    f"#{idx_hib}; top-1 final es el mismo chunk: {mismo}"
+                )
+                pag_t = (
+                    f"{fr_top.pagina}"
+                    if fr_top.pagina == fr_top.pagina_fin
+                    else f"{fr_top.pagina}-{fr_top.pagina_fin}"
+                )
+                pag_h = (
+                    f"{fr_hib.pagina}"
+                    if fr_hib.pagina == fr_hib.pagina_fin
+                    else f"{fr_hib.pagina}-{fr_hib.pagina_fin}"
+                )
+                print(
+                    f"       final: p={pag_t} score={fr_top.score:.4f} "
+                    f"score_rerank={sr_top} | "
+                    f"híbrido máx: p={pag_h} score={fr_hib.score:.4f} "
+                    f"score_rerank={sr_hib}"
+                )
+            if verbose:
                 print(f"     Q: {pregunta}")
 
     print("-" * 120)
@@ -238,6 +302,9 @@ def _imprimir_fragmento_eval(rank: int, fr) -> None:
         _linea("titulo_struct", fr.titulo)
     _linea("confidence", fr.confidence)
     _linea("score", fr.score)
+    _linea("sim_semantica", fr.sim_semantica)
+    if getattr(fr, "score_rerank", None) is not None:
+        _linea("score_rerank", fr.score_rerank)
     print("  citas detectadas (regex sobre el chunk, no verificación jurídica):")
     _linea("    artículo", fr.articulo if fr.articulo else "(ninguna)")
     _linea("    numeral", fr.numeral if fr.numeral else "(ninguna)")
@@ -387,6 +454,8 @@ def main() -> None:
     print(
         "Tip: python main.py --rag-eval  -> prueba RAG sin LLM sobre ./corpus\n"
         "     python main.py --rag-eval-benchmark  -> métricas vs eval_questions.json\n"
+        "     AGENT_RAG_DEBUG=1  -> traza top-K y decisión pairwise (stderr)\n"
+        "     AGENT_CROSS_ENCODER=0  -> desactiva re-rank BGE GPU (usa solo pairwise)\n"
     )
     try:
         while True:

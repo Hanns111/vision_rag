@@ -78,7 +78,11 @@ def leer_pdf(ruta: str) -> dict[str, Any]:
 
 def buscar_en_pdf(pregunta: str) -> dict[str, Any]:
     """
-    Todos los .pdf en ./corpus/: índice en memoria, embeddings (all-MiniLM-L6-v2), top-5 por coseno.
+    Todos los .pdf en ./corpus/: índice en memoria, embeddings (all-MiniLM-L6-v2),
+    top-10 + re-ranking local + CE/pairwise sobre el mismo conjunto; **devuelve top-10**.
+
+    Depuración: ``AGENT_RAG_DEBUG=1`` imprime candidatos y decisión pairwise en stderr.
+    Re-rank BGE (GPU): ``BAAI/bge-reranker-v2-m3`` si hay CUDA; si no, torneo pairwise. ``AGENT_CROSS_ENCODER=0`` lo desactiva.
     """
     pregunta = (pregunta or "").strip()
     root = directorio_corpus_defecto()

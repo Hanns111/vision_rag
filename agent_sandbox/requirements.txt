@@ -3,6 +3,8 @@ pymupdf>=1.24.0
 sentence-transformers>=3.0.0
 torch>=2.0.0
 #
+# Re-ranking GPU (opcional): BAAI/bge-reranker-v2-m3 vía sentence_transformers.CrossEncoder
+# Requiere CUDA; sin GPU se usa torneo pairwise sobre score híbrido.
 # Embeddings fijos en código: sentence-transformers/all-MiniLM-L6-v2
 # Corpus: ./corpus/ o AGENT_CORPUS_DIR
 # Índice JSON: ./index/index.json o AGENT_INDEX_JSON

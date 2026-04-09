@@ -1,6 +1,6 @@
 """Corpus PDF multi-documento: chunks con metadatos y citas, índice en JSON local, ranking híbrido.
 
-**Índice JSON schema 3:** cada chunk incluye ``dominio`` y ``tipo_doc`` derivados de la ruta
+**Índice JSON schema 4:** cada chunk incluye ``dominio`` y ``tipo_doc`` derivados de la ruta
 relativa al corpus (primera y segunda carpeta); PDF en la raíz → ambos vacíos.
 
 Campo ``confidence`` (índice JSON, :class:`ChunkIndizado`, :class:`Fragmento`):
@@ -15,9 +15,14 @@ Campo ``confidence`` (índice JSON, :class:`ChunkIndizado`, :class:`Fragmento`):
     luego multiplicadores por ``tipo`` de chunk (p. ej. penalizar ``indice``, reforzar
     ``objetivo`` / ``articulo``), y por último un *boost* léxico si la pregunta nombra
     explícitamente ``objetivo`` / ``artículo`` / ``numeral`` y el chunk coincide en ``tipo``.
-    Tras el orden global, solo sobre los primeros ``TOP_K`` resultados se aplica un
+    Recuperación multi-vista (mismo ``TOP_K``): 6 por score híbrido global, hasta 2
+    léxicos y 2 estructurales, unión y deduplicación. Sobre ese pool se aplica un
     *re-ranking* local (cobertura léxica, anclas numerales, página explícita en la pregunta,
-    señal oficio/directiva) **sin** modificar embeddings.
+    señal oficio/directiva, coincidencias en título) **sin** modificar embeddings.
+    Una tercera fase reordena solo el top-1 por torneo pairwise entre el pool (si no hay CE)
+    candidatos: si el ``score`` rerankeado está en banda de empate, se usa
+    ``sim_semantica`` con margen 0.02 (la variante *solo sim primero* degradó el
+    benchmark; ver ``_comparar_fragmentos``).
     ``confidence`` es metadato de trazabilidad / auditoría.
 
     **Diseño futuro (no implementado):** separar señales explícitas, p. ej.
@@ -33,6 +38,7 @@ import json
 import logging
 import os
 import re
+import sys
 import unicodedata
 from collections import Counter
 from dataclasses import dataclass, replace
@@ -41,7 +47,7 @@ from typing import Any
 
 from embeddings import MODEL_ID, _embed_batch, embed_text
 
-INDEX_SCHEMA_VERSION = 3
+INDEX_SCHEMA_VERSION = 4
 
 _LOG = logging.getLogger(__name__)
 
@@ -79,7 +85,14 @@ _TIPO_PRIORIDAD_RANK = (
 )
 
 CHUNK_TARGET_WORDS = 400
-TOP_K = 5
+# Multi-view: 6 semánticos + 2 léxicos + 2 estructurales → merge, dedupe → 10 (sin subir K global).
+K_POOL_SEMANTIC = 6
+K_POOL_LEX = 2
+K_POOL_STRUCT = 2
+TOP_K_POOL = 10
+TOP_K_OUTPUT = 10
+# Compat: nombre histórico (= salida al caller).
+TOP_K = TOP_K_OUTPUT
 # Peso de coincidencias léxicas sobre el score semántico (coseno en [~ -1, 1], habitualmente >0).
 KEYWORD_WEIGHT = 0.1
 
@@ -102,6 +115,217 @@ def _terminos_consulta(pregunta: str) -> list[str]:
         vistos.add(tl)
         ordenados.append(tl)
     return ordenados
+
+
+def _score_lexico_chunk(pregunta: str, ch: ChunkIndizado, terminos: list[str]) -> float:
+    """Coincidencia léxica fuerte: términos de la consulta en chunk (peso mayor en términos largos)."""
+    blob = f"{ch.texto} {ch.titulo or ''}".lower()
+    total = 0.0
+    for term in terminos:
+        if len(term) < 2:
+            continue
+        try:
+            if not re.search(r"\b" + re.escape(term) + r"\b", blob, flags=re.IGNORECASE):
+                continue
+        except re.error:
+            continue
+        w = 1.0 + min(4.0, len(term) * 0.18)
+        total += w
+    return total
+
+
+def recuperar_lexico(
+    query: str,
+    corpus: list[ChunkIndizado],
+    k: int = K_POOL_LEX,
+) -> list[ChunkIndizado]:
+    """Top-k chunks por score léxico (sin embeddings)."""
+    if not corpus or k <= 0:
+        return []
+    terminos = _terminos_consulta(query)
+    if not terminos:
+        return []
+    ranked = sorted(
+        corpus,
+        key=lambda ch: (-_score_lexico_chunk(query, ch, terminos), ch.archivo.lower(), ch.pagina),
+    )
+    return ranked[:k]
+
+
+_NORM_VERBOS = (
+    "debe",
+    "debera",
+    "corresponde",
+    "procede",
+    "se requiere",
+    "se exige",
+)
+_STRUCT_CUES = (
+    "articulo",
+    "numeral",
+    "inciso",
+    "objetivo",
+    "directiva",
+    "disposicion",
+)
+
+
+def _score_estructural_query_chunk(q_fold: str, ch: ChunkIndizado) -> float:
+    """Señales normativas estructurales alineadas con patrones en la pregunta."""
+    raw = (ch.texto or "") + " " + (ch.titulo or "")
+    ln = unicodedata.normalize("NFD", raw.lower())
+    low = "".join(c for c in ln if unicodedata.category(c) != "Mn")
+    qf = q_fold
+    s = 0.0
+
+    if any(x in qf for x in ("quien", "aplica", "ambito", "alcance")):
+        if ch.tipo == TIPO_OBJETIVO:
+            s += 3.2
+        if any(
+            p in low
+            for p in (
+                "aplica",
+                "ambito",
+                "alcance",
+                "obligatoriamente",
+                "sujetos",
+            )
+        ):
+            s += 2.1
+
+    if "requisito" in qf or "condicion" in qf or "documentacion" in qf:
+        if ch.tipo in (TIPO_ARTICULO, TIPO_LISTADO):
+            s += 2.0
+        if any(p in low for p in ("requisito", "documentacion", "comprobante", "anexo")):
+            s += 1.6
+
+    if "plazo" in qf or "rendicion" in qf or "dias" in qf or "dia " in qf:
+        if any(p in low for p in ("plazo", "dia", "calendario", "plazos")):
+            s += 2.2
+        if "procedimiento" in qf or "rendicion" in qf:
+            if "rendicion" in low or "comisionado" in low:
+                s += 1.8
+
+    if "procedimiento" in qf or "reprogram" in qf or "otorgamiento" in qf:
+        if any(p in low for p in ("procedimiento", "reprogram", "otorgamiento", "planilla")):
+            s += 2.0
+
+    if "numeral" in qf or re.search(r"\b\d+\.\d+", qf):
+        if ch.tipo == TIPO_NUMERAL or "numeral" in low:
+            s += 2.5
+        if ch.numeral:
+            s += 1.2
+
+    if ch.tipo == TIPO_ARTICULO:
+        s += 0.9
+    for vb in _NORM_VERBOS:
+        if vb in low:
+            s += 0.35
+    for w in _STRUCT_CUES:
+        if w in low:
+            s += 0.15
+
+    return s
+
+
+def recuperar_estructural(
+    query: str,
+    corpus: list[ChunkIndizado],
+    k: int = K_POOL_STRUCT,
+) -> list[ChunkIndizado]:
+    """Top-k chunks por señales estructurales (tipo + léxico normativo)."""
+    if not corpus or k <= 0:
+        return []
+    q = (query or "").lower()
+    qn = unicodedata.normalize("NFD", q)
+    q_fold = "".join(c for c in qn if unicodedata.category(c) != "Mn")
+    ranked = sorted(
+        corpus,
+        key=lambda ch: (-_score_estructural_query_chunk(q_fold, ch), ch.archivo.lower(), ch.pagina),
+    )
+    return ranked[:k]
+
+
+def _top_chunks_excluyendo(
+    ordenados: list[ChunkIndizado],
+    prohibidos: set[str],
+    k: int,
+) -> list[ChunkIndizado]:
+    out: list[ChunkIndizado] = []
+    for ch in ordenados:
+        if ch.chunk_id in prohibidos:
+            continue
+        out.append(ch)
+        if len(out) >= k:
+            break
+    return out
+
+
+def _merge_pool_multivista(
+    puntuados_ordenados: list[Fragmento],
+    indice: list[ChunkIndizado],
+    pregunta: str,
+) -> list[Fragmento]:
+    """
+    6 mejores por score híbrido global + hasta 2 léxicos + hasta 2 estructurales (sin duplicar chunk_id),
+    completando hasta TOP_K_POOL desde el ranking global.
+    """
+    if not puntuados_ordenados:
+        return []
+    by_id: dict[str, Fragmento] = {f.chunk_id: f for f in puntuados_ordenados}
+    sem = puntuados_ordenados[: min(K_POOL_SEMANTIC, len(puntuados_ordenados))]
+    prohibidos = {f.chunk_id for f in sem}
+
+    terminos = _terminos_consulta(pregunta)
+    if terminos:
+        lex_order = sorted(
+            indice,
+            key=lambda ch: (
+                -_score_lexico_chunk(pregunta, ch, terminos),
+                ch.archivo.lower(),
+                ch.pagina,
+            ),
+        )
+        lex_pick = _top_chunks_excluyendo(lex_order, prohibidos, K_POOL_LEX)
+    else:
+        lex_pick = []
+    prohibidos |= {c.chunk_id for c in lex_pick}
+
+    q = (pregunta or "").lower()
+    qn = unicodedata.normalize("NFD", q)
+    q_fold = "".join(c for c in qn if unicodedata.category(c) != "Mn")
+    est_order = sorted(
+        indice,
+        key=lambda ch: (-_score_estructural_query_chunk(q_fold, ch), ch.archivo.lower(), ch.pagina),
+    )
+    est_pick = _top_chunks_excluyendo(est_order, prohibidos, K_POOL_STRUCT)
+
+    orden_ids: list[str] = [f.chunk_id for f in sem]
+    for ch in lex_pick:
+        orden_ids.append(ch.chunk_id)
+    for ch in est_pick:
+        orden_ids.append(ch.chunk_id)
+
+    vistos: set[str] = set()
+    pool: list[Fragmento] = []
+    for cid in orden_ids:
+        if cid in vistos:
+            continue
+        vistos.add(cid)
+        fr = by_id.get(cid)
+        if fr is not None:
+            pool.append(fr)
+        if len(pool) >= TOP_K_POOL:
+            return pool[:TOP_K_POOL]
+
+    for fr in puntuados_ordenados:
+        if fr.chunk_id in vistos:
+            continue
+        vistos.add(fr.chunk_id)
+        pool.append(fr)
+        if len(pool) >= TOP_K_POOL:
+            break
+    return pool[:TOP_K_POOL]
 
 
 def _score_keyword(chunk_texto: str, terminos: list[str]) -> int:
@@ -219,10 +443,16 @@ def _boost_score_por_intencion(
     return out
 
 
-# Re-ranking **local** solo sobre los primeros TOP_K candidatos (sin tocar embeddings).
-_RERANK_KW_COVER = 0.22
+# Re-ranking **local** solo sobre el pool ``TOP_K_POOL`` (sin tocar embeddings).
+_RERANK_KW_COVER = 0.24
 _RERANK_PAGE_PEN = 0.022
 _RERANK_PAGE_MAX_DIST = 14
+# Coincidencias en título estructural del chunk (señal débil, tope acotado).
+_RERANK_TITLE_HIT = 0.022
+_RERANK_TITLE_CAP = 0.07
+# Términos de consulta largos (≥6) suelen ser más discriminativos en normativa.
+_RERANK_LONG_TERM_BONUS = 0.011
+_RERANK_LONG_TERM_CAP = 0.044
 _RERANK_NUMERAL_HIT = 0.13
 _RERANK_NUMERAL_CAP = 0.28
 _RERANK_ESTE_DOC_OFICIO_BONUS = 0.28
@@ -335,6 +565,27 @@ def _rerank_score_local(
         ratio = cubiertos / len(terminos)
         s += _RERANK_KW_COVER * ratio
 
+        tit_low = (fr.titulo or "").lower()
+        if tit_low:
+            n_tit = 0
+            for t in terminos:
+                if len(t) < 3:
+                    continue
+                if re.search(
+                    r"\b" + re.escape(t) + r"\b", tit_low, flags=re.IGNORECASE
+                ):
+                    n_tit += 1
+            if n_tit:
+                s += min(_RERANK_TITLE_CAP, float(n_tit) * _RERANK_TITLE_HIT)
+
+        extra_long = 0.0
+        for t in terminos:
+            if len(t) < 6:
+                continue
+            if re.search(r"\b" + re.escape(t) + r"\b", low, flags=re.IGNORECASE):
+                extra_long += _RERANK_LONG_TERM_BONUS
+        s += min(extra_long, _RERANK_LONG_TERM_CAP)
+
     nh = 0.0
     for pat in patrones_numeral:
         if pat in low:
@@ -356,6 +607,74 @@ def _rerank_score_local(
         or "framecriterio" in low
     ):
         s += _RERANK_RUC_SUNAT_CHUNK_BONUS
+
+    q_fold = _q_fold(pregunta)
+    ln = unicodedata.normalize("NFD", low)
+    low_fold = "".join(c for c in ln if unicodedata.category(c) != "Mn")
+    head_fold = low_fold[:1800]
+
+    # «A quiénes aplica» / alcance (el chunk puede ir como texto_general con cabecera OBJETIVO).
+    if "quien" in q_fold and "aplica" in q_fold:
+        tit_raw = (fr.titulo or "")
+        tit_ln = unicodedata.normalize("NFD", tit_raw.lower())
+        tit_fold = "".join(c for c in tit_ln if unicodedata.category(c) != "Mn")
+        if fr.tipo == TIPO_OBJETIVO:
+            s += 0.58
+        elif "objetivo" in tit_fold:
+            s += 0.72
+        elif re.search(r"\b(1\.\s*)?objetivo\b", head_fold, flags=re.IGNORECASE):
+            s += 0.52
+        elif re.search(r"\b(alcance|ambito)\b", head_fold, flags=re.IGNORECASE) and (
+            "aplica" in low_fold or "obligatoriamente" in low_fold
+        ):
+            s += 0.46
+        elif "obligatoriamente" in low_fold and "directiva" in low_fold:
+            s += 0.24
+        elif "aplica" in low_fold and "sujetos" in low_fold:
+            s += 0.2
+
+    # Plazo para iniciar rendición (tras el viaje) — refuerzo si coocurren señales del enunciado.
+    if (
+        "plazo" in q_fold
+        and "rendicion" in q_fold
+        and "comisionado" in q_fold
+    ):
+        if (
+            "iniciar" in low_fold
+            and "rendicion" in low_fold
+            and "plazo" in low_fold
+        ):
+            s += 0.68
+        elif (
+            "comisionado" in low_fold
+            and "rendicion" in low_fold
+            and "plazo" in low_fold
+        ):
+            s += 0.58
+        elif (
+            "viaje" in q_fold
+            and "rendicion" in q_fold
+            and "plazo" in low_fold
+            and "rendicion" in low_fold
+        ):
+            s += 0.64
+        elif "iniciar" in low_fold and "rendicion" in low_fold:
+            s += 0.48
+        elif "plazo" in low_fold and (
+            "rendicion" in low_fold
+            or "comisionado" in low_fold
+            or "dia" in low_fold
+        ):
+            s += 0.34
+
+    # Reprogramaciones de otorgamiento de viáticos.
+    if "reprogram" in q_fold or (
+        "procedimiento" in q_fold and "otorgamiento" in q_fold
+    ):
+        if "reprogram" in low_fold or "reprogramac" in low_fold:
+            s += 0.62
+        elif "otorgamiento" in low_fold and "viatico" in low_fold:
+            s += 0.22
 
     return s
 
@@ -385,6 +704,185 @@ def _rerank_top_k_fragmentos(
     for nuevo, fr in scored:
         out.append(replace(fr, score=nuevo))
     return out
+
+
+# Tercera fase (opcional): desempate top-1 por comparación directa A vs B (sin LLM).
+_PAIRWISE_SEM_EPS = 0.02
+# Si dos reranks difieren menos que esto en ``score``, se considera empate y entra ``sim_semantica``.
+_PAIRWISE_SCORE_TIE_BAND = 0.015
+
+# --- Variante literal pedida (prioridad ``sim_semantica``), dejó ~39% en benchmark ---
+# def _comparar_fragmentos_literal(fr_a, fr_b):
+#     if fr_a.sim_semantica > fr_b.sim_semantica + 0.02:
+#         return True
+#     if fr_b.sim_semantica > fr_a.sim_semantica + 0.02:
+#         return False
+#     return fr_a.score > fr_b.score
+
+
+def _comparar_fragmentos(fr_a: Fragmento, fr_b: Fragmento) -> bool:
+    """True si *fr_a* es preferible a *fr_b* (torneo pairwise).
+
+    Prioridad del ``score`` rerankeado; en banda de empate (Δscore pequeña) se usa
+    ``sim_semantica`` con umbral ±0.02 (spec original para el desempate semántico).
+    """
+    d = fr_a.score - fr_b.score
+    if d > _PAIRWISE_SCORE_TIE_BAND:
+        return True
+    if d < -_PAIRWISE_SCORE_TIE_BAND:
+        return False
+    if fr_a.sim_semantica > fr_b.sim_semantica + _PAIRWISE_SEM_EPS:
+        return True
+    if fr_b.sim_semantica > fr_a.sim_semantica + _PAIRWISE_SEM_EPS:
+        return False
+    return fr_a.score > fr_b.score
+
+
+def _promover_top1_pairwise(candidatos: list[Fragmento]) -> list[Fragmento]:
+    """Ganador por torneo al frente; resto igual orden."""
+    if len(candidatos) <= 1:
+        return candidatos
+    mejor = candidatos[0]
+    for fr in candidatos[1:]:
+        if _comparar_fragmentos(fr, mejor):
+            mejor = fr
+    resto = [f for f in candidatos if f.chunk_id != mejor.chunk_id]
+    return [mejor] + resto
+
+
+def _rag_debug_enabled() -> bool:
+    v = (os.environ.get("AGENT_RAG_DEBUG") or "").strip().lower()
+    return v in ("1", "true", "yes", "on")
+
+
+def _fragmento_preview(fr: Fragmento, max_len: int = 100) -> str:
+    t = (fr.texto or "").replace("\n", " ").strip()
+    if len(t) > max_len:
+        return t[: max_len - 3] + "..."
+    return t
+
+
+def _razon_pairwise_prefer_a_sobre_b(fr_a: Fragmento, fr_b: Fragmento) -> str:
+    """Texto breve coherente con ``_comparar_fragmentos(fr_a, fr_b)`` (A mejor que B)."""
+    d = fr_a.score - fr_b.score
+    if d > _PAIRWISE_SCORE_TIE_BAND:
+        return "mejor score (Δ fuera de banda de empate)"
+    if d < -_PAIRWISE_SCORE_TIE_BAND:
+        return "peor score que el otro (Δ fuera de banda)"
+    if fr_a.sim_semantica > fr_b.sim_semantica + _PAIRWISE_SEM_EPS:
+        return "mayor sim_semantica (scores en banda de empate)"
+    if fr_b.sim_semantica > fr_a.sim_semantica + _PAIRWISE_SEM_EPS:
+        return "menor sim_semantica que el otro (en banda de empate)"
+    return "desempate por score"
+
+
+def _rag_debug_imprimir_busqueda(
+    pregunta: str,
+    post_rerank: list[Fragmento],
+    resultado_final: list[Fragmento],
+    cross_encoder_ok: bool = False,
+) -> None:
+    """Salida humana en stderr si ``AGENT_RAG_DEBUG`` está activo."""
+    if not _rag_debug_enabled() or not resultado_final:
+        return
+    g = resultado_final[0]
+    q_short = pregunta if len(pregunta) <= 160 else pregunta[:157] + "..."
+    print("\n[AGENT_RAG_DEBUG]", file=sys.stderr)
+    print(f"  consulta: {q_short}", file=sys.stderr)
+    n = len(post_rerank)
+    print(
+        f"[TOP-{n}] (tras rerank local, antes del torneo pairwise / cross-encoder)",
+        file=sys.stderr,
+    )
+    for i, fr in enumerate(post_rerank, 1):
+        pag = (
+            f"{fr.pagina}"
+            if fr.pagina == fr.pagina_fin
+            else f"{fr.pagina}-{fr.pagina_fin}"
+        )
+        nom = Path(fr.archivo).name
+        if len(nom) > 40:
+            nom = nom[:37] + "..."
+        print(
+            f"  #{i} score={fr.score:.4f} sim={fr.sim_semantica:.4f} "
+            f"tipo={fr.tipo} p={pag} file={nom}",
+            file=sys.stderr,
+        )
+        print(f"      {_fragmento_preview(fr)}", file=sys.stderr)
+
+    if cross_encoder_ok and resultado_final and getattr(resultado_final[0], "score_rerank", None) is not None:
+        n_ce = len(resultado_final)
+        print(
+            f"[TOP-{n_ce} por score_rerank] (cross-encoder BGE, pool completo; salida API = {TOP_K_OUTPUT})",
+            file=sys.stderr,
+        )
+        for i, fr in enumerate(resultado_final, 1):
+            pag = (
+                f"{fr.pagina}"
+                if fr.pagina == fr.pagina_fin
+                else f"{fr.pagina}-{fr.pagina_fin}"
+            )
+            sr = getattr(fr, "score_rerank", None)
+            sr_s = f"{sr:.4f}" if sr is not None else "—"
+            print(
+                f"  #{i} score_rerank={sr_s} score={fr.score:.4f} sim={fr.sim_semantica:.4f} "
+                f"tipo={fr.tipo} p={pag}",
+                file=sys.stderr,
+            )
+        idx_g = -1
+        for j, fr in enumerate(post_rerank, 1):
+            if fr.chunk_id == g.chunk_id:
+                idx_g = j
+                break
+        print("[DECISIÓN cross-encoder]", file=sys.stderr)
+        print(
+            f"  Top-1 elegido por mayor score_rerank (posición previa en lista rerank: #{idx_g})",
+            file=sys.stderr,
+        )
+    else:
+        idx_g = -1
+        for j, fr in enumerate(post_rerank, 1):
+            if fr.chunk_id == g.chunk_id:
+                idx_g = j
+                break
+        print("[DECISIÓN pairwise]", file=sys.stderr)
+        if idx_g < 0:
+            print("  (ganador no encontrado en lista — inconsistencia)", file=sys.stderr)
+            return
+        print(f"  Ganador (posición en lista anterior): #{idx_g}", file=sys.stderr)
+        if idx_g <= 1:
+            print(
+                "  Motivo: sin cambio de orden (el ganador ya era #1 tras rerank)",
+                file=sys.stderr,
+            )
+        else:
+            primero = post_rerank[0]
+            gana = _comparar_fragmentos(g, primero)
+            razon = _razon_pairwise_prefer_a_sobre_b(g, primero)
+            print(
+                f"  vs #1 rerank: _comparar_fragmentos(ganador,#1)={gana}",
+                file=sys.stderr,
+            )
+            if gana:
+                print(f"  Motivo (ganador vs #1 rerank): {razon}", file=sys.stderr)
+            else:
+                print(
+                    "  Nota: ganador ≠ #1 rerank pero el torneo pairwise no es orden total; "
+                    "la comparación directa ganador vs #1 puede ser False.",
+                    file=sys.stderr,
+                )
+    pag_g = (
+        f"{g.pagina}" if g.pagina == g.pagina_fin else f"{g.pagina}-{g.pagina_fin}"
+    )
+    print("[TOP-1 final]", file=sys.stderr)
+    sr = getattr(g, "score_rerank", None)
+    extra = f" score_rerank={sr:.4f}" if sr is not None else ""
+    print(
+        f"  score={g.score:.4f} sim={g.sim_semantica:.4f}{extra} tipo={g.tipo} p={pag_g}",
+        file=sys.stderr,
+    )
+    print(f"  {_fragmento_preview(g, 120)}", file=sys.stderr)
+    print(file=sys.stderr)
 
 
 def _normalizar_tipo(t: str | None) -> str:
@@ -533,11 +1031,18 @@ class ChunkIndizado:
 
 @dataclass(frozen=True)
 class Fragmento:
-    """Resultado de búsqueda. ``score`` = híbrido + ajuste por ``tipo``; ``confidence`` = extracción (índice)."""
+    """Resultado de búsqueda. ``score`` = híbrido + ajuste por ``tipo``; ``confidence`` = extracción (índice).
+
+    ``sim_semantica`` es el coseno entre el embedding de la consulta y el del chunk (sin mezclar heurísticas).
+    """
 
     chunk_id: str
     texto: str
     score: float
+    # Similitud coseno(query_embedding, chunk.embedding); independiente del score híbrido.
+    sim_semantica: float
+    # Re-ranking cross-encoder (BGE); None si no se aplicó o falló.
+    score_rerank: float | None
     archivo: str
     dominio: str
     tipo_doc: str
@@ -810,6 +1315,11 @@ _RE_TITULO_INDICE = re.compile(
 _RE_SEC_COMPUESTO = re.compile(r"^\s*\d+\.\d+(?:\.\d+)*\s+\S")
 _RE_SEC_SIMPLE = re.compile(r"^\s*\d+\.\s+\S")
 _RE_ANEXO_LINE = re.compile(r"^ANEXO\s", re.IGNORECASE)
+# Entrada tipo índice «Anexo N° 1: …» — no forzar corte de chunk ni tipo anexo de cuerpo.
+_RE_ANEXO_ENTRADA_INDICE = re.compile(
+    r"^Anexo\s+N[°º]?\s*\d+\s*:",
+    re.IGNORECASE,
+)
 _RE_ART_LINE_START = re.compile(r"^Art[ií]culo\s+\d+", re.IGNORECASE)
 _RE_NUM_LINE_START = re.compile(r"^Numeral\s+\d", re.IGNORECASE)
 
@@ -855,9 +1365,6 @@ def _es_encabezado_objetivo_real(line: str) -> bool:
     s = (line or "").strip()
     if not _coincide_encabezado_objetivo_normativo(line):
         return False
-    linea_norm = _normalizar_linea_normativa(s)
-    print("LINEA ORIGINAL:", s)
-    print("LINEA NORMALIZADA:", linea_norm)
     return True
 
 
@@ -897,6 +1404,65 @@ def _es_mayusculas_titulo(line: str) -> bool:
     return all(not c.islower() for c in letters)
 
 
+# Firmas / tablas / pies: no usar como metadata de sección.
+_JUNK_TITLE_STARTS = (
+    "PRESIDENTE DEL",
+    "VICEMINISTRO",
+    "SECRETARIO GENERAL",
+    "SECRETARIA",
+    "PIE DE PAGINA",
+    "PIE DE PÁGINA",
+    "PAGINA ",
+    "PÁGINA ",
+)
+
+
+def _es_titulo_basura_mayusculas(line: str) -> bool:
+    """Descarta líneas que parecen firma, tabla o fragmento sin estructura de sección."""
+    z = (line or "").strip()
+    if not z:
+        return True
+    if _RE_ANEXO_ENTRADA_INDICE.match(z):
+        return True
+    zu = z.upper()
+    for pref in _JUNK_TITLE_STARTS:
+        if zu.startswith(pref):
+            return True
+    # Tabla / columnas
+    if z.count("\t") >= 2 or z.count("|") >= 2:
+        return True
+    # Muy pocas palabras, todo mayúsculas, sin numeración (p. ej. «PRESIDENTE DEL»)
+    words = z.split()
+    if len(words) <= 4 and len(z) < 52:
+        letters = [c for c in z if c.isalpha()]
+        if len(letters) >= 6 and all(not c.islower() for c in letters):
+            if not re.search(r"\d", z):
+                return True
+    return False
+
+
+def _titulo_mayusculas_aceptable(line: str) -> bool:
+    """Mayúsculas tipo título solo si pasan el filtro estructural."""
+    s0 = (line or "").strip()
+    if _es_entrada_toc(s0) or _es_anexo_entrada_toc_o_indice(s0):
+        return False
+    if _es_titulo_basura_mayusculas(line):
+        return False
+    if not _es_mayusculas_titulo(line):
+        return False
+    # Debe parecer encabezado: numeración, palabra clave normativa o línea sustancial
+    s = (line or "").strip()
+    if re.search(r"^\s*\d+[\d.\s]", s):
+        return True
+    if re.search(
+        r"\b(OBJETIVO|ALCANCE|DISPOSICION|NORMATIVA|PROCEDIMIENTO|REQUISITOS|ANEXO)\b",
+        s,
+        re.IGNORECASE,
+    ):
+        return True
+    return len(s) >= 20
+
+
 @dataclass
 class _EstadoChunkingEstructural:
     active_tipo: str = TIPO_TEXTO_GENERAL
@@ -912,12 +1478,37 @@ class _EstadoChunkingEstructural:
     toc_tokens_diferidos: list[str] | None = None
     # Emitir prefijo (p. ej. "1.") tras _actualizar, antes del texto de la línea actual.
     pending_prefijo_tokens: list[str] | None = None
+    # Cuerpo: "6.4." en una línea y "DE LA RENDICIÓN…" en la siguiente (mismo patrón que TOC).
+    sec_linea_num_pendiente: str | None = None
+    sec_tokens_diferidos: list[str] | None = None
+    saltar_emit_linea_sec: bool = False
 
 
 def _solo_numeracion_seccion_toc(line: str) -> bool:
     """Línea que solo trae la enumeración (p. ej. '1.' / '2. ') antes del título en siguiente línea."""
     s = (line or "").strip()
     return bool(re.match(r"^\d+\.\s*$", s))
+
+
+def _solo_numeracion_seccion_cuerpo(line: str) -> bool:
+    """Solo numeración en una línea (p. ej. '6.4.') antes del título en la siguiente — cuerpo normativo."""
+    s = (line or "").strip()
+    if _solo_numeracion_seccion_toc(s):
+        return False
+    # Al menos dos niveles (6.4.) para no fusionar «12.» o años con la línea siguiente.
+    if not re.match(r"^\s*\d+\.\d+", s):
+        return False
+    return bool(re.match(r"^\s*\d+(\.\d+)*\.?\s*$", s))
+
+
+def _es_anexo_entrada_toc_o_indice(line: str) -> bool:
+    """Fila de índice o referencia tipo TOC; no dispara chunk de anexo de cuerpo."""
+    s = (line or "").strip()
+    if not s:
+        return False
+    if _es_entrada_toc(s):
+        return True
+    return bool(_RE_ANEXO_ENTRADA_INDICE.match(s))
 
 
 def _actualizar_estado_por_linea(
@@ -933,6 +1524,20 @@ def _actualizar_estado_por_linea(
         st.siguiente_linea_reset_texto_general = False
         st.active_tipo = TIPO_TEXTO_GENERAL
 
+    if st.sec_linea_num_pendiente is not None:
+        s = f"{st.sec_linea_num_pendiente} {s}".strip()
+        st.sec_linea_num_pendiente = None
+        st.sec_tokens_diferidos = None
+    elif (
+        not st.in_toc_block
+        and _solo_numeracion_seccion_cuerpo(s)
+        and not _solo_numeracion_seccion_toc(s)
+    ):
+        st.sec_linea_num_pendiente = s
+        st.sec_tokens_diferidos = re.findall(r"\S+", s)
+        st.saltar_emit_linea_sec = True
+        return
+
     if st.toc_linea_num_pendiente is not None:
         if st.in_toc_block:
             combined = f"{st.toc_linea_num_pendiente} {s}".strip()
@@ -945,7 +1550,6 @@ def _actualizar_estado_por_linea(
                     st.toc_tokens_diferidos = None
                 return
             if _coincide_encabezado_objetivo_normativo(combined):
-                print("SALIDA DE INDICE -> NUEVO CHUNK OBJETIVO")
                 st.in_toc_block = False
                 st.active_tipo = TIPO_OBJETIVO
                 st.active_titulo = combined[:200]
@@ -955,8 +1559,6 @@ def _actualizar_estado_por_linea(
                 if st.toc_tokens_diferidos:
                     st.pending_prefijo_tokens = list(st.toc_tokens_diferidos)
                     st.toc_tokens_diferidos = None
-                if pagina is not None:
-                    print("DETECTADO OBJETIVO EN PAGINA:", pagina)
                 return
             st.in_toc_block = False
             st.toc_linea_num_pendiente = None
@@ -971,6 +1573,8 @@ def _actualizar_estado_por_linea(
         st.active_titulo = s[:200]
         st.toc_linea_num_pendiente = None
         st.toc_tokens_diferidos = None
+        st.sec_linea_num_pendiente = None
+        st.sec_tokens_diferidos = None
         return
 
     if st.in_toc_block:
@@ -997,36 +1601,44 @@ def _actualizar_estado_por_linea(
         return
 
     if _RE_ANEXO_LINE.match(s):
+        # Solo filas de índice (puntos guía / bloque TOC); en cuerpo el anexo sigue siendo corte fuerte.
+        if st.in_toc_block or _es_entrada_toc(s):
+            st.active_tipo = TIPO_INDICE if st.in_toc_block else TIPO_TEXTO_GENERAL
+            st.active_titulo = s[:200]
+            return
+        st.cortar_chunk_antes_siguiente_palabra = True
         st.active_tipo = TIPO_ANEXO
         st.active_titulo = s[:200]
         return
 
     if _RE_ART_LINE_START.match(s):
+        st.cortar_chunk_antes_siguiente_palabra = True
         st.active_tipo = TIPO_ARTICULO
         st.active_titulo = s[:200]
         return
 
     if _RE_NUM_LINE_START.match(s):
+        st.cortar_chunk_antes_siguiente_palabra = True
         st.active_tipo = TIPO_NUMERAL
         st.active_titulo = s[:200]
         return
 
     if _es_encabezado_objetivo_real(s):
+        st.cortar_chunk_antes_siguiente_palabra = True
         st.active_tipo = TIPO_OBJETIVO
         st.active_titulo = s[:200]
         st.siguiente_linea_reset_texto_general = True
-        if pagina is not None:
-            print("DETECTADO OBJETIVO EN PAGINA:", pagina)
         return
 
     if _es_encabezado_seccion(s):
+        st.cortar_chunk_antes_siguiente_palabra = True
         st.active_titulo = s[:200]
         st.active_tipo = TIPO_OBJETIVO if _tiene_objetivo(s) else TIPO_TEXTO_GENERAL
         if st.active_tipo == TIPO_OBJETIVO:
             st.siguiente_linea_reset_texto_general = True
         return
 
-    if _es_mayusculas_titulo(s):
+    if _titulo_mayusculas_aceptable(s):
         st.active_titulo = s[:200]
         return
 
@@ -1059,13 +1671,15 @@ def _stream_palabras_etiquetadas(
                     if pref.strip():
                         _actualizar_estado_por_linea(st, pref, num_pagina)
                         _emit_palabras_linea(out, st, pref, num_pagina)
-                    print("SALIDA DE INDICE -> NUEVO CHUNK OBJETIVO")
                     st.in_toc_block = False
                     st.cortar_chunk_antes_siguiente_palabra = True
                     _actualizar_estado_por_linea(st, suf, num_pagina)
                     _emit_palabras_linea(out, st, suf, num_pagina)
                     continue
             _actualizar_estado_por_linea(st, line, num_pagina)
+            if st.saltar_emit_linea_sec:
+                st.saltar_emit_linea_sec = False
+                continue
             if st.pending_prefijo_tokens:
                 pto = st.pending_prefijo_tokens
                 st.pending_prefijo_tokens = None
@@ -1098,7 +1712,10 @@ def _chunks_estructurados(
         titulo_dom = ""
         for _, _, tw, tit_w in buf_local:
             if _normalizar_tipo(tw) == tnorm and tit_w:
-                titulo_dom = tit_w[:200]
+                cand = tit_w[:200]
+                if _es_titulo_basura_mayusculas(cand):
+                    continue
+                titulo_dom = cand
         return titulo_dom
 
     def flush() -> None:
@@ -1111,8 +1728,6 @@ def _chunks_estructurados(
         texto = " ".join(t for t, _, _, _ in buf).strip()
         if texto:
             tnorm = _tipo_chunk_prioridad_estructural(buf, counts)
-            if tnorm == TIPO_OBJETIVO:
-                print("CHUNK CLASIFICADO COMO OBJETIVO")
             titulo_out = _titulo_del_tipo_dominante(buf, tnorm)
             bloques.append((texto, p_min, p_max or p_min, tnorm, titulo_out))
         buf = []
@@ -1136,8 +1751,6 @@ def _chunks_estructurados(
         texto = " ".join(t for t, _, _, _ in buf).strip()
         if texto:
             tnorm = _tipo_chunk_prioridad_estructural(buf, counts)
-            if tnorm == TIPO_OBJETIVO:
-                print("CHUNK CLASIFICADO COMO OBJETIVO")
             titulo_out = _titulo_del_tipo_dominante(buf, tnorm)
             bloques.append((texto, p_min, p_max or p_min, tnorm, titulo_out))
 
@@ -1232,11 +1845,18 @@ def _coseno(a: list[float], b: list[float]) -> float:
     return sum(x * y for x, y in zip(a, b))
 
 
-def _chunk_a_fragmento(ch: ChunkIndizado, score: float) -> Fragmento:
+def _chunk_a_fragmento(
+    ch: ChunkIndizado,
+    score: float,
+    sim_semantica: float,
+    score_rerank: float | None = None,
+) -> Fragmento:
     return Fragmento(
         chunk_id=ch.chunk_id,
         texto=ch.texto,
         score=score,
+        sim_semantica=sim_semantica,
+        score_rerank=score_rerank,
         archivo=ch.archivo,
         dominio=ch.dominio,
         tipo_doc=ch.tipo_doc,
@@ -1269,7 +1889,7 @@ def buscar_en_corpus(
         base = _score_final_hibrido(sem, ch.texto, terminos)
         final = _ajustar_score_por_tipo(base, ch.tipo, pregunta)
         final = _boost_score_por_intencion(final, ch.tipo, intencion)
-        puntuados.append(_chunk_a_fragmento(ch, final))
+        puntuados.append(_chunk_a_fragmento(ch, final, sem))
     # Orden por score (semántico + keyword + ajuste por tipo + boost intención); confidence no interviene.
     puntuados.sort(key=lambda f: (-f.score, f.archivo.lower(), f.pagina))
 
@@ -1283,8 +1903,23 @@ def buscar_en_corpus(
             )
         else:
             puntuados = filtrados
-    top = puntuados[:TOP_K]
-    return _rerank_top_k_fragmentos(pregunta, top, terminos)
+    pool = _merge_pool_multivista(puntuados, indice, pregunta)
+    ranked = _rerank_top_k_fragmentos(pregunta, pool, terminos)
+    try:
+        from cross_encoder_rerank import aplicar_rerank_cross_encoder
+
+        ranked_ce, ce_ok = aplicar_rerank_cross_encoder(
+            pregunta, ranked, indice_corpus=indice
+        )
+    except ImportError:
+        ce_ok = False
+        ranked_ce = ranked
+    if ce_ok:
+        out = ranked_ce
+    else:
+        out = _promover_top1_pairwise(ranked)
+    _rag_debug_imprimir_busqueda(pregunta, ranked, out, cross_encoder_ok=ce_ok)
+    return out[:TOP_K_OUTPUT]
 
 
 def _fragmento_coincide_dominio(fr: Fragmento, filtro: str) -> bool:
@@ -1336,8 +1971,23 @@ def buscar_fragmentos(pregunta: str, ruta_pdf: str) -> list[Fragmento]:
         base = _score_final_hibrido(sem, ch.texto, terminos)
         final = _ajustar_score_por_tipo(base, ch.tipo, pregunta)
         final = _boost_score_por_intencion(final, ch.tipo, intencion)
-        puntuados.append(_chunk_a_fragmento(ch, final))
+        puntuados.append(_chunk_a_fragmento(ch, final, sem))
     # Misma política que buscar_en_corpus: orden por score de consulta, no por confidence.
     puntuados.sort(key=lambda f: (-f.score, f.pagina))
-    top = puntuados[:TOP_K]
-    return _rerank_top_k_fragmentos(pregunta, top, terminos)
+    pool = _merge_pool_multivista(puntuados, tmp_chunks, pregunta)
+    ranked = _rerank_top_k_fragmentos(pregunta, pool, terminos)
+    try:
+        from cross_encoder_rerank import aplicar_rerank_cross_encoder
+
+        ranked_ce, ce_ok = aplicar_rerank_cross_encoder(
+            pregunta, ranked, indice_corpus=tmp_chunks
+        )
+    except ImportError:
+        ce_ok = False
+        ranked_ce = ranked
+    if ce_ok:
+        out = ranked_ce
+    else:
+        out = _promover_top1_pairwise(ranked)
+    _rag_debug_imprimir_busqueda(pregunta, ranked, out, cross_encoder_ok=ce_ok)
+    return out[:TOP_K_OUTPUT]
