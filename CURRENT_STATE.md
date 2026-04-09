@@ -101,12 +101,7 @@ El sistema, en condiciones normales de corpus e índice generado:
 ## Repositorio Git (cierre de sesión)
 
 - **Rama:** `main`. **Último commit:** ejecutar `git log -1 --oneline` en la raíz del proyecto.
-- **`git push`:** no hay `remote` configurado en esta máquina. Cuando exista el remoto (p. ej. GitHub):
-
-  ```bash
-  git remote add origin <URL-del-repo>
-  git push -u origin main
-  ```
+- **`git push`:** remoto típico `origin` → `main` (ver `git remote -v`).
 
 - En Windows, el repo usa `git config core.longpaths true` (evita fallos con rutas muy largas en carpetas de análisis o corpus).
 
