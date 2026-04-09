@@ -50,14 +50,27 @@ El sistema, en condiciones normales de corpus e índice generado:
 - **Dependencias**: embeddings (p. ej. `sentence-transformers`), posible `OPENROUTER_*` para el nodo de razonamiento con LLM cuando se usa el agente completo.
 - **Índice**: depende de PDFs y de reconstruir `index.json`; extracción PyMuPDF sigue sujeta a calidad del PDF.
 
+### Línea OCR / extracción documental (no es el RAG normativo)
+
+- Roadmap obligatorio: **`docs/ROADMAP_PROYECTO.md`** (**PASO 0 → 7**). OCR sigue ese orden; el RAG normativo es **PASO 6** y es independiente del piloto de facturas.
+- **PASO 0** operativo: **§4.1–4.3** (N=15 páginas, 11 campos, `piloto_ocr.v1`, métricas §4.3); checklist de cierre **§9**; datos en **`data/piloto_ocr/`**.
+- Script baseline: `scripts/document_ocr_runner.py`. **Sin cierre de §9**, PASO 1 no tiene tabla de métricas **comparable** (solo pruebas ad hoc).
+- **Bloqueos** hasta PASO 0 cerrado: ver roadmap **§5.2** (bake-off formal, integración OCR–agente, subvención productiva).
+
 ---
 
 ## SIGUIENTE PASO (recomendado)
 
-1. **Simplificar** `output_node`: respuesta más corta estilo asistente, opción de ocultar bloque “texto completo” o moverlo a modo verbose.
-2. **Reducir longitud** por defecto del bloque principal y del listado de fragmentos secundarios.
-3. **Mejorar UX** (variables de entorno, flags CLI, o UI ligera) según prioridad.
-4. **Más adelante**: valorar integración con **AG-EVIDENCE** — **no** iniciar integración hasta cerrar estos puntos y acordar contrato de datos.
+1. **Cerrar PASO 0** según **`docs/ROADMAP_PROYECTO.md` §9** (15 JSON + manifest).
+2. **PASO 1** baseline y CSV en `data/piloto_ocr/metrics/`.
+3. En paralelo (menor prioridad): simplificar `output_node` / UX según lista histórica abajo.
+4. **Más adelante**: AG-EVIDENCE — no integrar hasta contrato de datos.
+
+**Backlog RAG/UX (sin bloquear OCR):**
+
+1. Simplificar `output_node`: respuesta más corta, modo verbose.
+2. Reducir longitud por defecto del bloque principal y fragmentos secundarios.
+3. Mejorar UX (env, flags CLI, UI ligera).
 
 ---
 
@@ -72,6 +85,9 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 | Qué | Dónde |
 |-----|--------|
+| Roadmap PASO 0–7, bloqueos, checklist §9 | `docs/ROADMAP_PROYECTO.md` |
+| Decisiones D-01…D-09 | `docs/DECISIONES_TECNICAS.md` |
+| Piloto OCR (ground truth) | `data/piloto_ocr/` |
 | RAG + índice | `agent_sandbox/pdf_rag.py` |
 | Agente (orquestación) | `agent_sandbox/orchestrator.py`, `agent_sandbox/main.py` |
 | Razonamiento / fallback RAG | `agent_sandbox/nodes/reasoning_node.py` |
@@ -92,8 +108,8 @@ El sistema, en condiciones normales de corpus e índice generado:
   git push -u origin main
   ```
 
-- En Windows, el repo usa `git config core.longpaths true` (evita fallos con rutas muy largas bajo `SANTO_GRIAL_ANALYSIS/`).
+- En Windows, el repo usa `git config core.longpaths true` (evita fallos con rutas muy largas en carpetas de análisis o corpus).
 
 ---
 
-*Última actualización del documento: alineado con el cierre de sesión de trabajo (RAG normativo + agente + documentación).*
+*Última actualización: 2026-04-09 — alineado con PASO 0 ejecutable y documentación cruzada.*

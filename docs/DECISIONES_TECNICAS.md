@@ -1,0 +1,19 @@
+# vision_rag — Decisiones (tabla)
+
+> Detalle de ruta: **[`ROADMAP_PROYECTO.md`](ROADMAP_PROYECTO.md)** (PASO 0–7, §4.1 cierre, §5 bloqueos, §9 checklist).
+
+| ID | Decisión | Estado |
+|----|----------|--------|
+| D-01 | Rechazar VLM/LLM como OCR principal masivo | Cerrada |
+| D-02 | Pipeline híbrido (preproceso → OCR → reglas → fallback LLM acotado) | Cerrada |
+| D-03 | RAG en `agent_sandbox/` = consulta normativa con evidencia | Cerrada |
+| D-04 | Docling / parsers cloud: solo tras bake-off (PASO 2) | Cerrada |
+| D-05 | PaddleOCR: candidato; elección solo con métricas del piloto | Abierta hasta PASO 2 |
+| D-06 | Baseline código: `scripts/document_ocr_runner.py` | Hecho |
+| D-07 | Integración OCR ↔ agente: pendiente; **bloqueado** hasta PASO 7 por contrato | Pendiente |
+| D-08 | PASO 0 v1 **documentado**: N=15, 11 campos, `piloto_ocr.v1`, rutas `data/piloto_ocr/` | Cerrada (documentación) |
+| D-09 | **15 JSON** de etiquetas reales + `MANIFEST_PILOTO.csv` completo | Pendiente (operación humana) |
+
+**Fuera de alcance inmediato:** GraphRAG sustitutivo sin evaluación; un solo proveedor OCR sin bake-off; tunear chunking RAG antes de baseline OCR en el piloto.
+
+**Tras PASO 0 cerrado (D-09):** ejecutar PASO 1 y rellenar `metrics/baseline_*.csv`; luego PASO 2 y decisión D-05.

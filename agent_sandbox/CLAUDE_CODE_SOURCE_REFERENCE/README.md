@@ -1,14 +1,16 @@
 # Puerta de entrada — referencia reconstruida (análisis del producto tipo “Claude Code”)
 
-**Importante:** El trabajo de “toda la noche” y los **gigabytes de material reconstruido** **no** están solo en este README. Viven principalmente en la carpeta hermana del repo:
+> **2026-04:** La carpeta grande de análisis **`SANTO_GRIAL_ANALYSIS/`** en la raíz del repo **puede haber sido eliminada** del disco local (no aportaba al pipeline de `agent_sandbox/`). Los enlaces relativos a `../../SANTO_GRIAL_ANALYSIS/` en este árbol quedan como **referencia histórica**; si necesitas ese material, recupera desde copia de seguridad.
 
-**`SANTO_GRIAL/SANTO_GRIAL_ANALYSIS/`**
+**Importante:** El trabajo de “toda la noche” y los **gigabytes de material reconstruido** vivían principalmente en la carpeta hermana del repo:
 
-Desde esta ubicación (`agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/`), ruta relativa:
+**`SANTO_GRIAL_ANALYSIS/`** (raíz del proyecto)
+
+Desde esta ubicación (`agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/`), ruta relativa típica:
 
 **`../../SANTO_GRIAL_ANALYSIS/`**
 
-Esta carpeta (`CLAUDE_CODE_SOURCE_REFERENCE`) es el **mostrador ordenado**: reglas de aislamiento, índice maestro, síntesis de claves y copia del sandbox para auditores — **sin sustituir** el árbol de análisis.
+Esta carpeta (`CLAUDE_CODE_SOURCE_REFERENCE`) es el **mostrador ordenado**: reglas de aislamiento, índice maestro, síntesis de claves y copia del sandbox para auditores — **sin sustituir** el árbol de análisis si aún existe.
 
 ---
 

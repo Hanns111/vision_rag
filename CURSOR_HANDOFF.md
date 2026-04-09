@@ -1,6 +1,9 @@
 # Handoff para Cursor (al volver al proyecto)
 
-**Propósito:** resumen estable para que el asistente y tú retomen el hilo **sin depender del chat anterior**. El detalle técnico del RAG sigue en `CURRENT_STATE.md`.
+**Propósito:** retomar el hilo sin el chat. Detalle RAG: `CURRENT_STATE.md`.  
+**Roadmap (PASO 0–7):** [`docs/ROADMAP_PROYECTO.md`](docs/ROADMAP_PROYECTO.md) · **PASO 0** (N=15, §4.1–4.3, checklist §9): `data/piloto_ocr/README.md`  
+**Decisiones:** [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md) (D-09 = etiquetado pendiente)  
+**Normativa / expedientes por categoría:** [`control_previo/README.md`](control_previo/README.md) · manifiestos: `control_previo/MANIFEST_INGESTION_TODO.csv` (regenerar con `python scripts/gen_control_previo_manifests.py`).
 
 ---
 
@@ -14,48 +17,38 @@ Todo lo demás es relativo a esta carpeta salvo que se indique lo contrario.
 
 ## Qué es este repo (dos piezas distintas)
 
-1. **SANTO GRIAL — RAG normativo + agente (núcleo)**  
-   - Carpeta: `agent_sandbox/`  
+1. **Núcleo RAG normativo + agente (`agent_sandbox/`)**  
    - PDF → texto con **PyMuPDF**, chunks, embeddings, índice JSON, búsqueda híbrida.  
    - Orquestación: `orchestrator.py` — ciclo razonamiento → herramienta (`buscar_en_pdf`) → validación (máx. 2 vueltas).  
    - Entrada: `agent_sandbox/main.py` (también eval RAG con `--rag-eval`).  
-   - **Estado detallado, limitaciones y rutas:** leer **`CURRENT_STATE.md`**.
+   - **Estado:** `CURRENT_STATE.md`.
 
-2. **OCR ligero (auxiliar, no integrado al agente)**  
-   - Script: `scripts/document_ocr_runner.py`  
-   - Flujo: si la página PDF tiene bastante texto incrustado → usa capa digital; si no → raster + OpenCV (CLAHE) + **Tesseract**.  
-   - Dependencias: `scripts/requirements-ocr.txt` + binario **Tesseract** en el sistema.  
-   - **No** forma parte del pipeline RAG principal; es herramienta aparte para carpetas de PDFs escaneados.
+2. **OCR / piloto documental (PASO 0–2)**  
+   - Script baseline: `scripts/document_ocr_runner.py` (PyMuPDF + OpenCV + Tesseract).  
+   - **Ground truth y métricas:** `data/piloto_ocr/` según roadmap §4.1–4.3. **No** integrado al agente hasta PASO 7 (D-07).
 
 ---
 
 ## Qué NO es el grueso del repo
 
-- No hay un pipeline CV multi-agente integrado en Python en todo el monorepo.  
-- Volumen grande (GB) en disco suele ser **PDFs y carpetas documentales**, no solo código.  
-- Hay código TypeScript de referencia (`output/`, `SANTO_GRIAL_ANALYSIS/`) orientado a IDE/clipboard; **no** sustituye al flujo `agent_sandbox`.
-
----
-
-## Sesiones recientes (contexto humano)
-
-- Se documentó el repo con un **análisis estructurado (PROMPT 1):** sistema principal = RAG + agente; OCR = script aislado.  
-- Se acordó: **la memoria del chat no sustituye** notas en archivos; este handoff + `CURRENT_STATE.md` son la fuente de verdad.
+- No hay pipeline CV multi-agente integrado en un solo ejecutable Python.  
+- Volumen grande en disco: PDFs y carpetas documentales.  
+- Material opcional en `output/` (gitignore). `SANTO_GRIAL_ANALYSIS/` retirada del árbol local si existía.
 
 ---
 
 ## Cómo usar esto en Cursor
 
-- Escribir en el chat: *«Lee `CURSOR_HANDOFF.md` y `CURRENT_STATE.md`»* al abrir el proyecto.  
-- O `@CURSOR_HANDOFF.md` al hacer una pregunta.
+- *«Lee `CURSOR_HANDOFF.md` y `CURRENT_STATE.md`»* al abrir el proyecto.
 
 ---
 
-## Siguiente paso sugerido (opcional)
+## Orden sugerido (roadmap)
 
-- Integrar o no el OCR con el RAG (decisión de producto).  
-- Si se busca pipeline multi-agente CV/OCR, diseñarlo **aparte** o como nuevo paquete bajo `agent_sandbox/` o `scripts/` con contratos claros.
+1. Completar **§9** en `docs/ROADMAP_PROYECTO.md` (PASO 0).  
+2. **PASO 1** baseline → `data/piloto_ocr/metrics/`.  
+3. **PASO 2** bake-off. Integración OCR ↔ agente solo con contrato (**PASO 7**, D-07).
 
 ---
 
-*Creado para continuidad entre sesiones; actualizar este archivo cuando cambie el alcance o la arquitectura.*
+*Actualizar cuando cambie alcance o arquitectura.*

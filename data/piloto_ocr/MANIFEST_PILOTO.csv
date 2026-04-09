@@ -1,0 +1,2 @@
+doc_id,archivo_raw_relativo,paginas_en_pdf,paginas_incluidas_en_piloto,indices_pagina_piloto,notas
+EJEMPLO-reemplazar,raw/ejemplo.pdf,1,1,1,copiar PDF real a raw/ y ajustar filas; total paginas en piloto debe sumar 15

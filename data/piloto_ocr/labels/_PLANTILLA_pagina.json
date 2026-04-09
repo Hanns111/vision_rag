@@ -1,0 +1,21 @@
+{
+  "schema_version": "piloto_ocr.v1",
+  "doc_id": "EJEMPLO-reemplazar",
+  "page_index": 1,
+  "etiquetado_por": "iniciales",
+  "fecha_etiquetado": "2026-04-09",
+  "campos": {
+    "ruc_emisor": null,
+    "tipo_documento": null,
+    "serie_numero": null,
+    "fecha_emision": null,
+    "moneda": null,
+    "monto_subtotal": null,
+    "monto_igv": null,
+    "monto_total": null,
+    "ruc_receptor": null,
+    "razon_social_emisor": null,
+    "requiere_revision": false
+  },
+  "notas": ""
+}

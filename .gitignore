@@ -33,6 +33,8 @@ agent_sandbox/logs/
 data/*
 !data/.gitkeep
 !data/README.md
+!data/piloto_ocr/
+!data/piloto_ocr/**
 
 # Dumps y logs
 *.log
@@ -58,3 +60,6 @@ SYSTEM_BRAIN.md
 # Carpetas locales fuera del núcleo RAG (evitar `git add .` accidental)
 DJ_ANUAL_CONTABILIDAD_SIETE_NOV_2025/
 CÓDIGO FUENTE _CLAUDE _ ME DA LA SOLUCIÓN/
+
+# Normativas y expedientes MINEDU (PDFs y binarios en disco; README forzado con git add -f)
+control_previo/
