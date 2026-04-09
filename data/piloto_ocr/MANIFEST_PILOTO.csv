@@ -1,2 +1,4 @@
 doc_id,archivo_raw_relativo,paginas_en_pdf,paginas_en_piloto,indices_paginas_en_pdf,notas
-rhe-sojo-e001-71,raw/rhe-sojo-e001-71.pdf,38,1,1,"RHE E001-71 (SOJO). Suma piloto actual: 1/15 páginas; añadir PDFs/filas hasta completar 15."
+rhe-sojo-e001-71,raw/rhe-sojo-e001-71.pdf,38,1,1,"RHE E001-71 (SOJO). Origen: caso propio."
+os-diplan-2026-1394,raw/os-diplan-2026-1394.pdf,4,1,1,"Orden de servicio 2026-1394 (MINEDU SIGA). Copia desde control_previo/01_viaticos/.../2026031015105OS20261394.pdf; página 1 en piloto (texto seleccionable)."
+ri-ue024-1012r,raw/ri-ue024-1012r.pdf,1,1,1,"Recibo de ingreso UE.024 devolución saldos viáticos. Copia desde control_previo/01_viaticos/.../20260406162541RIUE0241012R.pdf."

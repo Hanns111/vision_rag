@@ -44,6 +44,8 @@ CLAUDE_SOURCE_FINAL_60MB.map
 
 # Archivos comprimidos / binarios pesados
 *.pdf
+# Piloto OCR: PDFs acotados en raw/ (N páginas inventariadas; ver MANIFEST_PILOTO.csv)
+!data/piloto_ocr/raw/*.pdf
 *.zip
 *.7z
 *.rar
