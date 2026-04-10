@@ -1,0 +1,21 @@
+{
+  "schema_version": "piloto_ocr.v1",
+  "doc_id": "ri-debedsar-amiquero-2026",
+  "page_index": 1,
+  "etiquetado_por": "ground_truth_texto_pdf",
+  "fecha_etiquetado": "2026-04-10",
+  "campos": {
+    "ruc_emisor": "20380795907",
+    "tipo_documento": "ri",
+    "serie_numero": "900-4-2026",
+    "fecha_emision": "2026-04-07",
+    "moneda": "PEN",
+    "monto_subtotal": null,
+    "monto_igv": null,
+    "monto_total": "138.70",
+    "ruc_receptor": null,
+    "razon_social_emisor": null,
+    "requiere_revision": false
+  },
+  "notas": "RI devolución viáticos (total S/ 138.70 según cuerpo del documento). | DEBEDSAR2026-INT-0103251; SINAD 103251; planilla 00242; comisionado AMIQUERO AHUI CARLOS FERNANDO"
+}

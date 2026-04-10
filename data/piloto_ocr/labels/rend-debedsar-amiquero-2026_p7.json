@@ -1,0 +1,21 @@
+{
+  "schema_version": "piloto_ocr.v1",
+  "doc_id": "rend-debedsar-amiquero-2026",
+  "page_index": 7,
+  "etiquetado_por": "ground_truth_texto_pdf",
+  "fecha_etiquetado": "2026-04-10",
+  "campos": {
+    "ruc_emisor": null,
+    "tipo_documento": "informe_comision",
+    "serie_numero": null,
+    "fecha_emision": "2026-02-27",
+    "moneda": null,
+    "monto_subtotal": null,
+    "monto_igv": null,
+    "monto_total": null,
+    "ruc_receptor": null,
+    "razon_social_emisor": null,
+    "requiere_revision": true
+  },
+  "notas": "Informe comisión planilla 00242 (narrativa; baja densidad factura). | DEBEDSAR2026-INT-0103251; SINAD 103251; planilla 00242; comisionado AMIQUERO AHUI CARLOS FERNANDO"
+}
