@@ -133,7 +133,9 @@ if __name__ == "__main__":
         except Exception:
             pass
 
-    ruta = r"C:\Users\Hans\Proyectos\vision_rag\VIÁTICO_DIPLAN2026-INT-0283297"
+    # Piloto OCR PASO 1: PDFs bajo data/piloto_ocr/raw/ (ver MANIFEST_PILOTO.csv)
+    _repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    ruta = os.path.join(_repo_root, "data", "piloto_ocr", "raw")
 
     if os.path.isdir(ruta):
         archivos = sorted(os.listdir(ruta))
