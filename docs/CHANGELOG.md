@@ -4,6 +4,16 @@ Todos los cambios notables del proyecto se documentan aquí.
 
 ---
 
+## [2026-04-09]
+
+### Control previo — taxonomía viáticos
+
+- **Reubicación:** expediente **DEBEDSAR2026-INT-0103251** desde la raíz del repositorio a `control_previo/01_viaticos/expedientes_revision/DEBEDSAR2026-INT-0103251/`.
+- **Documentación:** nuevo guardarraíl de auditoría `docs/GUARDARRAILES_AUDITORIA.md` (identidad única **EXPEDIENTE_ID** antes de revisión documental o validación de gasto); decisión **D-10** en `docs/DECISIONES_TECNICAS.md`.
+- **Piloto OCR:** sin cambios en `data/piloto_ocr/` en esta entrega.
+
+---
+
 ## [2026-04-08]
 
 ### RAG — Chunking v4 y diagnóstico estructural

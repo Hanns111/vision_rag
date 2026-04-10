@@ -40,6 +40,7 @@ En cada `NN_*` hay:
 | Expediente | Ruta |
 |------------|------|
 | Viáticos DIPLAN 2026 | `01_viaticos/expedientes_revision/VIÁTICO_DIPLAN2026-INT-0283297/` |
+| Viáticos DEBEDSAR 2026 | `01_viaticos/expedientes_revision/DEBEDSAR2026-INT-0103251/` *(reubicado desde la raíz del repo el 2026-04-09)* |
 | Subvenciones FGE UGEL Huancayo | `06_subvenciones/expedientes_revision/SUBVENCIONES_FGE2025-INT-1081440_UGEL HUANCAYO/` |
 
 ---
