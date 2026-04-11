@@ -1,0 +1,4 @@
+bakeoff_paso2 fecha=2026-04-10 paginas=15
+{'motor': 'tesseract_baseline', 'macro_f1_campos_eval': 0.6667, 'celdas_evaluadas': 117, 'celdas_correctas': 78, 'tiempo_total_s': 0.17, 'segundos_por_pagina': 0.012, 'len_texto_promedio': 1235.1, 'fecha_corrida': '2026-04-10'}
+{'motor': 'docling', 'macro_f1_campos_eval': 0.5897, 'celdas_evaluadas': 117, 'celdas_correctas': 69, 'tiempo_total_s': 31.78, 'segundos_por_pagina': 2.119, 'len_texto_promedio': 1964.8, 'fecha_corrida': '2026-04-10'}
+{'motor': 'easyocr_raster', 'macro_f1_campos_eval': 0.5641, 'celdas_evaluadas': 117, 'celdas_correctas': 66, 'tiempo_total_s': 226.92, 'segundos_por_pagina': 15.128, 'len_texto_promedio': 1225.8, 'fecha_corrida': '2026-04-10'}

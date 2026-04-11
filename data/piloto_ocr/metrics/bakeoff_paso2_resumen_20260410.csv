@@ -1,0 +1,4 @@
+motor,macro_f1_campos_eval,celdas_evaluadas,celdas_correctas,tiempo_total_s,segundos_por_pagina,len_texto_promedio,fecha_corrida
+tesseract_baseline,0.6667,117,78,0.17,0.012,1235.1,2026-04-10
+docling,0.5897,117,69,31.78,2.119,1964.8,2026-04-10
+easyocr_raster,0.5641,117,66,226.92,15.128,1225.8,2026-04-10

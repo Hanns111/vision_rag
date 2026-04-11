@@ -1,0 +1,10 @@
+# PASO 2 bake-off (Docling + baseline + EasyOCR). Python 3.11–3.12 recomendado.
+# Docling: forzar CPU si la GPU no es compatible (ver bakeoff_paso2.py).
+# PaddleOCR: no incluido por defecto; en Windows + Paddle 3.x puede fallar (oneDNN). Opcional: pip install paddlepaddle paddleocr
+
+pymupdf>=1.24
+opencv-python-headless>=4.9
+numpy>=2.0,<2.3
+pytesseract
+docling>=2.0
+easyocr>=1.7
