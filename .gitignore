@@ -65,3 +65,8 @@ CÓDIGO FUENTE _CLAUDE _ ME DA LA SOLUCIÓN/
 
 # Normativas y expedientes MINEDU (PDFs y binarios en disco; README forzado con git add -f)
 control_previo/
+
+# Expedientes reales pegados en raíz (drop-zone ad-hoc; ver docs/INGESTA_EXPEDIENTES.md)
+DIED*/
+EXP*/
+raw_input/
