@@ -42,6 +42,8 @@ from modelo.expediente import (  # noqa: E402
     IdCandidato,
     ResolucionId,
     FuenteEvidencia,
+    Comprobante,
+    FlujoFinanciero,
     SCHEMA_VERSION,
 )
 from ingesta.id_resolver import detectar_candidatos  # noqa: E402
@@ -312,6 +314,38 @@ def consolidar(exp_dir: Path | str) -> Expediente:
         observaciones=observaciones_globales,
     )
 
+    # --- Comprobantes a nivel expediente (deduplicados entre archivos) ---
+    comprobantes_agg: list[Comprobante] = []
+    hashes_vistos: set[str] = set()
+    for doc in docs:
+        for c_raw in (doc.get("comprobantes") or []):
+            if not isinstance(c_raw, dict) or "hash_deduplicacion" not in c_raw:
+                continue
+            h = c_raw.get("hash_deduplicacion", "")
+            if h in hashes_vistos:
+                continue
+            hashes_vistos.add(h)
+            comprobantes_agg.append(
+                Comprobante(
+                    archivo=c_raw.get("archivo", ""),
+                    pagina_inicio=int(c_raw.get("pagina_inicio", 0) or 0),
+                    pagina_fin=int(c_raw.get("pagina_fin", 0) or 0),
+                    tipo=c_raw.get("tipo", "desconocido"),
+                    ruc=c_raw.get("ruc"),
+                    razon_social=c_raw.get("razon_social"),
+                    serie_numero=c_raw.get("serie_numero"),
+                    fecha=c_raw.get("fecha"),
+                    monto_total=c_raw.get("monto_total"),
+                    moneda=c_raw.get("moneda"),
+                    monto_igv=c_raw.get("monto_igv"),
+                    confianza=float(c_raw.get("confianza", 0.0) or 0.0),
+                    hash_deduplicacion=h,
+                    texto_resumen=c_raw.get("texto_resumen", ""),
+                )
+            )
+
+    flujo = _calcular_flujo(comprobantes_agg) if comprobantes_agg else None
+
     exp = Expediente(
         expediente_id_carpeta=nombre_carpeta,
         schema_version=SCHEMA_VERSION,
@@ -322,8 +356,56 @@ def consolidar(exp_dir: Path | str) -> Expediente:
             for doc in docs
             if (doc.get("validaciones") or {}).get("firmas_anexo3")
         ],
+        comprobantes=comprobantes_agg,
+        flujo_financiero=flujo,
     )
     return exp
+
+
+def _calcular_flujo(comprobantes: list[Comprobante]) -> FlujoFinanciero:
+    """Agrega totales y detecta inconsistencias mínimas; no inventa."""
+    from collections import Counter
+
+    total = 0.0
+    monedas: Counter = Counter()
+    n_fact = n_bol = n_tic = n_desc = 0
+    inconsistencias: list[str] = []
+
+    for c in comprobantes:
+        if c.tipo == "factura_electronica":
+            n_fact += 1
+        elif c.tipo == "boleta_venta":
+            n_bol += 1
+        elif c.tipo == "ticket":
+            n_tic += 1
+        else:
+            n_desc += 1
+        if c.monto_total:
+            try:
+                total += float(c.monto_total)
+                if c.moneda:
+                    monedas[c.moneda] += 1
+            except (ValueError, TypeError):
+                inconsistencias.append(
+                    f"monto_no_parseable: {c.archivo}#p{c.pagina_inicio}={c.monto_total}"
+                )
+        else:
+            inconsistencias.append(
+                f"sin_monto: {c.archivo}#p{c.pagina_inicio}-{c.pagina_fin} tipo={c.tipo}"
+            )
+
+    moneda_dominante = monedas.most_common(1)[0][0] if monedas else ""
+
+    return FlujoFinanciero(
+        total_detectado=f"{total:.2f}",
+        moneda=moneda_dominante,
+        n_comprobantes=len(comprobantes),
+        n_facturas=n_fact,
+        n_boletas=n_bol,
+        n_tickets=n_tic,
+        n_desconocidos=n_desc,
+        inconsistencias=inconsistencias[:50],  # tope para mantener el json legible
+    )
 
 
 def escribir_expediente_json(exp: Expediente, exp_dir: Path | str) -> Path:
