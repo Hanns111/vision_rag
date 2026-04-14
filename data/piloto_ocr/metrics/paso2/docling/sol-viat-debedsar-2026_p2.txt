@@ -1,0 +1,60 @@
+Sistema Integrado de Gestión Administrativa Módulo de Tesorería Versión 25.02.00.U1
+
+## PLANILLA DE VIÁTICOS Nº
+
+UNIDAD EJECUTORA
+
+NRO. IDENTIFICACIÓN
+
+:
+
+: 000081
+
+026 PROGRAMA EDUCACION BASICA PARA TODOS - 026
+
+## Datos del Comisionado:
+
+Nº Exp. SIAF:
+
+Nº Pedido:  233
+
+Fecha:  27/01/2026
+
+Sr(a):  CARLOS FERNANDO AMIQUERO ÑAHUI
+
+N° Cuenta:AHORROS-04601608303
+
+Escala:  EMPLEADOS DEBEDSAR COAR PUA 2026
+
+Centro Costo:  026.04.00.02 - DIRECCION DE EDUCACION BASICA PARA ESTUDIANTES CON DESEMPEÑO SOBRESALIENTE Y ALTO RENDIMI
+
+Motivo de Viaje:  APLICACIÓN DE LA I FASE - PUA 2026; AMIQUERO ÑAHUI,  CARLOS FERNANDO; DNI :42192880; DIRECCIÓN: URB.  LOS  MÉDANOS  MZ  "C"  LTE  20-  ICA-ICA-ICA;  CARGO:  DOCENTE  DE  HISTORIA;  CELULAR:  991725618; SINAD:103251
+
+## Detalle de Gastos de Comisión de Servicios:
+
+| Salida: 06/02/2026   | Regreso: 09/02/2026   | 3 d 4 h Nº Días/Horas:   |
+|----------------------|-----------------------|--------------------------|
+| Concepto             | Clasificador          | Importe (S/.)            |
+| VIÁTICOS             | 2.3. 2 1. 2 2         | 791.70                   |
+| PASAJES              | 2.3. 2 1. 2 1         | 200.00                   |
+| TUUA                 |                       | .00                      |
+| COMBUSTIBLE          | 2.3. 1 3. 1 1         | .00                      |
+| OTROS GASTOS         | 2.3. 2 1. 2 99        | .00                      |
+| SERV. DIVERSOS       | 2.3. 2 7.11 99        | .00                      |
+
+| CADENA FUNCIONAL   | CADENA FUNCIONAL                                                                      | CADENA FUNCIONAL   | CADENA FUNCIONAL            | CADENA FUNCIONAL   | CADENA FUNCIONAL   |
+|--------------------|---------------------------------------------------------------------------------------|--------------------|-----------------------------|--------------------|--------------------|
+| Meta/ Mnemónico    | Cadena                                                                                |                    | Clasif. Gasto               | Monto              | Monto              |
+|                    | Funcional                                                                             | FF/Rb              |                             |                    | S/                 |
+| 0127 0127          | 22 . 047 . 0105 . 9002 . 3999999 . 5000659 22 . 047 . 0105 . 9002 . 3999999 . 5000659 | 1-00 1-00          | 2.3. 2 1. 2 1 2.3. 2 1. 2 2 |                    | 200.00 791.70      |
+|                    |                                                                                       |                    |                             | Total              | 991.70             |
+
+| Tipo de Viaje   | Destino                     | Salida             | Regreso            | Días/Horas   |
+|-----------------|-----------------------------|--------------------|--------------------|--------------|
+| Nacional        | AYACUCHO - LUCANAS - PUQUIO | 01:00am 06/02/2026 | 05:00am 09/02/2026 | 3 d 4 h      |
+
+<!-- image -->
+
+Firma Autorizada
+
+00242

@@ -1,0 +1,70 @@
+FACTURA ELECTRONICA
+RUC: 20612666751 
+E001-478 
+Sub Total
+Ventas :
+S/ 271.49 
+Anticipos :
+S/ 0.00 
+Descuentos :
+S/ 0.00 
+Valor Venta :
+S/ 271.49 
+ISC :
+S/ 0.00 
+IGV :
+S/ 28.51 
+ICBPER :
+S/ 0.00 
+Otros Cargos :
+S/ 0.00 
+Otros Tributos :
+S/ 0.00 
+Monto de
+redondeo :
+S/ 0.00 
+Importe Total :
+S/ 300.00 
+ 
+HOTEL SUMAC SAMARI S.A.C.  
+JR. BOLIVAR MZA. 20 LOTE. 4 A MEDIA CUADRA DE ALAMEDA  
+PUQUIO - LUCANAS - AYACUCHO 
+Fecha de Emisión
+: 08/02/2026 
+Señor(es)
+: PROGRAMA EDUCACION
+BASICA PARA TODOS  
+RUC 
+: 20380795907 
+Dirección del Cliente 
+:
+CAL. DEL COMERCIO 193 RES.
+LAS TORRES DE SAN BORJA
+LIMA-LIMA-SAN BORJA 
+Tipo de Moneda
+: SOLES 
+Observación
+:  
+Forma de pago : Contado
+Cantidad Unidad Medida
+Descripción
+Valor Unitario
+ICBPER
+1.00
+UNIDAD
+POR SERVICIO DE HOSPEDAJE DE UNA HABITACION SUITE
+DEL DIA 06/02/2026 AL DIA 08/02/2026
+271.493213
+0.00
+Valor de Venta de
+Operaciones Gratuitas : S/ 0.00 
+ 
+ 
+SON: TRESCIENTOS Y 00/100 SOLES
+ 
+Esta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede verificarla utilizando su
+clave SOL.
+8/2/26, 9:48 a.m.
+.:: Factura Electronica - Impresion ::.
+https://ww1.sunat.gob.pe/ol-ti-itemisionfactura/emitir.do?action=imprimirComprobante&preventCache=1770562103790
+1/1
