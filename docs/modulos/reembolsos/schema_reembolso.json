@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vision_rag.local/schemas/reembolso_mayor_gasto.json",
+  "title": "Expediente — extracción estructurada y derivación (reembolso mayor gasto / viáticos)",
+  "description": "Esquema alineado al JSON canónico de la Etapa 4 y al output de derivación §8.3 del documento fuente reembolso_mayor_gasto_base.txt. Los ejemplos con ... en comprobantes requieren definición de item completo en implementación.",
+  "type": "object",
+  "properties": {
+    "expediente": {
+      "type": "object",
+      "properties": {
+        "nro_sinad": { "type": "string" },
+        "unidad_ejecutora": { "type": "string" },
+        "organo_solicitante": { "type": "string" },
+        "categoria": {
+          "type": "string",
+          "enum": ["REEMBOLSO_MAYOR_GASTO", "RENDICION_REGULAR", "NO_CLASIFICADO"]
+        },
+        "confianza_clasificacion": { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "required": ["nro_sinad", "categoria"]
+    },
+    "comisionado": {
+      "type": "object",
+      "properties": {
+        "nombres_apellidos": { "type": "string" },
+        "dni": { "type": "string" },
+        "cargo": { "type": "string" },
+        "escala": { "type": "string" },
+        "cuenta_cci": { "type": "string" }
+      }
+    },
+    "comision": {
+      "type": "object",
+      "properties": {
+        "motivo": { "type": "string" },
+        "destino": { "type": "string" },
+        "fecha_inicio": { "type": "string", "format": "date-time" },
+        "fecha_fin": { "type": "string", "format": "date-time" },
+        "horas_comision": { "type": "integer" },
+        "tipo_dia": { "type": "string" },
+        "modalidad_traslado": { "type": "string" }
+      }
+    },
+    "montos": {
+      "type": "object",
+      "properties": {
+        "total_gastado": { "type": "number" },
+        "con_comprobante": { "type": "number" },
+        "con_dj": { "type": "number" },
+        "monto_recibido": { "type": "number" },
+        "devolucion": { "type": "number" },
+        "reembolso_solicitado": { "type": "number" }
+      }
+    },
+    "comprobantes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tipo": { "type": "string" },
+          "serie": { "type": "string" },
+          "numero": { "type": "string" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "declaracion_jurada": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "concepto": { "type": "string" },
+          "importe": { "type": "number" },
+          "zona": { "type": "string" }
+        }
+      }
+    },
+    "documentos_presentes": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "firmas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "documento": { "type": "string" },
+          "firmante": { "type": "string" },
+          "tipo": { "type": "string" }
+        }
+      }
+    },
+    "sunat": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "ruc": { "type": "string" },
+          "estado": { "type": "string" },
+          "condicion": { "type": "string" },
+          "consulta_ruc_adjunta": { "type": "boolean" },
+          "consulta_cpe_adjunta": { "type": "boolean" }
+        }
+      }
+    },
+    "bitacora_sinad": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "etapa": { "type": "integer" },
+          "oficina": { "type": "string" },
+          "responsable": { "type": "string" },
+          "estado": { "type": "string" }
+        }
+      }
+    },
+    "derivacion": {
+      "type": "object",
+      "description": "Output sugerido §8.3 (puede emitirse aparte o anidarse según implementación).",
+      "properties": {
+        "veredicto": {
+          "type": "string",
+          "enum": ["APROBABLE", "SUBSANABLE", "DEVOLUTIVO", "ATIPICO"]
+        },
+        "siguiente_etapa": { "type": "string" },
+        "requiere_habilitacion_siga": { "type": "boolean" },
+        "responsable_habilitacion": { "type": ["string", "null"] },
+        "unidad_ejecutora": { "type": "string" },
+        "memorando_sugerido": { "type": "string" },
+        "plazo_estimado_pago_dias_habiles": { "type": "integer" }
+      }
+    }
+  }
+}

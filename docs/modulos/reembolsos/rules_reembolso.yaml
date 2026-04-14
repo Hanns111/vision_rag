@@ -1,0 +1,65 @@
+# Estructura de rule-sets — Reembolso por mayor gasto (viáticos)
+# Las reglas textuales y fundamento están en reembolso_mayor_gasto_base.txt (§6 y §7).
+# Este archivo es solo esqueleto para implementación / versionado (ver §14 del documento fuente).
+
+version: "1.0"
+documento_fuente: "docs/modulos/reembolsos/reembolso_mayor_gasto_base.txt"
+
+modulo:
+  id: reembolso_mayor_gasto
+  padre: control_previo_viaticos
+
+# Parches por norma (nombres ilustrativos; contenido en YAMLs separados cuando existan)
+normas_versionadas:
+  - archivo: directiva_023_2026.yaml
+    estado: placeholder
+  - archivo: om_00016_2026.yaml
+    estado: placeholder
+  - archivo: om_00010_2026.yaml
+    estado: placeholder
+
+# Rule-set base — IDs V001 … V019 (viáticos general)
+rule_set_base:
+  ids: [V001, V002, V003, V004, V005, V006, V007, V008, V009, V010, V011, V012, V013, V014, V015, V016, V017, V018, V019]
+  reglas: []  # lista de objetos { id, descripcion, fundamento, nivel } — poblar desde fuente
+
+# Rule-set específico — IDs R001 … R013
+rule_set_reembolso_mayor_gasto:
+  ids: [R001, R002, R003, R004, R005, R006, R007, R008, R009, R010, R011, R012, R013]
+  reglas: []  # lista de objetos { id, descripcion, fundamento, nivel } — poblar desde fuente
+
+# Capa clasificadora (§4)
+clasificador:
+  senales_primarias: []
+  senales_secundarias: []
+  salidas:
+    - REEMBOLSO_MAYOR_GASTO
+    - RENDICION_REGULAR
+    - NO_CLASIFICADO
+
+# Orden de veredicto (Etapa 6, §5)
+veredicto:
+  prioridad_observaciones:
+    - nivel_B  # DEVOLUTIVO
+    - nivel_A  # SUBSANABLE
+  por_defecto: APROBABLE
+
+# Derivación (§8–9) — valores de negocio a mapear en motor
+derivacion:
+  matriz: []  # filas: veredicto, gravedad, accion, destino
+  salida_json: {}  # ver §8.3 del documento fuente
+
+# SUNAT (§10) — regla de negocio: validación por RUC Activo/Habido; CPE no sustituye RUC
+sunat:
+  requiere_consulta_ruc_adjunta: true
+  cpe_no_sustituye_ruc: true
+
+# Topes (§11)
+topes:
+  hospedaje_distribucion_por_noche: true
+  filas: []  # poblar desde tabla §11
+
+# Trazabilidad (§12)
+trazabilidad:
+  log_reglas:
+    incluir: [timestamp, version_rule_set, hash_expediente]

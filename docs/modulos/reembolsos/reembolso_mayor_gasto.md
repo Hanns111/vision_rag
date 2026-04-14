@@ -1,0 +1,326 @@
+# PIPELINE DE VALIDACIÓN — REEMBOLSO POR MAYOR GASTO (Sub-módulo de Viáticos)
+
+**Proyecto:** Sistema de Revisión de Expedientes de Pago — MINEDU  
+**Módulo padre:** Control Previo de Viáticos  
+**Sub-módulo nuevo:** Reembolso por mayor gasto  
+**Versión:** 1.0  
+**Fecha:** 14/04/2026  
+
+> **Fuente literal:** el texto íntegro sin alteraciones está en `reembolso_mayor_gasto_base.txt`. Este documento ordena el mismo contenido por secciones.
+
+---
+
+## 1. PROPÓSITO
+
+Integrar al pipeline de validación automática de expedientes de viáticos MINEDU una rama específica para reembolsos por mayor gasto, que son expedientes atípicos (la comisionada no recibió adelanto para esos gastos, los asumió de su peculio y solicita su devolución). El sistema debe clasificar el expediente al ingreso, aplicar el set de reglas que corresponda (rendición regular vs. reembolso), y emitir un veredicto (aprobable / subsanable / devolutivo) junto con la ruta de derivación interna.
+
+---
+
+## 2. TAXONOMÍA DEL DOMINIO
+
+```
+EXPEDIENTES DE PAGO (MINEDU)
+├── Órdenes de Servicio / Compra (OS/OC)
+└── Viáticos
+    ├── Rendición regular (comisionada recibió adelanto y rinde)
+    │   ├── Con devolución de saldo
+    │   └── Sin devolución (gasto = adelanto)
+    ├── Reembolso por mayor gasto   ← SUB-MÓDULO NUEVO
+    │   ├── Sin viático previo (gasto 100% de peculio)
+    │   └── Complementario a un viático ya rendido
+    └── Devolución total (no se ejecutó la comisión)
+```
+
+**Nota para la IA clasificadora:** la distinción entre subcategorías no requiere ser codificada rígidamente; basta con identificar señales textuales en el expediente. Ver sección 4.
+
+---
+
+## 3. MARCO NORMATIVO APLICABLE
+
+```text
+NormaUsoDirectiva DI-003-01-MINEDU V03, aprobada por RSG N° 023-2026-MINEDU (05/02/2026)Directiva madre de viáticos. Numerales 4.1.12 y 6.6.1 definen el reembolso por mayor gasto.Oficio Múltiple N° 00010-2026-MINEDU/SG-OGA (10/02/2026)Precisiones operativas iniciales a la Directiva.Oficio Múltiple N° 00016-2026-MINEDU/SG-OGA (11/03/2026)Precisión 1: variación de horarios 3h±. Precisión 2: validación SUNAT = consulta de RUC (Activo/Habido), NO consulta CPE.Pautas para la Remisión de Expedientes para el Trámite de Devengado y Pago (OGA)Rige el flujo interno de derivación.Decreto Legislativo N° 1441 — Sistema Nacional de TesoreríaFase de devengado (Finanzas) y pago (Tesorería).Ley N° 27444 — Procedimiento Administrativo GeneralSupletoria para observaciones subsanables y plazos.
+```
+
+---
+
+## 4. REGLAS DE CLASIFICACIÓN (CLASSIFIER LAYER)
+
+El clasificador debe identificar si el expediente es un reembolso revisando:
+
+### 4.1 Señales primarias (alta precisión)
+
+- Presencia de un Informe Técnico con el asunto: "solicitud de reembolso por mayor gasto" o similar.
+- Cita explícita a los numerales 4.1.12 y/o 6.6.1 de la Directiva 023-2026.
+- En el Anexo 3 (Rendición), el campo REEMBOLSO > 0 y DEVOLUCIÓN = 0, y los montos (3) Total gastado > (5) Monto recibido.
+- El monto recibido en la rendición es S/ 0.00 o menor al gasto efectuado.
+
+### 4.2 Señales secundarias (apoyo)
+
+- Existencia de una planilla de viáticos previa ya pagada y habilitada en SIGA (bitácora SINAD muestra etapas anteriores cerradas).
+- Fecha de comisión anterior a la fecha de elaboración del Anexo 3 con diferencia mayor a 10 días hábiles (indica hecho consumado).
+- Ausencia de "Compromiso de Devolución de Viáticos" vinculado al gasto actual.
+
+### 4.3 Decisión del clasificador
+
+```text
+IF (señales_primarias ≥ 1) → categoría = "REEMBOLSO_MAYOR_GASTO"
+ELIF (Anexo3.monto_recibido > 0 AND Anexo3.devolución ≥ 0) → "RENDICION_REGULAR"
+ELSE → "NO_CLASIFICADO" (deriva a revisión manual)
+```
+
+---
+
+## 5. PIPELINE COMPLETO (7 ETAPAS)
+
+```text
+[1] Ingesta        → [2] OCR/Parsing  → [3] Clasificación  → [4] Extracción
+                                                                    ↓
+[7] Derivación ← [6] Veredicto ← [5] Validación reglas ←─────────────
+```
+
+### Etapa 1 — Ingesta
+
+**Input:** carpeta del expediente (PDF múltiples) + metadatos SINAD (N° expediente, UE, bitácora).  
+**Output:** índice de archivos con hash y tamaño.
+
+### Etapa 2 — OCR / Parsing
+
+- **Herramientas:** pdfplumber, pytesseract (para comprobantes escaneados), pdfminer.six.
+- Detección automática de formularios SIGA (Anexos 2, 3, 4) por patrones de encabezado.
+- Lectura de comprobantes electrónicos por QR/XML si está disponible.
+
+### Etapa 3 — Clasificación
+
+- Aplica sección 4 de este documento.
+- Registra categoria y confianza (0-1).
+
+### Etapa 4 — Extracción estructurada
+
+**Schema canónico (JSON)** — literal del documento fuente:
+
+```text
+json{
+  "expediente": {
+    "nro_sinad": "DIED2026-INT-0268072",
+    "unidad_ejecutora": "026",
+    "organo_solicitante": "DIED-DIGEDD-VMGP",
+    "categoria": "REEMBOLSO_MAYOR_GASTO",
+    "confianza_clasificacion": 0.97
+  },
+  "comisionado": {
+    "nombres_apellidos": "ABARCA CALDERON, DINA MARGOT",
+    "dni": "23908456",
+    "cargo": "Monitora Regional de Operaciones - Cusco",
+    "escala": "ESCALA-2",
+    "cuenta_cci": "00228512158906209855"
+  },
+  "comision": {
+    "motivo": "...",
+    "destino": "Sicuani - UGEL Canchis",
+    "fecha_inicio": "2026-03-10T05:00",
+    "fecha_fin":    "2026-03-10T18:00",
+    "horas_comision": 13,
+    "tipo_dia": "COMPLETO",
+    "modalidad_traslado": "TERRESTRE"
+  },
+  "montos": {
+    "total_gastado":     104.00,
+    "con_comprobante":    74.00,
+    "con_dj":             30.00,
+    "monto_recibido":      0.00,
+    "devolucion":          0.00,
+    "reembolso_solicitado":104.00
+  },
+  "comprobantes": [ { "tipo":"FACTURA","serie":"F010","numero":"00007366", ... } ],
+  "declaracion_jurada": [ { "concepto":"movilidad", "importe":10.00, "zona":"REGION" } ],
+  "documentos_presentes": ["ANEXO_3","ANEXO_4","ANEXO_01","ANEXO_02","ANEXO_5","ANEXO_10","INFORME_TECNICO","DNI","CCP"],
+  "firmas": [ { "documento":"ANEXO_3", "firmante":"HERNANDEZ LAMA Carlos", "tipo":"FAU_DIGITAL" } ],
+  "sunat": [ { "ruc":"20154434217", "estado":"ACTIVO", "condicion":"HABIDO", "consulta_ruc_adjunta": true, "consulta_cpe_adjunta": true } ],
+  "bitacora_sinad": [ { "etapa":19, "oficina":"CONTROL_PREVIO", "responsable":"HANNS CONTRERAS", "estado":"EN_PROCESO" } ]
+}
+```
+
+*(El ejemplo usa `...` dentro de comprobantes tal como en el fuente.)*
+
+### Etapa 5 — Validación (motor de reglas)
+
+Ejecuta los rule-sets según categoria. Ver secciones 6 y 7.
+
+### Etapa 6 — Veredicto
+
+```text
+IF hay observaciones_nivel_B → "DEVOLUTIVO"
+ELIF hay observaciones_nivel_A → "SUBSANABLE"
+ELSE → "APROBABLE"
+```
+
+### Etapa 7 — Derivación sugerida
+
+Ver sección 8 (matriz de derivación).
+
+---
+
+## 6. RULE-SET BASE (aplica a todos los viáticos)
+
+Estas reglas ya deberían existir en tu pipeline de rendición regular; se listan para asegurar compatibilidad con el sub-módulo.
+
+```text
+IDReglaFundamentoNivelV001Anexo 3 presente y firmado6.4.3BV002Plan de Trabajo Diario presente6.4.3B (salvo OCI/AD)V003Informe de Comisión presente6.4.3B (salvo OCI/AD)V004Formato de Alertas presente6.4.3AV005Constancia en Comisión (Anexo 10) presente6.4.3 lit. gB (salvo OCI/AD/Jefes)V006Anexo 11 (Supervisión) solo si la comisión fue supervisión/monitoreo6.4.3 lit. hCondicionalV007Cada comprobante en Anexo 3 tiene físico6.4.3 + 6.4.8BV008Consulta SUNAT de RUC adjunta (Activo/Habido)6.4.3 lit. j + OM 00016AV009Alimentación detalla consumo6.4.11AV010Hospedaje indica fechas ingreso/salida; distribución proporcional6.4.12B/AV011Movilidad precisa itinerario6.4.14AV012No hay conceptos prohibidos (alcohol, ropa, medicinas, etc.)6.4.13BV013Factura > S/ 700 con retención IGV4.1.13BV014Tope diario ≤ S/ 320 (Escala-2) o S/ 380 (Alta Dirección)6.4BV015DJ ≤ 30% del total de viáticos otorgados6.4.7 / 6.4.17BV016DJ movilidad dentro de topes (Lima/Regiones)6.4.18AV017Comprobantes a nombre de la UE con RUC correcto6.4.8BV018Firmas requeridas completas (digitales FAU o manuscritas)4.1.4 / 6.4.3A/BV019Numeración de anexos puede diferir (formato antiguo) — NO observableDisp. interna MINEDUInformativo
+```
+
+---
+
+## 7. RULE-SET ESPECÍFICO — REEMBOLSO POR MAYOR GASTO
+
+Reglas adicionales exclusivas del sub-módulo.
+
+```text
+IDReglaFundamentoNivelR001Existe Informe Técnico que justifica la necesidad del servicio no prevista y cita los numerales 4.1.12 y 6.6.14.1.12 / 6.6.1BR002El Informe Técnico cuenta con V°B° del Jefe de la unidad de organización (Coordinador u órgano equivalente)6.6.1BR003La justificación describe concretamente el hecho excepcional (qué no estaba previsto)6.6.1AR004Los gastos solicitados corresponden a actividades dentro del Plan de Trabajo e Informe de Comisión (coherencia)6.4.1BR005El monto recibido por la comisionada para esos conceptos es S/ 0 (o menor al gasto); si hubo adelanto previo, debe estar ya rendido y habilitado en SIGA6.6.1BR006Los gastos son razonables, coherentes y proporcionales al período y ubicación (validar contra estándares de mercado regional)6.4.1AR007El Anexo 3 muestra REEMBOLSO > 0 y DEVOLUCIÓN = 0; el total recibido = 0Formato SIGAB (consistencia)R008La solicitud se presenta dentro del plazo razonable posterior a la comisión (análogo a 10 días hábiles)6.4AR009Si el reembolso es complementario a un viático ya rendido, se adjunta referencia a la planilla previa (N° y estado)Práctica MINEDUAR010Existe Certificación de Crédito Presupuestario vigente que cubra el reembolsoDL 1440BR011No se solicita reembolso por conceptos no aceptados (ver V012)6.4.13BR012Para gastos sin comprobante, aplicar los mismos topes de DJ (6.4.18) como si fuera rendición regular6.4.18BR013El Informe Técnico no contradice el Informe de Comisión ni el Plan de Trabajo en fechas/lugaresCoherenciaA
+```
+
+---
+
+## 8. FLUJO ADMINISTRATIVO INTERNO (para enriquecer el output con "derivación sugerida")
+
+### 8.1 Ruta estándar del reembolso
+
+```text
+DIED/Área usuaria (elabora Informe Técnico + V°B° del Coordinador)
+      ↓
+Mesa de Partes (SINAD Reingreso)
+      ↓
+OGA — Oficina General de Administración (Teresa Quiroz u homólogo)
+      ↓
+OCCP — Oficina de Contabilidad y Control Previo
+      ↓
+Coordinación de Control Previo (REVISIÓN: analista asignado)
+      ↓                                   ↓
+  SI APROBABLE                       SI DEVOLUTIVO
+      ↓                                   ↓
+Coordinación Financiera / DIFI      DIED (subsanar y reingresar)
+      ↓
+Tesorería (giro y pago al CCI de la comisionada)
+```
+
+### 8.2 Casos especiales que debe manejar el pipeline
+
+```text
+CasoAcción internaResponsable típicoReembolso tras rendición con devolución de saldoHabilitar planilla en SIGA antes de generar SIAF del reembolsoBertha (UE 026) / Milton (UE 024)Reembolso complementario sin planilla previaIr directamente al flujo de OGA → Financiera → TesoreríaAnalista de Control PrevioExpediente con observaciones A (subsanable)Devolver a DIED con proveído de observaciones detalladasAnalista de Control PrevioExpediente con observaciones B (devolutivo)Devolver a DIED con sustento normativoAnalista de Control Previo
+```
+
+### 8.3 Output de derivación (JSON)
+
+```text
+json{
+  "veredicto": "APROBABLE",
+  "siguiente_etapa": "COORDINACION_FINANCIERA_DIFI",
+  "requiere_habilitacion_siga": false,
+  "responsable_habilitacion": null,
+  "unidad_ejecutora": "026",
+  "memorando_sugerido": "DERIVACION_CP_CONFORME",
+  "plazo_estimado_pago_dias_habiles": 7
+}
+```
+
+---
+
+## 9. MATRIZ DE OBSERVACIONES → DERIVACIÓN
+
+```text
+VeredictoNivel de gravedadAcciónDestinoAPROBABLESin observacionesProveído de conformidadCoordinación Financiera / DIFISUBSANABLESolo observaciones AProveído con observaciones subsanablesDIED / Área usuariaDEVOLUTIVOAl menos 1 observación BProveído con sustento normativoDIED / Área usuariaATÍPICOCaso no previstoElevar a supervisorCoordinador de Control Previo
+```
+
+---
+
+## 10. VALIDACIÓN SUNAT — IMPLEMENTACIÓN TÉCNICA
+
+**REGLA CRÍTICA — OM 00016-2026-MINEDU/SG-OGA Precisión 2:**
+
+- La validación exigida es consulta de RUC (Estado = ACTIVO y Condición = HABIDO).
+- La consulta CPE NO sustituye la consulta RUC.
+
+```text
+pythondef validar_sunat(comprobante):
+    if comprobante.consulta_ruc_adjunta:
+        if comprobante.ruc_estado == "ACTIVO" and comprobante.ruc_condicion == "HABIDO":
+            return Resultado(conforme=True, obs=None)
+        else:
+            return Resultado(conforme=False, nivel="B",
+                obs="RUC no está Activo/Habido")
+    elif comprobante.consulta_cpe_adjunta:
+        return Resultado(conforme=False, nivel="A",
+            obs="Solo presenta consulta CPE — falta consulta de RUC Activo/Habido (OM 00016, Precisión 2)")
+    else:
+        return Resultado(conforme=False, nivel="A",
+            obs="Sin validación SUNAT adjunta (6.4.3 lit. j + OM 00016)")
+```
+
+**Endpoint oficial para validación en línea:**
+
+`https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp`
+
+Se recomienda que el pipeline NO consuma directamente el servicio SUNAT para evitar bloqueos; debe verificar que el expediente adjunte el pantallazo/PDF de la consulta RUC. Opcionalmente, hacer una consulta secundaria de control interno sin reemplazar el requisito documental.
+
+---
+
+## 11. TOPES Y VERIFICACIÓN PROGRAMÁTICA
+
+```text
+ConceptoTopeAplica aViático diario totalS/ 320 (Escala-2) / S/ 380 (Alta Dirección)Rendición regular y reembolsoDJ total≤ 30% del total de viáticos otorgadosRendición regular y reembolsoDJ traslado aeropuerto (Regiones)S/ 35 por servicio—DJ traslado terrapuerto (Regiones)S/ 25 por servicio—DJ movilidad local (Regiones)S/ 30 acumulado/día—DJ movilidad local (Lima)S/ 45 acumulado/día—Retención IGV3% si factura > S/ 700—
+```
+
+**Regla de distribución de hospedaje:** si una factura cubre N noches, el pipeline debe dividir monto / N y asignar la porción a cada día antes de verificar el tope diario. Nunca asignar el total a un solo día.
+
+---
+
+## 12. ENTREGABLES DEL PIPELINE (por expediente)
+
+- Informe Excel (10 hojas: Datos, Inventario, Checklist, Comprobantes, Cruce Anexo 3, Topes, DJ, Firmas, Coherencia, Observaciones).
+- JSON estructurado según schema de la sección 4.
+- Proveído/Memorándum sugerido (Word o Markdown) con:
+  - Veredicto
+  - Observaciones numeradas con fundamento normativo
+  - Destinatario de derivación sugerido
+
+**Trazabilidad:** log de reglas evaluadas con timestamp, versión del rule-set, hash del expediente.
+
+---
+
+## 13. CASOS DE PRUEBA SUGERIDOS
+
+```text
+IDEscenarioResultado esperadoTC01Reembolso S/ 104, 4 comprobantes con consulta RUC, DJ 28% del total, todo coherenteAPROBABLETC02Reembolso sin consulta RUC (solo CPE)SUBSANABLE (nivel A)TC03Reembolso sin Informe Técnico que justifique necesidadDEVOLUTIVO (nivel B)TC04Reembolso con concepto prohibido (bebidas alcohólicas)DEVOLUTIVOTC05Reembolso complementario a planilla aún sin habilitar SIGAATÍPICO (requiere habilitación previa de Bertha/Milton)TC06Reembolso con DJ > 30% del totalDEVOLUTIVOTC07Reembolso con comprobantes emitidos a nombre personal en vez de UEDEVOLUTIVOTC08Rendición regular clasificada correctamente (no confundir con reembolso)Clasificación = RENDICION_REGULAR
+```
+
+---
+
+## 14. EXTENSIBILIDAD
+
+El pipeline debe exponer puntos de extensión para:
+
+- Agregar nuevas sub-categorías de viáticos (p. ej., viáticos al extranjero).
+- Actualizar topes cuando se emita una nueva Directiva o RSG.
+- Incorporar nuevos Oficios Múltiples como parches de reglas sin modificar el core.
+- Soportar múltiples Unidades Ejecutoras (024, 026, 116, y futuras).
+
+Se recomienda estructurar el rule-set en archivos YAML versionados, uno por norma (p. ej., directiva_023_2026.yaml, om_00016_2026.yaml, om_00010_2026.yaml), para que el motor los cargue y permita auditoría de cambios.
+
+---
+
+## 15. RESUMEN EJECUTIVO PARA LA IA DESARROLLADORA
+
+Construye un módulo reembolso_mayor_gasto dentro del pipeline viaticos que:
+
+- Clasifique el expediente usando las señales de la sección 4.
+- Aplique el rule-set base (V001–V019) + el rule-set específico (R001–R013).
+- Valide SUNAT exclusivamente por consulta de RUC (no CPE).
+- Verifique topes con la lógica de la sección 11.
+- Emita veredicto (APROBABLE / SUBSANABLE / DEVOLUTIVO) y derivación sugerida según la matriz de la sección 9.
+- Entregue Excel + JSON + proveído + log de trazabilidad.
+- Sea extensible a nuevas normas vía YAML.
+
+La sub-categoría "reembolso" no es independiente: hereda todas las reglas de viáticos y añade las suyas. La IA debe saber distinguir una rendición regular de un reembolso por las señales descritas, sin codificación rígida de rutas.
+
+---
+
+**Fin del pipeline.**
