@@ -8,12 +8,14 @@ más segundos/página y % páginas con al menos un fallo (gold no null mal predi
 
 Uso (Python 3.12 recomendado):
   pip install -r scripts/requirements-ocr.txt -r scripts/requirements-paso2.txt openpyxl
-  set PYTHONPATH=scripts
+  export PYTHONPATH=scripts
   python scripts/bakeoff_paso2_human_export.py
+  python scripts/bakeoff_paso2_human_export.py --tag linux_wsl --entorno "WSL2 Ubuntu (preferente D-12)"
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import shutil
@@ -27,7 +29,6 @@ from typing import Any
 
 _REPO = Path(__file__).resolve().parent.parent
 _METRICS = _REPO / "data" / "piloto_ocr" / "metrics"
-_PASO2 = _METRICS / "paso2"
 _RAW = _REPO / "data" / "piloto_ocr" / "raw"
 _LABELS = _REPO / "data" / "piloto_ocr" / "labels"
 _MANIFEST = _REPO / "data" / "piloto_ocr" / "MANIFEST_PILOTO.csv"
@@ -203,7 +204,11 @@ def compute_field_prf(
     return prec, rec, f1, tp, fp, fn
 
 
-def main() -> None:
+def main(
+    *,
+    env_tag: str | None = None,
+    entorno_label: str = "local (sin etiqueta)",
+) -> None:
     if hasattr(sys.stdout, "reconfigure"):
         try:
             sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -216,11 +221,13 @@ def main() -> None:
     run_date = date.today().isoformat()
     ymd = run_date.replace("-", "")
     ts = datetime.now(timezone.utc).astimezone().strftime("%Y-%m-%d %H:%M:%S %z")
+    file_suffix = f"_{env_tag}" if env_tag else ""
+    out_paso2 = _METRICS / (f"paso2_{env_tag}" if env_tag else "paso2")
 
     pages = _load_pilot_pages()
-    _PASO2.mkdir(parents=True, exist_ok=True)
+    out_paso2.mkdir(parents=True, exist_ok=True)
     for m in ("tesseract_baseline", "docling", "paddleocr"):
-        (_PASO2 / m).mkdir(parents=True, exist_ok=True)
+        (out_paso2 / m).mkdir(parents=True, exist_ok=True)
 
     tmpdir = tempfile.mkdtemp(prefix="paso2hv_", dir=str(_METRICS))
 
@@ -264,7 +271,7 @@ def main() -> None:
             dt_t = time.perf_counter() - t0
             motor_times["tesseract_baseline"].append(dt_t)
             pred_t = extract_fields_minimal(txt_t)
-            (_PASO2 / "tesseract_baseline" / f"{doc_id}_p{page_idx}.txt").write_text(
+            (out_paso2 / "tesseract_baseline" / f"{doc_id}_p{page_idx}.txt").write_text(
                 txt_t, encoding="utf-8"
             )
             per_motor_pages["tesseract_baseline"].append(
@@ -286,7 +293,7 @@ def main() -> None:
             dt_d = time.perf_counter() - t0
             motor_times["docling"].append(dt_d)
             pred_d = extract_fields_minimal(txt_d)
-            (_PASO2 / "docling" / f"{doc_id}_p{page_idx}.txt").write_text(
+            (out_paso2 / "docling" / f"{doc_id}_p{page_idx}.txt").write_text(
                 txt_d, encoding="utf-8"
             )
             per_motor_pages["docling"].append(
@@ -312,7 +319,7 @@ def main() -> None:
                     txt_p = ""
                 motor_times["paddleocr"].append(dt_p)
                 pred_p = extract_fields_minimal(txt_p or "")
-                (_PASO2 / "paddleocr" / f"{doc_id}_p{page_idx}.txt").write_text(
+                (out_paso2 / "paddleocr" / f"{doc_id}_p{page_idx}.txt").write_text(
                     (txt_p or "") + (f"\n\n[warn predict: {err_p}]\n" if err_p else ""),
                     encoding="utf-8",
                 )
@@ -329,7 +336,7 @@ def main() -> None:
                     }
                 )
             else:
-                (_PASO2 / "paddleocr" / f"{doc_id}_p{page_idx}.txt").write_text(
+                (out_paso2 / "paddleocr" / f"{doc_id}_p{page_idx}.txt").write_text(
                     f"[PaddleOCR no ejecutado: {paddle_fail_reason or 'N/A'}]\n",
                     encoding="utf-8",
                 )
@@ -423,6 +430,7 @@ def main() -> None:
             disp = paddle_ocr is not None
         resumen_motor.append(
             {
+                "entorno_ejecucion": entorno_label,
                 "motor": motor,
                 "disponible": disp,
                 "precision_macro_media_campo": round(macro_p, 4),
@@ -446,6 +454,7 @@ def main() -> None:
                 obs.append("PaddleOCR no ejecutado en este entorno.")
             fallo = page_has_failure(g, p) if not rec.get("omitido") else True
             row = {
+                "entorno_ejecucion": entorno_label,
                 "motor": motor,
                 "doc_id": rec["doc_id"],
                 "nombre_pdf": rec["nombre_pdf"],
@@ -484,6 +493,7 @@ def main() -> None:
                     ex = "1" if gold_pred_match(campo, gv, pv) else "0"
                 consolidated_rows.append(
                     {
+                        "entorno_ejecucion": entorno_label,
                         "motor": motor,
                         "doc_id": rec["doc_id"],
                         "nombre_pdf": rec["nombre_pdf"],
@@ -501,7 +511,7 @@ def main() -> None:
                 )
 
     # Guardar CSV consolidado
-    csv_path = _METRICS / f"bakeoff_paso2_consolidado_{ymd}.csv"
+    csv_path = _METRICS / f"bakeoff_paso2_consolidado_{ymd}{file_suffix}.csv"
     if consolidated_rows:
         keys = list(consolidated_rows[0].keys())
         with open(csv_path, "w", encoding="utf-8", newline="") as f:
@@ -515,11 +525,23 @@ def main() -> None:
     except ImportError as e:
         raise SystemExit("Instale openpyxl: pip install openpyxl") from e
 
-    xlsx_path = _METRICS / f"bakeoff_paso2_revision_{ymd}.xlsx"
+    xlsx_path = _METRICS / f"bakeoff_paso2_revision_{ymd}{file_suffix}.xlsx"
     wb = Workbook()
+    # NOTA_ENTORNO
+    ws_note = wb.active
+    ws_note.title = "NOTA_ENTORNO"
+    ws_note.append(["entorno_ejecucion", entorno_label])
+    ws_note.append(["env_tag", env_tag or "(default paso2/)"])
+    ws_note.append(["textos_intermedios", str(out_paso2.relative_to(_REPO))])
+    ws_note.append(
+        [
+            "comparacion_preferente",
+            "Si env_tag=linux_wsl: esta corrida es la comparacion preferente (D-12). "
+            "Corrida Windows referencia: bakeoff_paso2_revision_20260413.xlsx (mismo piloto).",
+        ]
+    )
     # RESUMEN
-    ws0 = wb.active
-    ws0.title = "RESUMEN"
+    ws0 = wb.create_sheet("RESUMEN", 1)
     h0 = list(resumen_motor[0].keys()) if resumen_motor else []
     if h0:
         ws0.append(h0)
@@ -551,19 +573,46 @@ def main() -> None:
     wb.save(xlsx_path)
 
     # Markdown
-    md_path = _METRICS / f"INFORME_PASO2_REVISION_{ymd}.md"
+    md_path = _METRICS / f"INFORME_PASO2_REVISION_{ymd}{file_suffix}.md"
     lines = [
         f"# Informe PASO 2 — Bake-off revisable ({run_date})",
         "",
+        f"**Entorno de ejecución:** {entorno_label}",
+        "",
+        f"**Etiqueta de corrida (`--tag`):** `{env_tag or '—'}` — CSV/XLSX/MD con sufijo `{file_suffix or '(ninguno)'}`. Textos por motor: `{out_paso2.relative_to(_REPO)}/<motor>/`.",
+        "",
         f"Generado: {ts}",
         "",
-        "## Motores",
-        "",
-        "- **tesseract_baseline**: ejecutado.",
-        "- **docling (CPU)**: ejecutado.",
-        f"- **paddleocr**: {'ejecutado' if paddle_ocr is not None else 'no viable / error en este entorno'}",
-        "",
     ]
+    if env_tag == "linux_wsl":
+        lines.extend(
+            [
+                "## Comparación preferente (D-12)",
+                "",
+                "Esta corrida en **Linux/Ubuntu vía WSL** se trata como la **comparación preferente y más confiable** frente a la corrida previa en **Windows** (artefactos `bakeoff_paso2_*_20260413.*` / `INFORME_PASO2_REVISION_20260413.md` sin sufijo `linux_wsl`), cuando Windows pudo introducir limitaciones de runtime (p. ej. PaddleOCR / oneDNN).",
+                "",
+                "### Referencia Windows (2026-04-13)",
+                "",
+                "| motor | P macro | R macro | F1 macro | s/página | % págs. fallo |",
+                "|-------|---------|---------|----------|----------|----------------|",
+                "| tesseract_baseline | 0.9833 | 0.6572 | 0.7388 | 0.0096 | 100.0 |",
+                "| docling | 0.9833 | 0.5761 | 0.6852 | 1.5756 | 100.0 |",
+                "| paddleocr | 0.0 | 0.0 | 0.0 | 0.0 | 100.0 |",
+                "",
+                "*Valores tomados del informe Windows `INFORME_PASO2_REVISION_20260413.md` (Paddle no ejecutó inferencia en ese entorno).*",
+                "",
+            ]
+        )
+    lines.extend(
+        [
+            "## Motores",
+            "",
+            "- **tesseract_baseline**: ejecutado.",
+            "- **docling (CPU)**: ejecutado.",
+            f"- **paddleocr**: {'ejecutado' if paddle_ocr is not None else 'no viable / error en este entorno'}",
+            "",
+        ]
+    )
     if paddle_fail_reason:
         lines.extend(
             [
@@ -573,10 +622,24 @@ def main() -> None:
                 "",
             ]
         )
+    if env_tag == "linux_wsl":
+        lines.extend(
+            [
+                "## Esta corrida (WSL/Linux)",
+                "",
+                "### Tabla comparativa (resumen)",
+                "",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "## Tabla comparativa (resumen)",
+                "",
+            ]
+        )
     lines.extend(
         [
-            "## Tabla comparativa (resumen)",
-            "",
             "| motor | P macro* | R macro* | F1 macro* | s/página | % págs. fallo |",
             "|-------|----------|----------|-----------|----------|----------------|",
         ]
@@ -592,14 +655,46 @@ def main() -> None:
             "",
             "*Media aritmética de precision/recall/F1 **por campo** (10 campos del extractor mínimo).",
             "",
+        ]
+    )
+    if env_tag == "linux_wsl":
+        _p2 = out_paso2.relative_to(_REPO)
+        paddle_wsl = (
+            f"PaddleOCR **sí** ejecutó inferencia en WSL (hoja Excel `paddleocr`, textos `{_p2}/paddleocr/`)."
+            if paddle_ocr is not None
+            else f"PaddleOCR **no** ejecutó inferencia en WSL; ver error arriba y placeholders en `{_p2}/paddleocr/`."
+        )
+        lines.extend(
+            [
+                "## Windows vs WSL/Linux",
+                "",
+                "| Aspecto | Windows (corrida ref. 2026-04-13) | WSL/Linux (esta corrida) |",
+                "|---------|-----------------------------------|---------------------------|",
+                "| Artefactos | `bakeoff_paso2_*_20260413.*`, `paso2/<motor>/` | mismos nombres con sufijo `_linux_wsl` y carpeta `paso2_linux_wsl/` |",
+                "| Confianza D-12 | secundaria si el runtime distorsionó OCR | **preferente** para decisión de motores |",
+                "| PaddleOCR | no inferencia (0 métricas útiles) | " + paddle_wsl.replace("|", "\\|") + " |",
+                "",
+            ]
+        )
+    lines.extend(
+        [
             "## Archivos",
             "",
             f"- Excel: `{xlsx_path.relative_to(_REPO)}`",
             f"- CSV consolidado: `{csv_path.relative_to(_REPO)}`",
-            f"- Textos por motor: `{_PASO2.relative_to(_REPO)}/<motor>/`",
+            f"- Textos por motor: `{out_paso2.relative_to(_REPO)}/<motor>/`",
             "",
         ]
     )
+    if env_tag == "linux_wsl":
+        lines.extend(
+            [
+                "## Recomendación preliminar actualizada",
+                "",
+                "Comparar la tabla **Esta corrida (WSL/Linux)** con **Referencia Windows**. Priorizar F1 macro y recall por campo según ROADMAP; si PaddleOCR solo es viable en WSL, la recomendación de motor puede cambiar respecto de Windows.",
+                "",
+            ]
+        )
     md_path.write_text("\n".join(lines), encoding="utf-8")
 
     print("OK")
@@ -609,4 +704,16 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    ap = argparse.ArgumentParser(description="PASO 2 bake-off export humano")
+    ap.add_argument(
+        "--tag",
+        default=None,
+        help="Sufijo en archivos y carpeta paso2_<tag> (ej. linux_wsl)",
+    )
+    ap.add_argument(
+        "--entorno",
+        default="local (sin etiqueta)",
+        help='Etiqueta legible del entorno (ej. "WSL2 Ubuntu")',
+    )
+    args = ap.parse_args()
+    main(env_tag=args.tag, entorno_label=args.entorno)

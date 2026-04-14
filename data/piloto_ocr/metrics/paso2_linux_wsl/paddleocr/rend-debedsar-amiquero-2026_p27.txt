@@ -1,0 +1,112 @@
+FACTURA ELECTRONICA
+E T M TOURS PUQUIO-NASCA SOCIEDAD ANONIMA CERRADA
+RUC: 20611798637
+JR. OCAÑA SIN NUMERO SEGUNDA SN
+E001-324
+PUQUIO - LUCANAS - AYACUCHO
+Forma de pago: Contado
+Fecha de Emisión
+: 08/02/2026
+PROGRAMA EDUCACION BASICA
+Señor(es)
+PARA TODOS
+RUC
+: 20380795907
+JR. OCAÃ'A SIN NUMERO SEGUNDA
+Establecimiento del Emisor
+SN AYACUCHO-LUCANAS-PUQUIO
+Tipo de Moneda
+: SOLES
+Observación
+• •
+Valor Unitario
+ICBPER
+Cantidad
+Unidad Medida
+Descripción
+40.00
+0.00
+1.00
+UNIDAD
+PQUIO-NASCA
+S/ 40.00
+Sub Total Ventas :
+S/ 0.00
+Anticipos :
+S/ 0.00
+Descuentos :
+Valor de Venta de Operaciones Gratuitas : S/ 0.00
+S/ 40.00
+Valor Venta :
+ISC :
+S/ 0.00
+IGV :
+S/ 0.00
+SON: CUARENTA Y 00/100 SOLES
+S/ 0.00
+ICBPER :
+S/ 0.00
+Otros Cargos :
+S/ 0.00
+Otros Tributos :
+S/ 0.00
+Monto de redondeo :
+S/ 40.00
+Importe Total :
+verificarla utilizando su clave SOL.
+FACTURA ELECTRONICA
+E T M TOURS PUQUIO-NASCA SOCIEDAD ANONIMA CERRADA
+RUC: 20611798637
+JR. OCAÑA SIN NUMERO SEGUNDA SN
+E001-324
+PUQUIO - LUCANAS - AYACUCHO
+Forma de pago: Contado
+Fecha de Emisión
+: 08/02/2026
+PROGRAMA EDUCACION BASICA
+Señor(es)
+PARA TODOS
+RUC
+: 20380795907
+JR. OCAÃ'A SIN NUMERO SEGUNDA
+Establecimiento del Emisor
+SN AYACUCHO-LUCANAS-PUQUIO
+Tipo de Moneda
+: SOLES
+Observación
+• •
+Valor Unitario
+ICBPER
+Cantidad
+Unidad Medida
+Descripción
+40.00
+0.00
+1.00
+UNIDAD
+PQUIO-NASCA
+S/ 40.00
+Sub Total Ventas :
+S/ 0.00
+Anticipos :
+S/ 0.00
+Descuentos :
+Valor de Venta de Operaciones Gratuitas : S/ 0.00
+S/ 40.00
+Valor Venta :
+ISC :
+S/ 0.00
+IGV :
+S/ 0.00
+SON: CUARENTA Y 00/100 SOLES
+S/ 0.00
+ICBPER :
+S/ 0.00
+Otros Cargos :
+S/ 0.00
+Otros Tributos :
+S/ 0.00
+Monto de redondeo :
+S/ 40.00
+Importe Total :
+verificarla utilizando su clave SOL.

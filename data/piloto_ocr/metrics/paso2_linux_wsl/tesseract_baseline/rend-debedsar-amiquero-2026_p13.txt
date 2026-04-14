@@ -1,0 +1,55 @@
+Representación impresa de la FACTURA ELECTRÓNICA. Esta puede ser consultada en https://hatunwasi.cpesimple.online/buscar
+RESTAURANT HATUN WASI
+De: PACHECO COYLLO GLORIA YOLANDA
+JR. LEONCIO PRADO N° 295 , PUQUIO , LUCANAS -
+AYACUCHO
+D. Comercial: JR. LEONCIO PRADO N° 295
+935 737 974
+yolandaccoyllopacheco@gmail.com
+RESTAURANTE - COMIDAS TIPICAS - ATENCION DE BUFFET
+PARA BAUTIZOS, MATRIMONIOS Y TODO TIPO DE EVENTOS
+SOCIALES
+RUC 10288513673
+FACTURA ELECTRÓNICA
+F001-00001706
+Fecha de emisión
+: 2026-02-06
+Fecha de vencimiento
+: 2026-02-06
+Cliente
+: PROGRAMA EDUCACION BASICA PARA TODOS
+RUC
+: 20380795907
+Dirección
+: CAL. DEL COMERCIO NRO. 193 RES. LAS TORRES DE SAN BORJA SAN BORJA , LIMA , LIMA
+Cant.
+Unidad
+Descripción
+P.Unit
+Dto.
+Total
+1
+UND
+1/2 de cuy chactado
+40.00
+0.00
+40.00
+1
+UND
+JARRA DE CHICHA
+6.00
+0.00
+6.00
+Op. Gravadas: S/
+38.98
+IGV: S/
+7.02
+Total a pagar: S/
+46.00
+Son: Cuarenta y seis con 00/100 Soles
+DrBkztMKqJWGgVM8RwnLzhYxhWM=
+Condición de Pago: Contado
+Pagos:
+• Efectivo - S/ 46
+Vendedor:
+Administrador

@@ -1,0 +1,140 @@
+FACTURA ELECTRONICA
+RUC: 20612666751
+HOTEL SUMAC SAMARI S.A.C.
+E001-478
+PUQUIO - LUCANAS - AYACUCHO
+Forma de pago : Contado
+Fecha de Emisión
+: 08/02/2026
+PROGRAMA EDUCACION
+Señor(es)
+BASICA PARA TODOS
+RUC
+: 20380795907
+CAL. DEL COMERCIO 193 RES.
+Dirección del Cliente
+: LAS TORRES DE SAN BORJA
+LIMA-LIMA-SAN BORJA
+Tipo de Moneda
+: SOLES
+Observación
+• •
+ICBPER
+Valor Unitario
+0.00
+Cantidad
+Unidad Medida
+Descripción
+271.493213
+1.00
+UNIDAD
+POR SERVICIO DE HOSPEDAJE DE UNA HABITACION SUITE
+DEL DIA 06/02/2026 AL DIA 08/02/2026
+S/
+271.49
+Sub Total
+Ventas
+S/
+0.00
+Anticipos :
+S/
+0.00
+Valor de Venta de
+Descuentos :
+S/ 0.00
+S/
+271.49
+Operaciones Gratuitas
+Valor Venta :
+S/
+0.00
+ISC :
+S/
+28.51
+IGV :
+S/
+0.00
+ICBPER :
+S/
+0.00
+SON: TRESCIENTOS Y 00/100 SOLES
+Otros Cargos :
+S/
+0.00
+Otros Tributos :
+Monto de
+S/ 0.00
+redondeo
+S/ 300.00
+Importe Total :
+clave SOL.
+FACTURA ELECTRONICA
+RUC: 20612666751
+HOTEL SUMAC SAMARI S.A.C.
+E001-478
+PUQUIO - LUCANAS - AYACUCHO
+Forma de pago : Contado
+Fecha de Emisión
+: 08/02/2026
+PROGRAMA EDUCACION
+Señor(es)
+BASICA PARA TODOS
+RUC
+: 20380795907
+CAL. DEL COMERCIO 193 RES.
+Dirección del Cliente
+: LAS TORRES DE SAN BORJA
+LIMA-LIMA-SAN BORJA
+Tipo de Moneda
+: SOLES
+Observación
+• •
+ICBPER
+Valor Unitario
+0.00
+Cantidad
+Unidad Medida
+Descripción
+271.493213
+1.00
+UNIDAD
+POR SERVICIO DE HOSPEDAJE DE UNA HABITACION SUITE
+DEL DIA 06/02/2026 AL DIA 08/02/2026
+S/
+271.49
+Sub Total
+Ventas
+S/
+0.00
+Anticipos :
+S/
+0.00
+Valor de Venta de
+Descuentos :
+S/ 0.00
+S/
+271.49
+Operaciones Gratuitas
+Valor Venta :
+S/
+0.00
+ISC :
+S/
+28.51
+IGV :
+S/
+0.00
+ICBPER :
+S/
+0.00
+SON: TRESCIENTOS Y 00/100 SOLES
+Otros Cargos :
+S/
+0.00
+Otros Tributos :
+Monto de
+S/ 0.00
+redondeo
+S/ 300.00
+Importe Total :
+clave SOL.

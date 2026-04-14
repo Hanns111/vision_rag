@@ -1,0 +1,73 @@
+Sistema Integrado de Gestión Administrativa
+Módulo de Tesorería
+Versión 25.02.00.U1
+UNIDAD EJECUTORA
+NRO. IDENTIFICACIÓN
+:
+:
+026
+PROGRAMA EDUCACION BASICA PARA TODOS - 026
+000081
+SOLICITUD DE VIATICOS Nº : 
+00233
+Fecha: 
+Hora: 
+Página: 1 de 1
+Centro de Costo: 
+Solicitante: 
+Motivo del Viaje: APLICACIÓN DE LA I FASE - PUA 2026; AMIQUERO ÑAHUI,  CARLOS FERNANDO; DNI :42192880; DIRECCIÓN: URB. LOS 
+MÉDANOS MZ "C" LTE 20- ICA-ICA-ICA; CARGO: DOCENTE DE HISTORIA; CELULAR: 991725618; SINAD:103251
+026.04.00.02 - DIRECCION DE EDUCACION BASICA PARA ESTUDIANTES CON DESEMPEÑO SOBRESALIENTE Y ALTO RENDI
+GARCIA MURRIETA RICARDO OLSEN
+18:07
+27/01/2026
+AMIQUERO ÑAHUI CARLOS FERNANDO
+1-00
+0127
+22
+047
+0105
+9002
+3999999
+5000659
+FF/Rb
+Meta
+Función
+División Func.
+Grupo Func.
+Prg.
+Prod/Pry
+Act/AI/Obr.
+3 d 4 h
+EMPLEADOS DEBEDSAR
+Comisionado: 
+Nº Días/Horas: 
+Escala: 
+DNI: 42192880
+Tipo de Ruta
+Origen
+Destino
+Obs.: 
+Terrestre
+Obs.: 
+AYACUCHO - LUCANAS - PUQUIO
+ICA - ICA - ICA
+Obs.: 
+Terrestre
+Obs.: 
+ICA - ICA - ICA
+AYACUCHO - LUCANAS - PUQUIO
+AYACUCHO, LUCANAS, PUQUIO
+Origen: 
+Obs.: 
+Destino: 
+Obs.: 
+ICA, ICA, ICA
+Salida: 06/02/2026
+Regreso: 09/02/2026
+01:00am
+05:00am
+3 d 4 h
+Nº Días/Horas: 
+Firma Autorizada
+Firma del Solicitante

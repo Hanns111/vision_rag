@@ -1,0 +1,109 @@
+## MULTISERVICIOS ASIEL S.A.C. MULTISERVICIOS ASIEL S.A.C.
+
+C.P. SIN BARRIO COMATRANA MZA. Q LOTE. 18 CP. COMATRANA ICA - ICA - ICA
+
+## FACTURA ELECTRONICA RUC: 20606737310 E001-2203
+
+Fecha de Emisión
+
+: 08/02/2026
+
+Señor(es) :
+
+PROGRAMA EDUCACION BASICA
+
+PARA TODOS
+
+RUC
+
+: 20380795907
+
+Dirección del Cliente
+
+: TORRES DE SAN BORJA LIMA-LIMA-
+
+CAL. DEL COMERCIO 193 RES. LAS
+
+SAN BORJA
+
+Tipo de Moneda
+
+:
+
+SOLES
+
+Observación
+
+:
+
+Forma de pago: Contado
+
+Cantidad
+
+Unidad Medida
+
+Descripción
+
+Valor Unitario
+
+ICBPER
+
+1.00
+
+UNIDAD
+
+SERVICIO DE TRANSPORTE RUTA NASCA - ICA PASAJERO CARLOS FERNANDO AMIQUERO ÑAHUI DNI 42192880
+
+29.66
+
+0.00
+
+Valor de Venta de Operaciones Gratuitas : S/ 0.00
+
+SON: TREINTA Y CINCO Y 00/100 SOLES
+
+Sub Total Ventas :
+
+S/ 29.66
+
+Anticipos :
+
+S/ 0.00
+
+Descuentos :
+
+S/ 0.00
+
+Valor Venta :
+
+S/ 29.66
+
+ISC :
+
+S/ 0.00
+
+IGV :
+
+S/ 5.34
+
+ICBPER :
+
+S/ 0.00
+
+Otros Cargos :
+
+S/ 0.00
+
+Otros Tributos :
+
+S/ 0.00
+
+Monto de redondeo :
+
+S/ 0.00
+
+Importe Total :
+
+S/ 35.00
+
+Esta es una representación impresa de la factura electrónica, generada en el Sistema de SUNAT. Puede verificarla utilizando su clave SOL.

@@ -1,0 +1,114 @@
+Sistema Integrado de Gestión Administrativa
+Fecha: 27/01/2026
+Módulo de Tesorería
+Hora: 18:07
+Versión 25.02.00.U1
+Página: 1 de 1
+SOLICITUD DE VIATICOS N° :
+00233
+UNIDAD EJECUTORA
+: 026
+PROGRAMA EDUCACION BASICA PARA TODOS - 026
+NRO. IDENTIFICACIÓN : 000081
+Solicitante: GARCIA MURRIETA RICARDO OLSEN
+MÉDANOS MZ "C" LTE 20- ICA-ICA-ICA; CARGO: DOCENTE DE HISTORIA; CELULAR: 991725618; SINAD:103251
+Comisionado: AMIQUERO ÑAHUI CARLOS FERNANDO
+N° Días/Horas: 3 d 4 h
+Escala: EMPLEADOS DEBEDSAR DNI: 42192880
+FF/Rb
+Meta
+Función
+División Func.
+Grupo Func.
+Prg.
+Prod/Pry
+Act/AI/Obr.
+1-00
+0127
+22
+047
+0105
+9002
+3999999
+5000659
+Origen: ICA, ICA, ICA
+Destino: AYACUCHO, LUCANAS, PUQUIO
+Obs.:
+Obs.:
+Salida: 06/02/2026
+Regreso: 09/02/2026
+05:00am
+N° Días/Horas: 3 d 4 h
+01:00am
+Tipo de Ruta
+Origen
+Destino
+Terrestre
+ICA - ICA - ICA
+AYACUCHO - LUCANAS - PUQUIO
+Obs.:
+Obs.:
+Terrestre
+AYACUCHO - LUCANAS - PUQUIO
+ICA - ICA - ICA
+Obs.:
+Obs.:
+Firmado digitalmente por:
+CARDENAS HUAYLLASCO
+Sistema Integrado de Gestión Administrativa
+Fecha: 27/01/2026
+Módulo de Tesorería
+Hora: 18:07
+Versión 25.02.00.U1
+Página: 1 de 1
+SOLICITUD DE VIATICOS N° :
+00233
+UNIDAD EJECUTORA
+: 026
+PROGRAMA EDUCACION BASICA PARA TODOS - 026
+NRO. IDENTIFICACIÓN : 000081
+Solicitante: GARCIA MURRIETA RICARDO OLSEN
+MÉDANOS MZ "C" LTE 20- ICA-ICA-ICA; CARGO: DOCENTE DE HISTORIA; CELULAR: 991725618; SINAD:103251
+Comisionado: AMIQUERO ÑAHUI CARLOS FERNANDO
+N° Días/Horas: 3 d 4 h
+Escala: EMPLEADOS DEBEDSAR DNI: 42192880
+FF/Rb
+Meta
+Función
+División Func.
+Grupo Func.
+Prg.
+Prod/Pry
+Act/AI/Obr.
+1-00
+0127
+22
+047
+0105
+9002
+3999999
+5000659
+Origen: ICA, ICA, ICA
+Destino: AYACUCHO, LUCANAS, PUQUIO
+Obs.:
+Obs.:
+Salida: 06/02/2026
+Regreso: 09/02/2026
+05:00am
+N° Días/Horas: 3 d 4 h
+01:00am
+Tipo de Ruta
+Origen
+Destino
+Terrestre
+ICA - ICA - ICA
+AYACUCHO - LUCANAS - PUQUIO
+Obs.:
+Obs.:
+Terrestre
+AYACUCHO - LUCANAS - PUQUIO
+ICA - ICA - ICA
+Obs.:
+Obs.:
+Firmado digitalmente por:
+CARDENAS HUAYLLASCO
