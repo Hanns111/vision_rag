@@ -54,6 +54,12 @@ def _cmd_process(args: argparse.Namespace) -> int:
         from ingesta.id_resolver import detectar_candidatos
     except Exception:
         detectar_candidatos = None
+    try:
+        from ingesta.comprobante_detector import detectar_bloques
+        from ingesta.comprobante_extractor import extraer_comprobantes
+    except Exception:
+        detectar_bloques = None
+        extraer_comprobantes = None
 
     dest = Path(args.dest).resolve()
     exp_id = args.expediente_id or (Path(args.src).name if args.src else None)
@@ -120,6 +126,20 @@ def _cmd_process(args: argparse.Namespace) -> int:
                     "error": f"excepcion:{exc!s}",
                 }
 
+        # Detección + extracción de comprobantes (solo rendiciones por ahora).
+        comprobantes_doc: list[dict[str, Any]] | None = None
+        if (
+            detectar_bloques is not None
+            and not args.skip_comprobantes
+            and cls.tipo_detectado == "rendicion"
+        ):
+            try:
+                bloques = detectar_bloques(texto, nombre)
+                comps = extraer_comprobantes(bloques)
+                comprobantes_doc = [c.to_dict() for c in comps]
+            except Exception as exc:
+                comprobantes_doc = [{"error": f"excepcion:{exc!s}"}]
+
         # Validación de firmas en Anexo 3: solo sobre rendiciones, desacoplada.
         # Si falla el módulo o el archivo no es rendición → validaciones=null.
         validaciones_out: dict[str, Any] | None = None
@@ -177,15 +197,18 @@ def _cmd_process(args: argparse.Namespace) -> int:
                 "texto_resumen": ext.texto_resumen,
             },
             "resolucion_id": resolucion_id_doc,
+            "comprobantes": comprobantes_doc,
             "validaciones": validaciones_out,
             "estado_procesamiento": estado,
         }
         (extractions_dir / f"{nombre}.json").write_text(
             json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
         )
+        n_comp = len(comprobantes_doc) if comprobantes_doc else 0
         print(
             f"[process]   tipo={cls.tipo_detectado} conf={cls.confianza} "
-            f"estado={estado} subtipos={cls.subtipos_detectados or '-'}"
+            f"estado={estado} subtipos={cls.subtipos_detectados or '-'} "
+            f"comprobantes={n_comp}"
         )
     return 0
 
@@ -447,6 +470,11 @@ def main(argv: list[str] | None = None) -> int:
             "--skip-resolucion",
             action="store_true",
             help="omitir resolución de identidad (SINAD/SIAF/EXP/AÑO)",
+        )
+        p.add_argument(
+            "--skip-comprobantes",
+            action="store_true",
+            help="omitir detección/extracción de comprobantes",
         )
 
     args = ap.parse_args(argv)
