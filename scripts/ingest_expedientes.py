@@ -40,7 +40,7 @@ def _cmd_scan(args: argparse.Namespace) -> int:
 
 
 def _cmd_process(args: argparse.Namespace) -> int:
-    """Lee texto → clasifica → extrae → valida → escribe extractions/{archivo}.json."""
+    """Lee texto → clasifica → extrae → resolver_id → valida → escribe extractions/{archivo}.json."""
     import json
     from dataclasses import asdict
     from ingesta.text_reader import read_pdf_with_cache
@@ -50,6 +50,10 @@ def _cmd_process(args: argparse.Namespace) -> int:
         from validaciones.firmas_anexo3 import validar as validar_firmas
     except Exception:  # validación opcional; si falta el módulo, el pipeline sigue
         validar_firmas = None
+    try:
+        from ingesta.id_resolver import detectar_candidatos
+    except Exception:
+        detectar_candidatos = None
 
     dest = Path(args.dest).resolve()
     exp_id = args.expediente_id or (Path(args.src).name if args.src else None)
@@ -101,6 +105,20 @@ def _cmd_process(args: argparse.Namespace) -> int:
             estado = "bajo_confianza"
         else:
             estado = "ok"
+
+        # Resolución de identidad (SINAD, SIAF, EXP, AÑO) — desacoplada, aditiva.
+        resolucion_id_doc: dict[str, Any] | None = None
+        if detectar_candidatos is not None and not args.skip_resolucion:
+            try:
+                cands = detectar_candidatos(texto, nombre)
+                resolucion_id_doc = {
+                    "candidatos_en_este_archivo": [c.to_dict() for c in cands]
+                }
+            except Exception as exc:
+                resolucion_id_doc = {
+                    "candidatos_en_este_archivo": [],
+                    "error": f"excepcion:{exc!s}",
+                }
 
         # Validación de firmas en Anexo 3: solo sobre rendiciones, desacoplada.
         # Si falla el módulo o el archivo no es rendición → validaciones=null.
@@ -158,6 +176,7 @@ def _cmd_process(args: argparse.Namespace) -> int:
                 "tipo_gasto": asdict(ext.tipo_gasto),
                 "texto_resumen": ext.texto_resumen,
             },
+            "resolucion_id": resolucion_id_doc,
             "validaciones": validaciones_out,
             "estado_procesamiento": estado,
         }
@@ -291,6 +310,35 @@ def _cmd_export(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_consolidate(args: argparse.Namespace) -> int:
+    """Produce control_previo/procesados/{id}/expediente.json (schema v2)."""
+    from consolidador import consolidar, escribir_expediente_json
+
+    dest = Path(args.dest).resolve()
+    exp_id = args.expediente_id or (Path(args.src).name if args.src else None)
+    if not exp_id:
+        print("[consolidate] --expediente-id o --src requerido")
+        return 2
+    exp_dir = dest / exp_id
+    if not (exp_dir / "metadata.json").exists():
+        print(f"[consolidate] falta metadata.json en {exp_dir}")
+        return 2
+    try:
+        expediente = consolidar(exp_dir)
+        out = escribir_expediente_json(expediente, exp_dir)
+    except Exception as exc:
+        print(f"[consolidate] ERROR {exc!s}")
+        return 2
+    r = expediente.resolucion_id
+    print(f"[consolidate] {out}")
+    if r:
+        print(
+            f"[consolidate]   exp={r.expediente_id_detectado} sinad={r.sinad} "
+            f"siaf={r.siaf} anio={r.anio} estado={r.estado_resolucion}"
+        )
+    return 0
+
+
 def _cmd_run_all(args: argparse.Namespace) -> int:
     rc = _cmd_scan(args)
     if rc != 0:
@@ -298,6 +346,10 @@ def _cmd_run_all(args: argparse.Namespace) -> int:
     rc = _cmd_process(args)
     if rc != 0:
         return rc
+    if not args.skip_resolucion:
+        rc = _cmd_consolidate(args)
+        if rc != 0:
+            return rc
     return _cmd_export(args)
 
 
@@ -318,7 +370,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--xlsx", type=Path, default=_DEFAULT_XLSX, help="ruta Excel salida")
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    for name in ("scan", "process", "export", "run-all"):
+    for name in ("scan", "process", "consolidate", "export", "run-all"):
         p = sub.add_parser(name)
         p.add_argument("--src", required=(name in ("scan", "run-all")), type=Path)
         p.add_argument("--expediente-id", type=str, default=None)
@@ -332,11 +384,17 @@ def main(argv: list[str] | None = None) -> int:
             action="store_true",
             help="omitir validaciones normativas (ej. firmas_anexo3)",
         )
+        p.add_argument(
+            "--skip-resolucion",
+            action="store_true",
+            help="omitir resolución de identidad (SINAD/SIAF/EXP/AÑO)",
+        )
 
     args = ap.parse_args(argv)
     dispatch = {
         "scan": _cmd_scan,
         "process": _cmd_process,
+        "consolidate": _cmd_consolidate,
         "export": _cmd_export,
         "run-all": _cmd_run_all,
     }
