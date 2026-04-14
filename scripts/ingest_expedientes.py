@@ -40,12 +40,16 @@ def _cmd_scan(args: argparse.Namespace) -> int:
 
 
 def _cmd_process(args: argparse.Namespace) -> int:
-    """Lee texto → clasifica → extrae → escribe extractions/{archivo}.json."""
+    """Lee texto → clasifica → extrae → valida → escribe extractions/{archivo}.json."""
     import json
     from dataclasses import asdict
     from ingesta.text_reader import read_pdf_with_cache
     from ingesta.classifier import classify
     from ingesta.extractor import extract_campos
+    try:
+        from validaciones.firmas_anexo3 import validar as validar_firmas
+    except Exception:  # validación opcional; si falta el módulo, el pipeline sigue
+        validar_firmas = None
 
     dest = Path(args.dest).resolve()
     exp_id = args.expediente_id or (Path(args.src).name if args.src else None)
@@ -98,6 +102,29 @@ def _cmd_process(args: argparse.Namespace) -> int:
         else:
             estado = "ok"
 
+        # Validación de firmas en Anexo 3: solo sobre rendiciones, desacoplada.
+        # Si falla el módulo o el archivo no es rendición → validaciones=null.
+        validaciones_out: dict[str, Any] | None = None
+        if (
+            validar_firmas is not None
+            and not args.skip_validaciones
+            and cls.tipo_detectado == "rendicion"
+        ):
+            try:
+                v = validar_firmas(texto)
+                validaciones_out = {"firmas_anexo3": v.to_dict()}
+            except Exception as exc:
+                validaciones_out = {
+                    "firmas_anexo3": {
+                        "tipo_validacion": "firmas_anexo3",
+                        "estado": "INSUFICIENTE_EVIDENCIA",
+                        "errores": [f"excepcion:{exc!s}"],
+                        "confianza": 0.0,
+                        "firmantes": [],
+                        "nota": "error_ejecucion_validador",
+                    }
+                }
+
         payload = {
             "archivo": nombre,
             "expediente_id": exp_id,
@@ -131,6 +158,7 @@ def _cmd_process(args: argparse.Namespace) -> int:
                 "tipo_gasto": asdict(ext.tipo_gasto),
                 "texto_resumen": ext.texto_resumen,
             },
+            "validaciones": validaciones_out,
             "estado_procesamiento": estado,
         }
         (extractions_dir / f"{nombre}.json").write_text(
@@ -226,6 +254,14 @@ def _cmd_export(args: argparse.Namespace) -> int:
             if d.get("estado_procesamiento") == "error":
                 nota = f"error: {d.get('error', '')}"
 
+            # Validaciones normativas (opcional; N/A si el archivo no se validó)
+            val = (d.get("validaciones") or {}).get("firmas_anexo3") or {}
+            val_firmas_nombre = val.get("tipo_validacion", "") if val else ""
+            val_estado = val.get("estado", "") if val else ""
+            val_errores_lista = val.get("errores", []) if val else []
+            val_errores = "; ".join(val_errores_lista) if val_errores_lista else ""
+            val_confianza: float | str = val.get("confianza", "") if val else ""
+
             documentos.append(
                 DocumentoValidacion(
                     expediente_id=d.get("expediente_id", ""),
@@ -242,6 +278,10 @@ def _cmd_export(args: argparse.Namespace) -> int:
                     texto_extraido_resumen=(ext.get("texto_resumen") or "")[:1000],
                     estado_procesamiento=d.get("estado_procesamiento", "error"),
                     nota_sistema=nota,
+                    validacion_firmas=val_firmas_nombre,
+                    estado_firmas=val_estado,
+                    errores_firmas=val_errores,
+                    confianza_firmas=val_confianza,
                 )
             )
 
@@ -286,6 +326,11 @@ def main(argv: list[str] | None = None) -> int:
             "--force",
             action="store_true",
             help="reprocesar ignorando cache (aplica a process/run-all)",
+        )
+        p.add_argument(
+            "--skip-validaciones",
+            action="store_true",
+            help="omitir validaciones normativas (ej. firmas_anexo3)",
         )
 
     args = ap.parse_args(argv)

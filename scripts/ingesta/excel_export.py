@@ -37,6 +37,11 @@ class DocumentoValidacion:
     texto_extraido_resumen: str
     estado_procesamiento: str  # "ok" | "bajo_confianza" | "error"
     nota_sistema: str = ""     # mensajes internos (overrides, errores, etc.)
+    # --- Validación normativa: firmas Anexo 3 (opcional; N/A si no es rendición) ---
+    validacion_firmas: str = ""       # "firmas_anexo3" | "" (no aplica)
+    estado_firmas: str = ""           # CONFORME | OBSERVADO | INSUFICIENTE_EVIDENCIA | ""
+    errores_firmas: str = ""          # lista separada por "; "
+    confianza_firmas: float | str = ""
 
 
 @dataclass
@@ -67,6 +72,11 @@ _COLS_SISTEMA_DOC = [
     "texto_extraido_resumen",
     "estado_procesamiento",
     "nota_sistema",
+    # validación normativa firmas Anexo 3
+    "validacion_firmas",
+    "estado_firmas",
+    "errores_firmas",
+    "confianza_firmas",
 ]
 _COLS_HUMANAS_DOC = [
     "tipo_correcto",
@@ -107,6 +117,10 @@ def _asdict_doc(d: DocumentoValidacion) -> dict[str, Any]:
         "texto_extraido_resumen": d.texto_extraido_resumen,
         "estado_procesamiento": d.estado_procesamiento,
         "nota_sistema": d.nota_sistema,
+        "validacion_firmas": d.validacion_firmas,
+        "estado_firmas": d.estado_firmas,
+        "errores_firmas": d.errores_firmas,
+        "confianza_firmas": d.confianza_firmas,
     }
 
 
@@ -197,6 +211,10 @@ def _escribir_hoja(
         "texto_extraido_resumen": 60,
         "estado_procesamiento": 18,
         "nota_sistema": 40,
+        "validacion_firmas": 18,
+        "estado_firmas": 22,
+        "errores_firmas": 40,
+        "confianza_firmas": 16,
         "tipo_correcto": 18,
         "monto_correcto": 14,
         "fecha_correcta": 14,
