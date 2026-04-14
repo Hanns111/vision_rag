@@ -1,0 +1,1042 @@
+[
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p13.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 13,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_header",
+        "lineas_usadas": [
+          "RUC 10288513673",
+          "Cliente : PROGRAMA EDUCACION BASICA PARA TODOS RUC : 20380795907"
+        ]
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "factura",
+        "regla": "anchor_factura_electronica",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_serie_FE_patron",
+        "lineas_usadas": [
+          "F001-00001706"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 38.98",
+          "IGV: S/ 7.02",
+          "Total a pagar: S/ 46.00"
+        ]
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 38.98",
+          "IGV: S/ 7.02",
+          "Total a pagar: S/ 46.00"
+        ]
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 38.98",
+          "IGV: S/ 7.02",
+          "Total a pagar: S/ 46.00"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_cliente",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "razon_lineas_previas_a_ruc",
+        "lineas_usadas": [
+          "RESTAURANT HATUN WASI",
+          "De: PACHECO COYLLO GLORIA YOLANDA"
+        ]
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p15.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 15,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_header",
+        "lineas_usadas": [
+          "RUC 10288513673",
+          "Cliente : PROGRAMA EDUCACION BASICA PARA TODOS RUC : 20380795907"
+        ]
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "factura",
+        "regla": "anchor_factura_electronica",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_serie_FE_patron",
+        "lineas_usadas": [
+          "F001-00001707"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 67.80",
+          "IGV: S/ 12.20",
+          "Total a pagar: S/ 80.00"
+        ]
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 67.80",
+          "IGV: S/ 12.20",
+          "Total a pagar: S/ 80.00"
+        ]
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 67.80",
+          "IGV: S/ 12.20",
+          "Total a pagar: S/ 80.00"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_cliente",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "razon_lineas_previas_a_ruc",
+        "lineas_usadas": [
+          "RESTAURANT HATUN WASI",
+          "De: PACHECO COYLLO GLORIA YOLANDA"
+        ]
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p17.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 17,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_header",
+        "lineas_usadas": [
+          "RUC 10288513673",
+          "Cliente : PROGRAMA EDUCACION BASICA PARA TODOS RUC : 20380795907"
+        ]
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "factura",
+        "regla": "anchor_factura_electronica",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_serie_FE_patron",
+        "lineas_usadas": [
+          "F001-00001711"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 38.14",
+          "IGV: S/ 6.86",
+          "Total a pagar: S/ 45.00"
+        ]
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 38.14",
+          "IGV: S/ 6.86",
+          "Total a pagar: S/ 45.00"
+        ]
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 38.14",
+          "IGV: S/ 6.86",
+          "Total a pagar: S/ 45.00"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_cliente",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "razon_lineas_previas_a_ruc",
+        "lineas_usadas": [
+          "RESTAURANT HATUN WASI",
+          "De: PACHECO COYLLO GLORIA YOLANDA"
+        ]
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p19.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 19,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_header",
+        "lineas_usadas": [
+          "R.U.C. : 10288019482",
+          "Cliente :  PROGRAMA EDUCACION BASICA PARA TODOS R.U.C. :  20380795907"
+        ]
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "factura",
+        "regla": "anchor_factura_electronica",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_serie_FE_patron",
+        "lineas_usadas": [
+          "Nº F003-2106"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv_total+monto_total_precio_venta",
+        "lineas_usadas": [
+          "Venta Gravada : S/ 45.45",
+          "Total I.G.V. : S/ 4.55",
+          "Total Precio de Venta : S/ 50.00"
+        ]
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv_total+monto_total_precio_venta",
+        "lineas_usadas": [
+          "Venta Gravada : S/ 45.45",
+          "Total I.G.V. : S/ 4.55",
+          "Total Precio de Venta : S/ 50.00"
+        ]
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv_total+monto_total_precio_venta",
+        "lineas_usadas": [
+          "Venta Gravada : S/ 45.45",
+          "Total I.G.V. : S/ 4.55",
+          "Total Precio de Venta : S/ 50.00"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_cliente",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "razon_lineas_previas_a_ruc",
+        "lineas_usadas": [
+          "POLLOS A LA",
+          "BRASA",
+          "RESTAURANTE EL"
+        ]
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p21.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 21,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_header",
+        "lineas_usadas": [
+          "RUC 10288513673",
+          "Cliente : PROGRAMA EDUCACION BASICA PARA TODOS RUC : 20380795907"
+        ]
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "factura",
+        "regla": "anchor_factura_electronica",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_serie_FE_patron",
+        "lineas_usadas": [
+          "F001-00001712"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 27.12",
+          "IGV: S/ 4.88",
+          "Total a pagar: S/ 32.00"
+        ]
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 27.12",
+          "IGV: S/ 4.88",
+          "Total a pagar: S/ 32.00"
+        ]
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_op_gravada+monto_igv+monto_total_pagar",
+        "lineas_usadas": [
+          "Op. Gravadas: S/ 27.12",
+          "IGV: S/ 4.88",
+          "Total a pagar: S/ 32.00"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_cliente",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "razon_lineas_previas_a_ruc",
+        "lineas_usadas": [
+          "RESTAURANT HATUN WASI",
+          "De: PACHECO COYLLO GLORIA YOLANDA"
+        ]
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p23.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 23,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_header",
+        "lineas_usadas": [
+          "RUC: 20615320561",
+          "fallback_segundo_ruc_en_documento:20380795907"
+        ]
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "factura",
+        "regla": "anchor_factura_electronica",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_serie_FE_patron",
+        "lineas_usadas": [
+          "E001-27"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 5.34",
+          "Importe Total : S/ 35.00"
+        ]
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 5.34",
+          "Importe Total : S/ 35.00"
+        ]
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 5.34",
+          "Importe Total : S/ 35.00"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_cliente",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "razon_lineas_previas_a_ruc",
+        "lineas_usadas": [
+          "POLLOS & PARRILLAS AMIGOS",
+          "POLLOS A LA BRASA AMIGOS S.A.C."
+        ]
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p25.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 25,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_header",
+        "lineas_usadas": [
+          "RUC: 20612666751",
+          "fallback_segundo_ruc_en_documento:20380795907"
+        ]
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "factura",
+        "regla": "anchor_factura_electronica",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_serie_FE_patron",
+        "lineas_usadas": [
+          "E001-478"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 28.51",
+          "Importe Total : S/ 300.00"
+        ]
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 28.51",
+          "Importe Total : S/ 300.00"
+        ]
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 28.51",
+          "Importe Total : S/ 300.00"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_cliente",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "razon_none",
+        "lineas_usadas": []
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p27.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 27,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_header",
+        "lineas_usadas": [
+          "RUC: 20611798637",
+          "fallback_segundo_ruc_en_documento:20380795907"
+        ]
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "factura",
+        "regla": "anchor_factura_electronica",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_serie_FE_patron",
+        "lineas_usadas": [
+          "E001-324"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 0.00",
+          "Importe Total : S/ 40.00"
+        ]
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 0.00",
+          "Importe Total : S/ 40.00"
+        ]
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 0.00",
+          "Importe Total : S/ 40.00"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_cliente",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "razon_lineas_previas_a_ruc",
+        "lineas_usadas": [
+          "E T M TOURS PUQUIO-NASCA SOCIEDAD ANONIMA CERRADA"
+        ]
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p29.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 29,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_header",
+        "lineas_usadas": [
+          "RUC: 20606737310",
+          "fallback_segundo_ruc_en_documento:20380795907"
+        ]
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "factura",
+        "regla": "anchor_factura_electronica",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_serie_FE_patron",
+        "lineas_usadas": [
+          "E001-2203"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "factura",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 5.34",
+          "Importe Total : S/ 35.00"
+        ]
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 5.34",
+          "Importe Total : S/ 35.00"
+        ]
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "factura",
+        "regla": "monto_igv+monto_importe_total",
+        "lineas_usadas": [
+          "IGV : S/ 5.34",
+          "Importe Total : S/ 35.00"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "factura_ruc_cliente",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "factura",
+        "regla": "razon_lineas_previas_a_ruc",
+        "lineas_usadas": [
+          "MULTISERVICIOS ASIEL S.A.C.",
+          "MULTISERVICIOS ASIEL S.A.C."
+        ]
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p5.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 5,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "nota_pago",
+        "regla": "nota_ruc_none",
+        "lineas_usadas": []
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "nota_pago",
+        "regla": "anchor_nota_pago",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "nota_pago",
+        "regla": "nota_serie_linea_encabezado",
+        "lineas_usadas": [
+          "NOTA DE PAGO - N° 1792.26.95.2601620"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "nota_pago",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "nota_pago",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "nota_pago",
+        "regla": "nota_no_extraido",
+        "lineas_usadas": []
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "nota_pago",
+        "regla": "nota_no_extraido",
+        "lineas_usadas": []
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "nota_pago",
+        "regla": "nota_total_monto_letras_novecientos",
+        "lineas_usadas": [
+          "991.70 (NOVECIENTOS"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "nota_pago",
+        "regla": "nota_no_extraido",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "nota_pago",
+        "regla": "nota_no_extraido",
+        "lineas_usadas": []
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p7.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 7,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "informe_comision",
+        "regla": "informe_sin_campo_extra",
+        "lineas_usadas": []
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "informe_comision",
+        "regla": "anchor_informe_comision",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "informe_comision",
+        "regla": "informe_sin_campo_extra",
+        "lineas_usadas": []
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "informe_comision",
+        "regla": "informe_fecha_texto_es",
+        "lineas_usadas": [
+          "27 de febrero de 2026"
+        ]
+      },
+      "moneda": {
+        "tipo_doc_inferido": "informe_comision",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "informe_comision",
+        "regla": "informe_sin_campo_extra",
+        "lineas_usadas": []
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "informe_comision",
+        "regla": "informe_sin_campo_extra",
+        "lineas_usadas": []
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "informe_comision",
+        "regla": "informe_sin_campo_extra",
+        "lineas_usadas": []
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "informe_comision",
+        "regla": "informe_sin_campo_extra",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "informe_comision",
+        "regla": "informe_sin_campo_extra",
+        "lineas_usadas": []
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\rend-debedsar-amiquero-2026_p8.txt",
+    "doc_id": "rend-debedsar-amiquero-2026",
+    "page_index": 8,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "anexo_informe",
+        "regla": "anexo_skip_campo",
+        "lineas_usadas": []
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "anexo_informe",
+        "regla": "anchor_anexo_cuerpo_narrativo",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "anexo_informe",
+        "regla": "anexo_skip_campo",
+        "lineas_usadas": []
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "anexo_informe",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "anexo_informe",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "anexo_informe",
+        "regla": "anexo_skip_campo",
+        "lineas_usadas": []
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "anexo_informe",
+        "regla": "anexo_skip_campo",
+        "lineas_usadas": []
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "anexo_informe",
+        "regla": "anexo_skip_campo",
+        "lineas_usadas": []
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "anexo_informe",
+        "regla": "anexo_skip_campo",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "anexo_informe",
+        "regla": "anexo_skip_campo",
+        "lineas_usadas": []
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\ri-debedsar-amiquero-2026_p1.txt",
+    "doc_id": "ri-debedsar-amiquero-2026",
+    "page_index": 1,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "ri",
+        "regla": "ri_ruc_etiqueta",
+        "lineas_usadas": [
+          "RUC N°:  20380795907"
+        ]
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "ri",
+        "regla": "anchor_devolucion_viaticos",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "ri",
+        "regla": "ri_serie_flexible_ocr_multilinea",
+        "lineas_usadas": [
+          "900 9 4 2026"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "ri",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "ri",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "ri",
+        "regla": "ri_no_campo",
+        "lineas_usadas": []
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "ri",
+        "regla": "ri_no_campo",
+        "lineas_usadas": []
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "ri",
+        "regla": "ri_total_antes_datos_generales",
+        "lineas_usadas": [
+          "138.70\nDATOS GENERALES"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "ri",
+        "regla": "ri_no_campo",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "ri",
+        "regla": "ri_no_campo",
+        "lineas_usadas": []
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\sol-viat-debedsar-2026_p1.txt",
+    "doc_id": "sol-viat-debedsar-2026",
+    "page_index": 1,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "solicitud_viaticos",
+        "regla": "planilla_ruc_none",
+        "lineas_usadas": []
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "solicitud_viaticos",
+        "regla": "anchor_solicitud_viaticos",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "solicitud_viaticos",
+        "regla": "solicitud_numero_bajo_titulo",
+        "lineas_usadas": [
+          "SOLICITUD DE VIATICOS Nº :  | 00233"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "solicitud_viaticos",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "solicitud_viaticos",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "solicitud_viaticos",
+        "regla": "planilla_sol_no_campo",
+        "lineas_usadas": []
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "solicitud_viaticos",
+        "regla": "planilla_sol_no_campo",
+        "lineas_usadas": []
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "desconocido",
+        "regla": null,
+        "lineas_usadas": []
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "solicitud_viaticos",
+        "regla": "planilla_sol_no_campo",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "desconocido",
+        "regla": null,
+        "lineas_usadas": []
+      }
+    }
+  },
+  {
+    "archivo_ocr": "data\\piloto_ocr\\metrics\\paso2_linux_wsl\\tesseract_baseline\\sol-viat-debedsar-2026_p2.txt",
+    "doc_id": "sol-viat-debedsar-2026",
+    "page_index": 2,
+    "trace_por_campo": {
+      "ruc_emisor": {
+        "tipo_doc_inferido": "planilla_viaticos",
+        "regla": "planilla_ruc_none",
+        "lineas_usadas": []
+      },
+      "tipo_documento": {
+        "tipo_doc_inferido": "planilla_viaticos",
+        "regla": "anchor_planilla_viaticos",
+        "lineas_usadas": []
+      },
+      "serie_numero": {
+        "tipo_doc_inferido": "planilla_viaticos",
+        "regla": "planilla_numero_antes_titulo",
+        "lineas_usadas": [
+          "00242 | PLANILLA DE VIÁTICOS"
+        ]
+      },
+      "fecha_emision": {
+        "tipo_doc_inferido": "planilla_viaticos",
+        "regla": "shared_fecha_primer_iso_o_slash",
+        "lineas_usadas": []
+      },
+      "moneda": {
+        "tipo_doc_inferido": "planilla_viaticos",
+        "regla": "shared_moneda_pen_usd",
+        "lineas_usadas": []
+      },
+      "monto_subtotal": {
+        "tipo_doc_inferido": "planilla_viaticos",
+        "regla": "planilla_sol_no_campo",
+        "lineas_usadas": []
+      },
+      "monto_igv": {
+        "tipo_doc_inferido": "planilla_viaticos",
+        "regla": "planilla_sol_no_campo",
+        "lineas_usadas": []
+      },
+      "monto_total": {
+        "tipo_doc_inferido": "planilla_viaticos",
+        "regla": "planilla_total_linea_siguiente",
+        "lineas_usadas": [
+          "Total :\n991.70"
+        ]
+      },
+      "ruc_receptor": {
+        "tipo_doc_inferido": "planilla_viaticos",
+        "regla": "planilla_sol_no_campo",
+        "lineas_usadas": []
+      },
+      "razon_social_emisor": {
+        "tipo_doc_inferido": "planilla_viaticos",
+        "regla": "planilla_sra_comisionado",
+        "lineas_usadas": [
+          "Sr(a): CARLOS FERNANDO AMIQUERO ÑAHUI"
+        ]
+      }
+    }
+  }
+]
