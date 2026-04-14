@@ -1,0 +1,31 @@
+archivo,doc_id,page_index,campo,es_objetivo,gold,pred_A,pred_B1,pred_B2,ok_A,ok_B1,ok_B2,delta_B1_vs_A,delta_B2_vs_A,paso4_candidato_A
+sol-viat-debedsar-2026.pdf,sol-viat-debedsar-2026,2,serie_numero,Sí,00242,,,,0,0,0,0,0,No
+sol-viat-debedsar-2026.pdf,sol-viat-debedsar-2026,2,monto_subtotal,Sí,,,,,,,,N/A,N/A,No
+sol-viat-debedsar-2026.pdf,sol-viat-debedsar-2026,2,monto_total,Sí,991.70,,,,0,0,0,0,0,No
+sol-viat-debedsar-2026.pdf,sol-viat-debedsar-2026,2,monto_igv,Sí,,,,,,,,N/A,N/A,No
+sol-viat-debedsar-2026.pdf,sol-viat-debedsar-2026,2,ruc_emisor,No,20380795907,04601608303,04601608303,04601608303,0,0,0,0,0,No
+sol-viat-debedsar-2026.pdf,sol-viat-debedsar-2026,2,tipo_documento,No,planilla_viaticos,,,,0,0,0,0,0,No
+sol-viat-debedsar-2026.pdf,sol-viat-debedsar-2026,2,fecha_emision,No,2026-01-27,2026-01-27,2026-01-27,2026-01-27,1,1,1,0,0,No
+sol-viat-debedsar-2026.pdf,sol-viat-debedsar-2026,2,moneda,No,PEN,PEN,PEN,PEN,1,1,1,0,0,No
+sol-viat-debedsar-2026.pdf,sol-viat-debedsar-2026,2,ruc_receptor,No,,20131370006,20131370006,20191370998,,,,N/A,N/A,No
+sol-viat-debedsar-2026.pdf,sol-viat-debedsar-2026,2,razon_social_emisor,No,AMIQUERO AHUI CARLOS FERNANDO,,,,0,0,0,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,5,serie_numero,Sí,1792-26-95-2601620,,,,0,0,0,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,5,monto_subtotal,Sí,,,,,,,,N/A,N/A,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,5,monto_total,Sí,991.70,991.70,991.70,991.70,1,1,1,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,5,monto_igv,Sí,,,,,,,,N/A,N/A,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,5,ruc_emisor,No,20380795907,,,,0,0,0,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,5,tipo_documento,No,nota_pago,,,,0,0,0,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,5,fecha_emision,No,2026-02-10,2026-02-10,2026-02-10,2026-02-10,1,1,1,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,5,moneda,No,PEN,PEN,PEN,PEN,1,1,1,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,5,ruc_receptor,No,,,,,,,,N/A,N/A,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,5,razon_social_emisor,No,,,,,,,,N/A,N/A,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,19,serie_numero,Sí,F003-2106,F003-2106,F003-2106,F003-2106,1,1,1,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,19,monto_subtotal,Sí,45.45,,,,0,0,0,0,0,Sí
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,19,monto_total,Sí,50.00,1.00,1.00,1.00,0,0,0,0,0,Sí
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,19,monto_igv,Sí,4.55,,,,0,0,0,0,0,Sí
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,19,ruc_emisor,No,10288019482,10288019482,10288019482,10288019482,1,1,1,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,19,tipo_documento,No,01,01,01,01,1,1,1,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,19,fecha_emision,No,2026-02-07,2026-02-07,2026-02-07,2026-02-07,1,1,1,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,19,moneda,No,PEN,PEN,PEN,PEN,1,1,1,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,19,ruc_receptor,No,20380795907,20380795907,20380795907,20380795907,1,1,1,0,0,No
+rend-debedsar-amiquero-2026.pdf,rend-debedsar-amiquero-2026,19,razon_social_emisor,No,RESTAURANTE EL DORADO,"Ofrece: Pollos a La Brasa, Brosther, Salchipapas,","Ofrece: Pollos a La Brasa, Brosther, Salchipapas,","Ofrece: Pollos a La Brasa, Brosther, Salchipapas,",0,0,0,0,0,No

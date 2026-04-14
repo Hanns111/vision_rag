@@ -1,0 +1,60 @@
+Sistema Integrado de Gestión Administrativa Fecha: 27/01/2026
+Módulo de Tesorería Hora: 18:28
+
+Versión 25.02.00.U1 , ágina: e
+PLANILLA DE VIÁTICOS N? Paginas tee
+
+UNIDAD EJECUTORA : 026 PROGRAMA EDUCACION BASICA PARA TODOS - 026
+NRO. IDENTIFICACIÓN : 000081
+
+Datos del Comisionado:
+Fecha: 27/01/2026 N° Exp. SIAF: N° Pedido: 233
+Sr(a): CARLOS FERNANDO AMIQUERO ÑAHUI
+Escala: EMPLEADOS DEBEDSAR COAR PUA 2026 N° Cuenta:AHORROS-04601608303
+Centro Costo: 026.04.00.02 - DIRECCION DE EDUCACION BASICA PARA ESTUDIANTES CON DESEMPENO SOBRESALIENTE Y AL
+
+Motivo de Viaje: APLICACION DE LA | FASE - PUA 2026; AMIQUERO NAHUI, CARLOS FERNANDO; DNI :42192880; DIRECCION:
+URB. LOS MEDANOS MZ "C" LTE 20- ICA-ICA-ICA; CARGO: DOCENTE DE HISTORIA; CELULAR: 991725618;
+SINAD:103251
+
+Detalle de Gastos de Comision de Servicios:
+Salida: 06/02/2026 Regreso: 09/02/2026 N° Dias/Horas: 3d 4h
+
+Concepto Clasificador Importe (S/.)
+
+VIATICOS 2.3.2 1.2 2
+
+PASAJES 2.3.2 1.2 1
+
+TUUA
+
+COMBUSTIBLE 2.3.1 3.1 1
+
+OTROS GASTOS 2.3.2 1.299
+SERV. DIVERSOS 2.3.2 7.11 99
+
+CADENA FUNCIONAL
+
+Meta/
+Mnemónico Cadena Funcional FF/Rb| Clasif. Gasto _
+
+22 .047 .0105 . 9002 . 3999999 . 5000659
+22 .047 .0105 . 9002 . 3999999 . 5000659
+
+Tipo de Viaje Destino Salida Regreso Dias/Horas
+
+Nacional AYACUCHO - LUCANAS - PUQUIO 06/02/2026 01:00am 09/02/2026 05:00am 3d4h
+
+Firmado digitalmente por:
+CARDENAS HUAYLLASCO
+Miguel Angel FAL 20191370998
+
+Firmado digitalmente por — — —— —
+
+GARCIAMURRIETA Ricariirma Autorizada Firma Autp lj hard
+
+Olsen FAL 20131370998 soft T Wwetive: En señal de
+
+hastivo: Doy 2 B* =e DIGITAL) conformidad
+
+Fecha: 03/02/2026 13:30:45-0500 = Fecha: 03/02/2026 19:38:03-0500
