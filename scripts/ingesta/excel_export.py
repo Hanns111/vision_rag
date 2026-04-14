@@ -42,6 +42,30 @@ class DocumentoValidacion:
     estado_firmas: str = ""           # CONFORME | OBSERVADO | INSUFICIENTE_EVIDENCIA | ""
     errores_firmas: str = ""          # lista separada por "; "
     confianza_firmas: float | str = ""
+    # --- Resolución de identidad administrativa (SINAD, SIAF, AÑO, EXP) ---
+    expediente_detectado: str = ""        # id_canonico ganador (ej. "SINAD-250235")
+    sinad_detectado: str = ""             # valor sin prefijo (ej. "250235")
+    siaf_detectado: str = ""
+    anio_detectado: str = ""
+    confianza_expediente: float | str = ""
+    confianza_sinad: float | str = ""
+    confianza_siaf: float | str = ""
+    conflicto_expediente: str = ""        # "Sí" | "No" | ""
+    observaciones_expediente: str = ""    # lista unida con "; "
+
+
+@dataclass
+class CandidatoResolucion:
+    """Fila de la hoja `resolucion_ids` (una por candidato por expediente)."""
+    expediente_carpeta: str
+    id_canonico: str
+    tipo: str
+    frecuencia: int
+    score_total: float
+    coincide_con_carpeta: str             # "Sí" | "No"
+    es_ganador: str                       # "Sí" | "No"
+    estado_resolucion: str                # estado global del expediente
+    fuentes: str                          # resumen de archivos + páginas
 
 
 @dataclass
@@ -77,6 +101,28 @@ _COLS_SISTEMA_DOC = [
     "estado_firmas",
     "errores_firmas",
     "confianza_firmas",
+    # resolución de identidad (SINAD, SIAF, AÑO, EXP)
+    "expediente_detectado",
+    "sinad_detectado",
+    "siaf_detectado",
+    "anio_detectado",
+    "confianza_expediente",
+    "confianza_sinad",
+    "confianza_siaf",
+    "conflicto_expediente",
+    "observaciones_expediente",
+]
+
+_COLS_RESOLUCION_IDS = [
+    "expediente_carpeta",
+    "id_canonico",
+    "tipo",
+    "frecuencia",
+    "score_total",
+    "coincide_con_carpeta",
+    "es_ganador",
+    "estado_resolucion",
+    "fuentes",
 ]
 _COLS_HUMANAS_DOC = [
     "tipo_correcto",
@@ -121,6 +167,29 @@ def _asdict_doc(d: DocumentoValidacion) -> dict[str, Any]:
         "estado_firmas": d.estado_firmas,
         "errores_firmas": d.errores_firmas,
         "confianza_firmas": d.confianza_firmas,
+        "expediente_detectado": d.expediente_detectado,
+        "sinad_detectado": d.sinad_detectado,
+        "siaf_detectado": d.siaf_detectado,
+        "anio_detectado": d.anio_detectado,
+        "confianza_expediente": d.confianza_expediente,
+        "confianza_sinad": d.confianza_sinad,
+        "confianza_siaf": d.confianza_siaf,
+        "conflicto_expediente": d.conflicto_expediente,
+        "observaciones_expediente": d.observaciones_expediente,
+    }
+
+
+def _asdict_cand(c: CandidatoResolucion) -> dict[str, Any]:
+    return {
+        "expediente_carpeta": c.expediente_carpeta,
+        "id_canonico": c.id_canonico,
+        "tipo": c.tipo,
+        "frecuencia": c.frecuencia,
+        "score_total": c.score_total,
+        "coincide_con_carpeta": c.coincide_con_carpeta,
+        "es_ganador": c.es_ganador,
+        "estado_resolucion": c.estado_resolucion,
+        "fuentes": c.fuentes,
     }
 
 
@@ -197,6 +266,15 @@ def _escribir_hoja(
 
     # anchos de columna aproximados
     anchos = {
+        "expediente_carpeta": 26,
+        "id_canonico": 22,
+        "tipo": 12,
+        "frecuencia": 10,
+        "score_total": 12,
+        "coincide_con_carpeta": 18,
+        "es_ganador": 10,
+        "estado_resolucion": 22,
+        "fuentes": 60,
         "expediente_id": 26,
         "archivo": 50,
         "ruta_origen": 60,
@@ -215,6 +293,15 @@ def _escribir_hoja(
         "estado_firmas": 22,
         "errores_firmas": 40,
         "confianza_firmas": 16,
+        "expediente_detectado": 22,
+        "sinad_detectado": 16,
+        "siaf_detectado": 16,
+        "anio_detectado": 12,
+        "confianza_expediente": 18,
+        "confianza_sinad": 16,
+        "confianza_siaf": 16,
+        "conflicto_expediente": 18,
+        "observaciones_expediente": 40,
         "tipo_correcto": 18,
         "monto_correcto": 14,
         "fecha_correcta": 14,
@@ -240,6 +327,7 @@ def exportar_excel(
     xlsx_path: Path | str,
     documentos: list[DocumentoValidacion],
     expedientes: list[ExpedienteValidacion],
+    candidatos: list[CandidatoResolucion] | None = None,
 ) -> Path:
     """Genera / actualiza el Excel preservando columnas humanas existentes."""
     from openpyxl import Workbook, load_workbook
@@ -287,9 +375,15 @@ def exportar_excel(
     _escribir_hoja(wb, "documentos", _COLS_DOC, nuevas_docs)
     _escribir_hoja(wb, "expedientes", _COLS_EXPEDIENTES, [_asdict_exp(e) for e in expedientes])
     _escribir_hoja(wb, "errores", _COLS_DOC, filas_errores)
+    if candidatos is not None:
+        _escribir_hoja(
+            wb,
+            "resolucion_ids",
+            _COLS_RESOLUCION_IDS,
+            [_asdict_cand(c) for c in candidatos],
+        )
 
-    # ordenar pestañas
-    orden = ["documentos", "expedientes", "errores"]
+    orden = ["documentos", "expedientes", "errores", "resolucion_ids"]
     wb._sheets = [wb[n] for n in orden if n in wb.sheetnames]
     wb.save(xlsx_path)
     return xlsx_path

@@ -203,11 +203,12 @@ def _cargar_extractions(exp_dir: Path) -> list[dict]:
 
 
 def _cmd_export(args: argparse.Namespace) -> int:
-    """Lee extractions/*.json de TODOS los expedientes en `dest` y genera el Excel."""
+    """Lee extractions/*.json + expediente.json de TODOS los expedientes en `dest`."""
     import json
     from ingesta.excel_export import (
         DocumentoValidacion,
         ExpedienteValidacion,
+        CandidatoResolucion,
         exportar_excel,
     )
 
@@ -219,6 +220,7 @@ def _cmd_export(args: argparse.Namespace) -> int:
 
     documentos: list[DocumentoValidacion] = []
     expedientes: list[ExpedienteValidacion] = []
+    candidatos_resolucion: list[CandidatoResolucion] = []
 
     # filtrar por expediente_id si se pidió, o todos los subdirs
     if args.expediente_id:
@@ -236,6 +238,51 @@ def _cmd_export(args: argparse.Namespace) -> int:
         docs = _cargar_extractions(exp_dir)
         if not docs:
             continue
+
+        # expediente.json (schema v2) — resolución de identidad
+        exp_json_path = exp_dir / "expediente.json"
+        resolucion: dict[str, Any] = {}
+        if exp_json_path.exists():
+            try:
+                resolucion = (json.loads(exp_json_path.read_text(encoding="utf-8")) or {}).get(
+                    "resolucion_id"
+                ) or {}
+            except Exception:
+                resolucion = {}
+
+        ganador_id = resolucion.get("expediente_id_detectado") or ""
+        sinad_v = resolucion.get("sinad") or ""
+        siaf_v = resolucion.get("siaf") or ""
+        anio_v = resolucion.get("anio") or ""
+        conf_exp = resolucion.get("confianza_expediente", "")
+        conf_sinad = resolucion.get("confianza_sinad", "")
+        conf_siaf = resolucion.get("confianza_siaf", "")
+        estado_res = resolucion.get("estado_resolucion", "")
+        es_conflicto = "Sí" if estado_res == "CONFLICTO_EXPEDIENTE" else "No" if estado_res else ""
+        coincide = resolucion.get("coincide_con_carpeta", False)
+        obs_res = resolucion.get("observaciones") or []
+        obs_res_str = "; ".join(str(o) for o in obs_res)[:500]
+
+        # poblar hoja resolucion_ids
+        for c in (resolucion.get("candidatos") or []):
+            fuentes_c = c.get("fuentes") or []
+            fuentes_resumen = "; ".join(
+                f"{f.get('archivo') or 'carpeta'}:p{f.get('pagina') or '-'}"
+                for f in fuentes_c[:5]
+            )
+            candidatos_resolucion.append(
+                CandidatoResolucion(
+                    expediente_carpeta=resolucion.get("expediente_id_carpeta", ""),
+                    id_canonico=c.get("id_canonico", ""),
+                    tipo=c.get("tipo", ""),
+                    frecuencia=int(c.get("frecuencia", 0) or 0),
+                    score_total=float(c.get("score_total", 0.0) or 0.0),
+                    coincide_con_carpeta="Sí" if coincide and c.get("id_canonico") == ganador_id else "No",
+                    es_ganador="Sí" if c.get("id_canonico") == ganador_id else "No",
+                    estado_resolucion=estado_res,
+                    fuentes=fuentes_resumen,
+                )
+            )
 
         n_ok = sum(1 for d in docs if d.get("estado_procesamiento") == "ok")
         n_bc = sum(1 for d in docs if d.get("estado_procesamiento") == "bajo_confianza")
@@ -301,12 +348,24 @@ def _cmd_export(args: argparse.Namespace) -> int:
                     estado_firmas=val_estado,
                     errores_firmas=val_errores,
                     confianza_firmas=val_confianza,
+                    expediente_detectado=ganador_id,
+                    sinad_detectado=sinad_v,
+                    siaf_detectado=siaf_v,
+                    anio_detectado=anio_v,
+                    confianza_expediente=conf_exp,
+                    confianza_sinad=conf_sinad,
+                    confianza_siaf=conf_siaf,
+                    conflicto_expediente=es_conflicto,
+                    observaciones_expediente=obs_res_str,
                 )
             )
 
-    path = exportar_excel(xlsx, documentos, expedientes)
+    path = exportar_excel(xlsx, documentos, expedientes, candidatos=candidatos_resolucion)
     print(f"[export] xlsx={path}")
-    print(f"[export] documentos={len(documentos)} expedientes={len(expedientes)}")
+    print(
+        f"[export] documentos={len(documentos)} expedientes={len(expedientes)} "
+        f"candidatos_id={len(candidatos_resolucion)}"
+    )
     return 0
 
 
