@@ -75,3 +75,21 @@ doc_id,archivo_raw_relativo,paginas_en_pdf,paginas_en_piloto,indices_paginas_en_
 fac-lote-a,raw/fac-lote-a.pdf,10,10,"1,2,3,4,5,6,7,8,9,10",ejemplo
 fac-lote-b,raw/fac-lote-b.pdf,5,5,"1,2,3,4,5",ejemplo
 ```
+
+---
+
+## 7. Entorno de ejecución (OCR, bake-off PASO 2, GPU)
+
+**Propósito:** evitar conclusiones injustas cuando un motor o herramienta **falla por incompatibilidad de runtime** (drivers, oneDNN, PyTorch/CUDA, etc.) y no por calidad intrínseca del modelo.
+
+| Criterio | Regla operativa |
+|----------|-----------------|
+| **Windows** | Válido para fases del piloto (etiquetado, baseline, bake-off ligero) cuando el entorno sea estable. Algunas dependencias OCR/parsing (p. ej. ciertas pilas con aceleración **GPU** o backends **oneDNN**) pueden ser **poco reproducibles o frágiles** en Windows concreto. |
+| **Linux / Ubuntu / WSL** | Entorno **preferente** para **bake-off** y para pruebas de motores **sensibles al runtime** (PaddleOCR, Docling con modelos pesados, etc.) cuando allí la pila sea **más estable** o permita **aprovechar GPU** (p. ej. RTX 5090) de forma fiable. |
+| **Interpretación de métricas PASO 2** | Los CSV/Excel/informes deben poder relacionarse con **OS, CPU/GPU y versiones** (documentar en `run_log` o en el informe de la corrida). **No** interpretar un resultado como “el motor perdió” si **no** se ha descartado antes un fallo **puramente de entorno** en esa máquina. |
+| **Descarte de herramienta** | Una herramienta **no** se da por descartada definitivamente **solo** por error de runtime en Windows si el fallo es **típico de incompatibilidad** (binarios, DLL, CUDA/oneDNN). La decisión debe apoyarse en **repetición en entorno estable** (p. ej. Linux/WSL con GPU si está disponible) o en criterio explícito documentado. |
+| **Prioridad para pruebas reproducibles** | Si **Linux/WSL con GPU** está disponible y ofrece mayor estabilidad para OCR avanzado, **priorizarlo** para corridas de **comparación seria** de motores; Windows puede seguir usándose para el resto del flujo según convenga al equipo. |
+
+**Subvención:** esta sección no altera normativa de negocio; solo criterio de **ingeniería y medición**.
+
+**Relación:** `docs/DECISIONES_TECNICAS.md` **D-12** · `data/piloto_ocr/metrics/METRICAS_MINIMAS.md` (entorno).

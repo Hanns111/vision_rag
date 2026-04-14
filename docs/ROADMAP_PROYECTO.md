@@ -136,6 +136,8 @@ Definición única para poder comparar motores sobre las **mismas 15 páginas** 
 | **Tiempo** | `segundos_por_pagina` medido en la corrida (misma máquina al comparar motores). |
 | **% páginas con fallo** | Páginas donde existe al menos un campo con exactitud 0. |
 
+**Interpretación:** los valores anteriores deben leerse **en contexto del entorno de ejecución** (OS, hardware, versiones). Un fallo de runtime (p. ej. incompatibilidad GPU/oneDNN en Windows) **no** sustituye por sí solo a una conclusión sobre la calidad del motor; ver `data/piloto_ocr/PILOTO_OPERATIVO.md` §7 y `docs/DECISIONES_TECNICAS.md` **D-12**.
+
 Plantilla de nombre de archivo de resultado: `metrics/baseline_paso1_YYYYMMDD.csv`, `metrics/bakeoff_paso2_motor_YYYYMMDD.csv`.
 
 Detalle operativo: `data/piloto_ocr/metrics/METRICAS_MINIMAS.md` · población de `raw/` y baseline: `data/piloto_ocr/PILOTO_OPERATIVO.md`.
@@ -217,7 +219,7 @@ PyMuPDF, OpenCV, Tesseract, RAG en `pdf_rag.py`; bake-off: PaddleOCR, Docling, e
 | `data/piloto_ocr/PILOTO_OPERATIVO.md` | Reglas y PASO 1 baseline |
 | `data/piloto_ocr/CHECKLIST_POBLADO.md` | Poblar piloto paso a paso |
 | `data/piloto_ocr/metrics/METRICAS_MINIMAS.md` | Métricas §4.3 |
-| `docs/DECISIONES_TECNICAS.md` | D-01…D-11 |
+| `docs/DECISIONES_TECNICAS.md` | D-01…D-12 |
 | `docs/CURRENT_STATE_RAG.md` | Retrieval |
 
 ---

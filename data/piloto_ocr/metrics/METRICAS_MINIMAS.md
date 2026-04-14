@@ -23,3 +23,9 @@ Alineado a **`docs/ROADMAP_PROYECTO.md` §4.3** y **[`../PILOTO_OPERATIVO.md`](.
 ## Tiempo
 
 Registrar en el mismo CSV o en `run_log_YYYYMMDD.txt`: tiempo total de corrida y **segundos_por_pagina** = tiempo / 15.
+
+## Entorno de ejecución (interpretación de PASO 1–2)
+
+Los resultados numéricos son **comparables solo entre motores corridos en el mismo entorno** (misma máquina, mismo OS, mismas versiones de dependencias). Las métricas de PASO 2 deben interpretarse **junto con** el entorno documentado (OS, CPU/GPU, notas de fallo de runtime).
+
+**Regla:** un fallo de herramienta (p. ej. PaddleOCR en Windows por oneDNN) **no** equivale por sí solo a “descartar el motor” frente a otro; puede requerir **repetición en Linux/WSL** u otro runtime estable. Ver **[`../PILOTO_OPERATIVO.md`](../PILOTO_OPERATIVO.md) §7** y **`docs/DECISIONES_TECNICAS.md` D-12**.
