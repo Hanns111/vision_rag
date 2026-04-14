@@ -10,7 +10,36 @@ No sustituye el pipeline de métricas formales (`data/piloto_ocr/metrics/METRICA
 
 ---
 
-## 1. Flujo (cuatro etapas, cada una idempotente)
+## 1. Lectura de texto: OCR por-página (text_reader v2)
+
+Desde 2026-04-14, `scripts/ingesta/text_reader.py` decide **por página**
+(no por documento) si aplica OCR:
+
+- PyMuPDF extrae texto nativo de cada página.
+- Si `len(texto_nativo.strip()) < 50` → Tesseract OCR sobre **esa sola página**.
+- Un único motor por página → sin duplicación. El `.txt` lleva marcadores
+  `===== PAGE N (motor=...) =====` que prueban el origen de cada bloque.
+- Cache por sha1 del PDF. El `.meta.json` registra por página: motor,
+  `len_texto`, status; y por documento: `paginas_nativas`, `paginas_ocr`.
+- Fallback tolerante: OCR fallido de una página → `sin_texto_ocr_fallido`,
+  pipeline continúa. Umbral configurable: `_MIN_CHARS_PAGE_NATIVE = 50`.
+
+Impacto medido sobre `DIED2026-INT-0250235` (RENDIC 150 páginas):
+
+| | Antes (v1) | Después (v2) |
+|---|---|---|
+| Páginas con texto | 102/150 | **143/150** |
+| Caracteres totales | 75 134 | **130 651** (+74%) |
+| Tiempo 1ª corrida | ~3 s | ~60 s (41 páginas OCR) |
+| Tiempo con cache | ~1 s | ~1 s |
+
+Resultado en `id_resolver` (más evidencia disponible): aparecen
+`EXP-DIED-2026-250235` y un segundo SIAF legítimo (Expediente SIAF del
+movimiento contable) que antes quedaban invisibles en las páginas escaneadas.
+
+---
+
+## 2. Flujo (cuatro etapas, cada una idempotente)
 
 ```
 DIED2026-INT-0250235/                ← pegas carpeta/PDFs aquí (gitignored)
