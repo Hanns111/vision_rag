@@ -58,6 +58,14 @@ El sistema, en condiciones normales de corpus e índice generado:
 - **Pasos operativos:** **`data/piloto_ocr/CHECKLIST_POBLADO.md`** · detalle **`data/piloto_ocr/PILOTO_OPERATIVO.md`**.
 - **Bloqueos** hasta PASO 0 cerrado: ver roadmap **§5.2** (bake-off formal, integración OCR–agente, subvención productiva).
 
+### Infraestructura de validación humana (alimenta PASO 0; pre-PASO 7)
+
+- **Desde 2026-04-14**: pipeline de ingesta de expedientes reales que produce un Excel revisable por humanos. No sustituye el piloto formal; lo acelera generando ground truth asistido sobre expedientes reales.
+- **Flujo y uso:** `docs/INGESTA_EXPEDIENTES.md`.
+- **Módulos:** `scripts/ingesta/{scanner,text_reader,classifier,extractor,excel_export}.py`, CLI `scripts/ingest_expedientes.py`.
+- **Primer caso real:** `DIED2026-INT-0250235` (viáticos LILIANA CHAVEZ TERRONES, 2 PDFs — planilla + rendición consolidada). Resultado en `data/piloto_ocr/metrics/validacion_expedientes.xlsx`.
+- **No inventa datos**: campos sin señal → `None` con confianza 0. Override consolidado trazable para PDFs de rendición con facturas anidadas.
+
 ---
 
 ## SIGUIENTE PASO (recomendado)
@@ -121,4 +129,4 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 ---
 
-*Última actualización: 2026-04-14 — PASO 4.1 cerrado; gobernanza operativa documentada.*
+*Última actualización: 2026-04-14 — PASO 4.1 cerrado; gobernanza operativa documentada; infra de ingesta de expedientes operativa (primer caso real DIED2026-INT-0250235).*
