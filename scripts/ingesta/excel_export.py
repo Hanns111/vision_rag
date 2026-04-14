@@ -69,6 +69,31 @@ class CandidatoResolucion:
 
 
 @dataclass
+class ComprobanteExcel:
+    """Fila de la hoja `comprobantes` (una por comprobante por expediente)."""
+    expediente_id: str
+    archivo: str
+    pagina_inicio: int
+    pagina_fin: int
+    tipo: str
+    ruc: str
+    razon_social: str
+    serie_numero: str
+    fecha: str
+    monto_total: str
+    moneda: str
+    monto_igv: str
+    confianza: float | str
+    texto_resumen: str
+    # columnas humanas
+    monto_correcto: str = ""
+    ruc_correcto: str = ""
+    proveedor_correcto: str = ""
+    observaciones: str = ""
+    validacion_final: str = ""
+
+
+@dataclass
 class ExpedienteValidacion:
     expediente_id: str
     ruta_origen: str
@@ -124,6 +149,31 @@ _COLS_RESOLUCION_IDS = [
     "estado_resolucion",
     "fuentes",
 ]
+
+_COLS_SISTEMA_COMP = [
+    "expediente_id",
+    "archivo",
+    "pagina_inicio",
+    "pagina_fin",
+    "tipo",
+    "ruc",
+    "razon_social",
+    "serie_numero",
+    "fecha",
+    "monto_total",
+    "moneda",
+    "monto_igv",
+    "confianza",
+    "texto_resumen",
+]
+_COLS_HUMANAS_COMP = [
+    "monto_correcto",
+    "ruc_correcto",
+    "proveedor_correcto",
+    "observaciones",
+    "validacion_final",
+]
+_COLS_COMP = _COLS_SISTEMA_COMP + _COLS_HUMANAS_COMP
 _COLS_HUMANAS_DOC = [
     "tipo_correcto",
     "monto_correcto",
@@ -193,6 +243,30 @@ def _asdict_cand(c: CandidatoResolucion) -> dict[str, Any]:
     }
 
 
+def _asdict_comp(c: ComprobanteExcel) -> dict[str, Any]:
+    return {
+        "expediente_id": c.expediente_id,
+        "archivo": c.archivo,
+        "pagina_inicio": c.pagina_inicio,
+        "pagina_fin": c.pagina_fin,
+        "tipo": c.tipo,
+        "ruc": c.ruc,
+        "razon_social": c.razon_social,
+        "serie_numero": c.serie_numero,
+        "fecha": c.fecha,
+        "monto_total": c.monto_total,
+        "moneda": c.moneda,
+        "monto_igv": c.monto_igv,
+        "confianza": c.confianza,
+        "texto_resumen": c.texto_resumen,
+        "monto_correcto": c.monto_correcto,
+        "ruc_correcto": c.ruc_correcto,
+        "proveedor_correcto": c.proveedor_correcto,
+        "observaciones": c.observaciones,
+        "validacion_final": c.validacion_final,
+    }
+
+
 def _asdict_exp(e: ExpedienteValidacion) -> dict[str, Any]:
     return {
         "expediente_id": e.expediente_id,
@@ -259,9 +333,9 @@ def _escribir_hoja(
         for i, col in enumerate(cols, start=1):
             v = f.get(col)
             c = ws.cell(row=row_idx, column=i, value=v)
-            if col in _COLS_HUMANAS_DOC:
+            if col in _COLS_HUMANAS_DOC or col in _COLS_HUMANAS_COMP:
                 c.fill = human_fill
-            if col == "texto_extraido_resumen":
+            if col in ("texto_extraido_resumen", "texto_resumen"):
                 c.alignment = Alignment(wrap_text=True, vertical="top")
 
     # anchos de columna aproximados
@@ -302,6 +376,18 @@ def _escribir_hoja(
         "confianza_siaf": 16,
         "conflicto_expediente": 18,
         "observaciones_expediente": 40,
+        "pagina_inicio": 10,
+        "pagina_fin": 10,
+        "ruc": 14,
+        "razon_social": 32,
+        "serie_numero": 16,
+        "monto_total": 14,
+        "moneda": 8,
+        "monto_igv": 12,
+        "confianza": 12,
+        "monto_correcto": 14,
+        "ruc_correcto": 14,
+        "proveedor_correcto": 28,
         "tipo_correcto": 18,
         "monto_correcto": 14,
         "fecha_correcta": 14,
@@ -328,6 +414,7 @@ def exportar_excel(
     documentos: list[DocumentoValidacion],
     expedientes: list[ExpedienteValidacion],
     candidatos: list[CandidatoResolucion] | None = None,
+    comprobantes: list[ComprobanteExcel] | None = None,
 ) -> Path:
     """Genera / actualiza el Excel preservando columnas humanas existentes."""
     from openpyxl import Workbook, load_workbook
@@ -382,8 +469,30 @@ def exportar_excel(
             _COLS_RESOLUCION_IDS,
             [_asdict_cand(c) for c in candidatos],
         )
+    if comprobantes is not None:
+        # Upsert: preservar columnas humanas previas por (expediente_id, archivo,
+        # pagina_inicio, pagina_fin).
+        prev_comp = _cargar_filas_existentes(
+            xlsx_path,
+            "comprobantes",
+            _COLS_COMP,
+            ("expediente_id", "archivo", "pagina_inicio", "pagina_fin"),
+        )
+        filas_comp: list[dict[str, Any]] = []
+        for c in comprobantes:
+            fila = _asdict_comp(c)
+            key = (c.expediente_id, c.archivo, c.pagina_inicio, c.pagina_fin)
+            if key in prev_comp:
+                for col in _COLS_HUMANAS_COMP:
+                    v = prev_comp[key].get(col)
+                    if v not in (None, ""):
+                        fila[col] = v
+            for col in _COLS_HUMANAS_COMP:
+                fila.setdefault(col, None)
+            filas_comp.append(fila)
+        _escribir_hoja(wb, "comprobantes", _COLS_COMP, filas_comp)
 
-    orden = ["documentos", "expedientes", "errores", "resolucion_ids"]
+    orden = ["documentos", "expedientes", "errores", "resolucion_ids", "comprobantes"]
     wb._sheets = [wb[n] for n in orden if n in wb.sheetnames]
     wb.save(xlsx_path)
     return xlsx_path

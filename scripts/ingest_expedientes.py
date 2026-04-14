@@ -232,6 +232,7 @@ def _cmd_export(args: argparse.Namespace) -> int:
         DocumentoValidacion,
         ExpedienteValidacion,
         CandidatoResolucion,
+        ComprobanteExcel,
         exportar_excel,
     )
 
@@ -244,6 +245,7 @@ def _cmd_export(args: argparse.Namespace) -> int:
     documentos: list[DocumentoValidacion] = []
     expedientes: list[ExpedienteValidacion] = []
     candidatos_resolucion: list[CandidatoResolucion] = []
+    comprobantes_excel: list[ComprobanteExcel] = []
 
     # filtrar por expediente_id si se pidió, o todos los subdirs
     if args.expediente_id:
@@ -262,16 +264,37 @@ def _cmd_export(args: argparse.Namespace) -> int:
         if not docs:
             continue
 
-        # expediente.json (schema v2) — resolución de identidad
+        # expediente.json (schema v2/v3) — resolución de identidad + comprobantes
         exp_json_path = exp_dir / "expediente.json"
         resolucion: dict[str, Any] = {}
+        comprobantes_exp: list[dict[str, Any]] = []
         if exp_json_path.exists():
             try:
-                resolucion = (json.loads(exp_json_path.read_text(encoding="utf-8")) or {}).get(
-                    "resolucion_id"
-                ) or {}
+                exp_json = json.loads(exp_json_path.read_text(encoding="utf-8")) or {}
+                resolucion = exp_json.get("resolucion_id") or {}
+                comprobantes_exp = exp_json.get("comprobantes") or []
             except Exception:
                 resolucion = {}
+
+        for c in comprobantes_exp:
+            comprobantes_excel.append(
+                ComprobanteExcel(
+                    expediente_id=meta["expediente_id"],
+                    archivo=c.get("archivo", ""),
+                    pagina_inicio=int(c.get("pagina_inicio", 0) or 0),
+                    pagina_fin=int(c.get("pagina_fin", 0) or 0),
+                    tipo=c.get("tipo", ""),
+                    ruc=c.get("ruc") or "",
+                    razon_social=c.get("razon_social") or "",
+                    serie_numero=c.get("serie_numero") or "",
+                    fecha=c.get("fecha") or "",
+                    monto_total=c.get("monto_total") or "",
+                    moneda=c.get("moneda") or "",
+                    monto_igv=c.get("monto_igv") or "",
+                    confianza=c.get("confianza", ""),
+                    texto_resumen=(c.get("texto_resumen") or "")[:500],
+                )
+            )
 
         ganador_id = resolucion.get("expediente_id_detectado") or ""
         sinad_v = resolucion.get("sinad") or ""
@@ -383,11 +406,17 @@ def _cmd_export(args: argparse.Namespace) -> int:
                 )
             )
 
-    path = exportar_excel(xlsx, documentos, expedientes, candidatos=candidatos_resolucion)
+    path = exportar_excel(
+        xlsx,
+        documentos,
+        expedientes,
+        candidatos=candidatos_resolucion,
+        comprobantes=comprobantes_excel,
+    )
     print(f"[export] xlsx={path}")
     print(
         f"[export] documentos={len(documentos)} expedientes={len(expedientes)} "
-        f"candidatos_id={len(candidatos_resolucion)}"
+        f"candidatos_id={len(candidatos_resolucion)} comprobantes={len(comprobantes_excel)}"
     )
     return 0
 
