@@ -39,8 +39,32 @@ def _cmd_scan(args: argparse.Namespace) -> int:
 
 
 def _cmd_process(args: argparse.Namespace) -> int:
-    print("[process] aún no implementado (commit 2-4)")
-    return 2
+    """Lee texto (PyMuPDF/OCR) y lo cachea. Clasificación y extracción: commit 3-4."""
+    import json
+    from ingesta.text_reader import read_pdf_with_cache
+
+    dest = Path(args.dest).resolve()
+    exp_id = args.expediente_id or (Path(args.src).name if args.src else None)
+    if not exp_id:
+        print("[process] --expediente-id o --src requerido")
+        return 2
+    exp_dir = dest / exp_id
+    meta_file = exp_dir / "metadata.json"
+    if not meta_file.exists():
+        print(f"[process] falta metadata.json: {meta_file} (corre `scan` primero)")
+        return 2
+
+    meta = json.loads(meta_file.read_text(encoding="utf-8"))
+    cache_dir = exp_dir / "ocr_cache"
+    for d in meta["documentos"]:
+        src_pdf = Path(d["ruta_destino"])
+        print(f"[process] leyendo {d['nombre']}...", flush=True)
+        res = read_pdf_with_cache(src_pdf, d["sha1"], cache_dir, force=args.force)
+        print(
+            f"[process]   paginas={res.total_paginas} "
+            f"con_texto={res.paginas_con_texto} len={res.len_total}"
+        )
+    return 0
 
 
 def _cmd_export(args: argparse.Namespace) -> int:
@@ -79,6 +103,11 @@ def main(argv: list[str] | None = None) -> int:
         p = sub.add_parser(name)
         p.add_argument("--src", required=(name in ("scan", "run-all")), type=Path)
         p.add_argument("--expediente-id", type=str, default=None)
+        p.add_argument(
+            "--force",
+            action="store_true",
+            help="reprocesar ignorando cache (aplica a process/run-all)",
+        )
 
     args = ap.parse_args(argv)
     dispatch = {
