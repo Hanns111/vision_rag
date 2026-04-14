@@ -24,7 +24,8 @@ _FIELD_KEYS = [
 
 _EXCLUDE_RAZON = re.compile(
     r"FACTURA|ELECTR|R\.?U\.?C\.?|HTTP|WWW\.|@|^\s*D\.?\s*Comercial|"
-    r"De:\s*$|^\s*Cliente\s*$|^\s*Direcci",
+    r"^\s*De:\s|^\s*Cliente\s*$|^\s*Direcci|"
+    r"^\s*(?:JR|AV|CALLE|CAL|C\.?P|MZA|KM)[\.\s]",
     re.I,
 )
 
@@ -240,7 +241,7 @@ def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
 
     sub = grab(r"(?:Op\.?\s*Gravadas?|Venta\s+Gravada)\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_op_gravada")
     if not sub:
-        sub = grab(r"SUB\s*TOTAL\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_subtotal_label")
+        sub = grab(r"SUB\s*TOTAL(?:\s+Ventas)?\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_subtotal_label")
 
     igv = grab(r"IGV\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_igv")
     if not igv:
@@ -262,6 +263,25 @@ def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
     )
 
 
+_LEGAL_SUFFIX_RE = re.compile(
+    r"\bS\.?A\.?C\.?\b|\bSOCIEDAD\s+ANONIMA\s+CERRADA\b|"
+    r"\bS\.?R\.?L\.?\b|\bE\.?I\.?R\.?L\.?\b",
+    re.I,
+)
+
+
+def _normalize_legal_suffix(name: str) -> str:
+    """Normaliza sufijos legales al abreviado estándar peruano."""
+    name = re.sub(r"\bSOCIEDAD\s+ANONIMA\s+CERRADA\b", "S.A.C.", name, flags=re.I)
+    name = re.sub(
+        r"\bSOCIEDAD\s+COMERCIAL\s+DE\s+RESPONSABILIDAD\s+LIMITADA\b",
+        "S.R.L.",
+        name,
+        flags=re.I,
+    )
+    return name.strip()
+
+
 def _factura_razon_social(head: str) -> tuple[str | None, str, list[str]]:
     lines = [ln.strip() for ln in head.splitlines() if ln.strip()]
     ruc_idx = None
@@ -270,19 +290,50 @@ def _factura_razon_social(head: str) -> tuple[str | None, str, list[str]]:
             ruc_idx = i
             break
     candidates = lines[:ruc_idx] if ruc_idx is not None else lines[:15]
-    parts: list[str] = []
+
+    # Filtrar y deduplicar
+    filtered: list[str] = []
+    seen: set[str] = set()
     for ln in candidates:
         if _EXCLUDE_RAZON.search(ln) or len(ln) < 3:
             continue
         if re.match(r"^[\d\s.,$/\-]+$", ln):
             continue
-        parts.append(ln)
-        if sum(len(p) for p in parts) > 28:
-            break
-    if not parts:
-        return None, "razon_none", []
-    name = " ".join(parts).strip()[:120]
-    return name, "razon_lineas_previas_a_ruc", parts[:5]
+        key = ln.upper().strip()
+        if key in seen:
+            continue
+        seen.add(key)
+        filtered.append(ln)
+
+    # Priorizar línea con sufijo legal (S.A.C., S.R.L., etc.)
+    for ln in filtered:
+        if _LEGAL_SUFFIX_RE.search(ln):
+            name = _normalize_legal_suffix(ln)[:120]
+            return name, "razon_legal_suffix_prioritaria", [ln]
+
+    # Primario: primera línea si es suficientemente larga
+    if filtered and len(filtered[0]) >= 10:
+        return filtered[0][:120], "razon_primera_linea_candidata", [filtered[0]]
+
+    # Primario: concatenar líneas cortas hasta ~25 chars
+    if filtered:
+        parts: list[str] = []
+        for ln in filtered:
+            parts.append(ln)
+            if sum(len(p) for p in parts) > 25:
+                break
+        name = " ".join(parts).strip()[:120]
+        return name, "razon_lineas_previas_a_ruc", parts[:5]
+
+    # Secundario: buscar sufijo legal en todo el head
+    for ln in lines:
+        if _EXCLUDE_RAZON.search(ln):
+            continue
+        if _LEGAL_SUFFIX_RE.search(ln):
+            name = _normalize_legal_suffix(ln)[:120]
+            return name, "razon_legal_suffix_scan_global", [ln]
+
+    return None, "razon_none", []
 
 
 def _normalize_nota_serie(raw: str) -> str:

@@ -8,7 +8,7 @@ rend-debedsar-amiquero-2026,13,monto_subtotal,38.98,,38.98,0,1,1,monto_op_gravad
 rend-debedsar-amiquero-2026,13,monto_igv,7.02,7.02,7.02,1,1,0,monto_op_gravada+monto_igv+monto_total_pagar,factura
 rend-debedsar-amiquero-2026,13,monto_total,46.00,46.00,46.00,1,1,0,monto_op_gravada+monto_igv+monto_total_pagar,factura
 rend-debedsar-amiquero-2026,13,ruc_receptor,20380795907,20380795907,20380795907,1,1,0,factura_ruc_cliente,factura
-rend-debedsar-amiquero-2026,13,razon_social_emisor,RESTAURANT HATUN WASI,FACTURA ELECTRÓNICA,RESTAURANT HATUN WASI,0,1,1,razon_primera_linea_candidata,factura
+rend-debedsar-amiquero-2026,13,razon_social_emisor,RESTAURANT HATUN WASI,FACTURA ELECTRÓNICA,RESTAURANT HATUN WASI De: PACHECO COYLLO GLORIA YOLANDA,0,0,0,razon_lineas_previas_a_ruc,factura
 rend-debedsar-amiquero-2026,15,ruc_emisor,10288513673,10288513673,10288513673,1,1,0,factura_ruc_header,factura
 rend-debedsar-amiquero-2026,15,tipo_documento,01,01,01,1,1,0,anchor_factura_electronica,factura
 rend-debedsar-amiquero-2026,15,serie_numero,F001-00001707,,F001-00001707,0,1,1,factura_serie_FE_patron,factura
@@ -18,7 +18,7 @@ rend-debedsar-amiquero-2026,15,monto_subtotal,67.80,,67.80,0,1,1,monto_op_gravad
 rend-debedsar-amiquero-2026,15,monto_igv,12.20,12.20,12.20,1,1,0,monto_op_gravada+monto_igv+monto_total_pagar,factura
 rend-debedsar-amiquero-2026,15,monto_total,80.00,80.00,80.00,1,1,0,monto_op_gravada+monto_igv+monto_total_pagar,factura
 rend-debedsar-amiquero-2026,15,ruc_receptor,20380795907,20380795907,20380795907,1,1,0,factura_ruc_cliente,factura
-rend-debedsar-amiquero-2026,15,razon_social_emisor,RESTAURANT HATUN WASI,FACTURA ELECTRÓNICA,RESTAURANT HATUN WASI,0,1,1,razon_primera_linea_candidata,factura
+rend-debedsar-amiquero-2026,15,razon_social_emisor,RESTAURANT HATUN WASI,FACTURA ELECTRÓNICA,RESTAURANT HATUN WASI De: PACHECO COYLLO GLORIA YOLANDA,0,0,0,razon_lineas_previas_a_ruc,factura
 rend-debedsar-amiquero-2026,17,ruc_emisor,10288513673,10288513673,10288513673,1,1,0,factura_ruc_header,factura
 rend-debedsar-amiquero-2026,17,tipo_documento,01,01,01,1,1,0,anchor_factura_electronica,factura
 rend-debedsar-amiquero-2026,17,serie_numero,F001-00001711,,F001-00001711,0,1,1,factura_serie_FE_patron,factura
@@ -28,7 +28,7 @@ rend-debedsar-amiquero-2026,17,monto_subtotal,38.14,,38.14,0,1,1,monto_op_gravad
 rend-debedsar-amiquero-2026,17,monto_igv,6.86,6.86,6.86,1,1,0,monto_op_gravada+monto_igv+monto_total_pagar,factura
 rend-debedsar-amiquero-2026,17,monto_total,45.00,45.00,45.00,1,1,0,monto_op_gravada+monto_igv+monto_total_pagar,factura
 rend-debedsar-amiquero-2026,17,ruc_receptor,20380795907,20380795907,20380795907,1,1,0,factura_ruc_cliente,factura
-rend-debedsar-amiquero-2026,17,razon_social_emisor,RESTAURANT HATUN WASI,FACTURA ELECTRÓNICA,RESTAURANT HATUN WASI,0,1,1,razon_primera_linea_candidata,factura
+rend-debedsar-amiquero-2026,17,razon_social_emisor,RESTAURANT HATUN WASI,FACTURA ELECTRÓNICA,RESTAURANT HATUN WASI De: PACHECO COYLLO GLORIA YOLANDA,0,0,0,razon_lineas_previas_a_ruc,factura
 rend-debedsar-amiquero-2026,19,ruc_emisor,10288019482,10288019482,10288019482,1,1,0,factura_ruc_header,factura
 rend-debedsar-amiquero-2026,19,tipo_documento,01,01,01,1,1,0,anchor_factura_electronica,factura
 rend-debedsar-amiquero-2026,19,serie_numero,F003-2106,F003-2106,F003-2106,1,1,0,factura_serie_FE_patron,factura
@@ -38,7 +38,7 @@ rend-debedsar-amiquero-2026,19,monto_subtotal,45.45,,45.45,0,1,1,monto_op_gravad
 rend-debedsar-amiquero-2026,19,monto_igv,4.55,,4.55,0,1,1,monto_op_gravada+monto_igv_total+monto_total_precio_venta,factura
 rend-debedsar-amiquero-2026,19,monto_total,50.00,1.00,50.00,0,1,1,monto_op_gravada+monto_igv_total+monto_total_precio_venta,factura
 rend-debedsar-amiquero-2026,19,ruc_receptor,20380795907,20380795907,20380795907,1,1,0,factura_ruc_cliente,factura
-rend-debedsar-amiquero-2026,19,razon_social_emisor,RESTAURANTE EL DORADO,"Ofrece: Pollos a La Brasa, Brosther, Salchipapas,",POLLOS A LA,0,0,0,razon_primera_linea_candidata,factura
+rend-debedsar-amiquero-2026,19,razon_social_emisor,RESTAURANTE EL DORADO,"Ofrece: Pollos a La Brasa, Brosther, Salchipapas,",POLLOS A LA BRASA RESTAURANTE EL,0,0,0,razon_lineas_previas_a_ruc,factura
 rend-debedsar-amiquero-2026,21,ruc_emisor,10288513673,10288513673,10288513673,1,1,0,factura_ruc_header,factura
 rend-debedsar-amiquero-2026,21,tipo_documento,01,01,01,1,1,0,anchor_factura_electronica,factura
 rend-debedsar-amiquero-2026,21,serie_numero,F001-00001712,,F001-00001712,0,1,1,factura_serie_FE_patron,factura
@@ -48,47 +48,47 @@ rend-debedsar-amiquero-2026,21,monto_subtotal,27.12,,27.12,0,1,1,monto_op_gravad
 rend-debedsar-amiquero-2026,21,monto_igv,4.88,4.88,4.88,1,1,0,monto_op_gravada+monto_igv+monto_total_pagar,factura
 rend-debedsar-amiquero-2026,21,monto_total,32.00,32.00,32.00,1,1,0,monto_op_gravada+monto_igv+monto_total_pagar,factura
 rend-debedsar-amiquero-2026,21,ruc_receptor,20380795907,20380795907,20380795907,1,1,0,factura_ruc_cliente,factura
-rend-debedsar-amiquero-2026,21,razon_social_emisor,RESTAURANT HATUN WASI,FACTURA ELECTRÓNICA,RESTAURANT HATUN WASI,0,1,1,razon_primera_linea_candidata,factura
+rend-debedsar-amiquero-2026,21,razon_social_emisor,RESTAURANT HATUN WASI,FACTURA ELECTRÓNICA,RESTAURANT HATUN WASI De: PACHECO COYLLO GLORIA YOLANDA,0,0,0,razon_lineas_previas_a_ruc,factura
 rend-debedsar-amiquero-2026,23,ruc_emisor,20615320561,20615320561,20615320561,1,1,0,factura_ruc_header,factura
 rend-debedsar-amiquero-2026,23,tipo_documento,01,01,01,1,1,0,anchor_factura_electronica,factura
 rend-debedsar-amiquero-2026,23,serie_numero,E001-27,E001-27,E001-27,1,1,0,factura_serie_FE_patron,factura
 rend-debedsar-amiquero-2026,23,fecha_emision,2026-02-08,2026-02-08,2026-02-08,1,1,0,shared_fecha_primer_iso_o_slash,factura
 rend-debedsar-amiquero-2026,23,moneda,PEN,PEN,PEN,1,1,0,shared_moneda_pen_usd,factura
-rend-debedsar-amiquero-2026,23,monto_subtotal,29.66,29.66,29.66,1,1,0,monto_subtotal_label+monto_igv+monto_importe_total,factura
-rend-debedsar-amiquero-2026,23,monto_igv,5.34,5.34,5.34,1,1,0,monto_subtotal_label+monto_igv+monto_importe_total,factura
-rend-debedsar-amiquero-2026,23,monto_total,35.00,29.66,35.00,0,1,1,monto_subtotal_label+monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,23,monto_subtotal,29.66,29.66,,1,0,-1,monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,23,monto_igv,5.34,5.34,5.34,1,1,0,monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,23,monto_total,35.00,29.66,35.00,0,1,1,monto_igv+monto_importe_total,factura
 rend-debedsar-amiquero-2026,23,ruc_receptor,20380795907,20380795907,20380795907,1,1,0,factura_ruc_cliente,factura
-rend-debedsar-amiquero-2026,23,razon_social_emisor,POLLOS A LA BRASA AMIGOS S.A.C.,E001-27,POLLOS A LA BRASA AMIGOS S.A.C.,0,1,1,razon_legal_suffix_prioritaria,factura
+rend-debedsar-amiquero-2026,23,razon_social_emisor,POLLOS A LA BRASA AMIGOS S.A.C.,E001-27,POLLOS & PARRILLAS AMIGOS POLLOS A LA BRASA AMIGOS S.A.C.,0,0,0,razon_lineas_previas_a_ruc,factura
 rend-debedsar-amiquero-2026,25,ruc_emisor,20612666751,20612666751,20612666751,1,1,0,factura_ruc_header,factura
 rend-debedsar-amiquero-2026,25,tipo_documento,01,01,01,1,1,0,anchor_factura_electronica,factura
 rend-debedsar-amiquero-2026,25,serie_numero,E001-478,E001-478,E001-478,1,1,0,factura_serie_FE_patron,factura
 rend-debedsar-amiquero-2026,25,fecha_emision,2026-02-08,2026-02-08,2026-02-08,1,1,0,shared_fecha_primer_iso_o_slash,factura
 rend-debedsar-amiquero-2026,25,moneda,PEN,PEN,PEN,1,1,0,shared_moneda_pen_usd,factura
-rend-debedsar-amiquero-2026,25,monto_subtotal,271.49,271.49,271.49,1,1,0,monto_subtotal_label+monto_igv+monto_importe_total,factura
-rend-debedsar-amiquero-2026,25,monto_igv,28.51,28.51,28.51,1,1,0,monto_subtotal_label+monto_igv+monto_importe_total,factura
-rend-debedsar-amiquero-2026,25,monto_total,300.00,271.49,300.00,0,1,1,monto_subtotal_label+monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,25,monto_subtotal,271.49,271.49,,1,0,-1,monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,25,monto_igv,28.51,28.51,28.51,1,1,0,monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,25,monto_total,300.00,271.49,300.00,0,1,1,monto_igv+monto_importe_total,factura
 rend-debedsar-amiquero-2026,25,ruc_receptor,20380795907,20380795907,20380795907,1,1,0,factura_ruc_cliente,factura
-rend-debedsar-amiquero-2026,25,razon_social_emisor,HOTEL SUMAC SAMARI S.A.C.,E001-478,HOTEL SUMAC SAMARI S.A.C.,0,1,1,razon_legal_suffix_scan_global,factura
+rend-debedsar-amiquero-2026,25,razon_social_emisor,HOTEL SUMAC SAMARI S.A.C.,E001-478,,0,0,0,razon_none,factura
 rend-debedsar-amiquero-2026,27,ruc_emisor,20611798637,20611798637,20611798637,1,1,0,factura_ruc_header,factura
 rend-debedsar-amiquero-2026,27,tipo_documento,01,01,01,1,1,0,anchor_factura_electronica,factura
 rend-debedsar-amiquero-2026,27,serie_numero,E001-324,E001-324,E001-324,1,1,0,factura_serie_FE_patron,factura
 rend-debedsar-amiquero-2026,27,fecha_emision,2026-02-08,2026-02-08,2026-02-08,1,1,0,shared_fecha_primer_iso_o_slash,factura
 rend-debedsar-amiquero-2026,27,moneda,PEN,PEN,PEN,1,1,0,shared_moneda_pen_usd,factura
-rend-debedsar-amiquero-2026,27,monto_subtotal,40.00,40.00,40.00,1,1,0,monto_subtotal_label+monto_igv+monto_importe_total,factura
-rend-debedsar-amiquero-2026,27,monto_igv,0.00,0.00,0.00,1,1,0,monto_subtotal_label+monto_igv+monto_importe_total,factura
-rend-debedsar-amiquero-2026,27,monto_total,40.00,40.00,40.00,1,1,0,monto_subtotal_label+monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,27,monto_subtotal,40.00,40.00,,1,0,-1,monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,27,monto_igv,0.00,0.00,0.00,1,1,0,monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,27,monto_total,40.00,40.00,40.00,1,1,0,monto_igv+monto_importe_total,factura
 rend-debedsar-amiquero-2026,27,ruc_receptor,20380795907,20380795907,20380795907,1,1,0,factura_ruc_cliente,factura
-rend-debedsar-amiquero-2026,27,razon_social_emisor,E T M TOURS PUQUIO-NASCA S.A.C.,E001-324,E T M TOURS PUQUIO-NASCA S.A.C.,0,1,1,razon_legal_suffix_prioritaria,factura
+rend-debedsar-amiquero-2026,27,razon_social_emisor,E T M TOURS PUQUIO-NASCA S.A.C.,E001-324,E T M TOURS PUQUIO-NASCA SOCIEDAD ANONIMA CERRADA,0,0,0,razon_lineas_previas_a_ruc,factura
 rend-debedsar-amiquero-2026,29,ruc_emisor,20606737310,20606737310,20606737310,1,1,0,factura_ruc_header,factura
 rend-debedsar-amiquero-2026,29,tipo_documento,01,01,01,1,1,0,anchor_factura_electronica,factura
 rend-debedsar-amiquero-2026,29,serie_numero,E001-2203,E001-2203,E001-2203,1,1,0,factura_serie_FE_patron,factura
 rend-debedsar-amiquero-2026,29,fecha_emision,2026-02-08,2026-02-08,2026-02-08,1,1,0,shared_fecha_primer_iso_o_slash,factura
 rend-debedsar-amiquero-2026,29,moneda,PEN,PEN,PEN,1,1,0,shared_moneda_pen_usd,factura
-rend-debedsar-amiquero-2026,29,monto_subtotal,29.66,29.66,29.66,1,1,0,monto_subtotal_label+monto_igv+monto_importe_total,factura
-rend-debedsar-amiquero-2026,29,monto_igv,5.34,5.34,5.34,1,1,0,monto_subtotal_label+monto_igv+monto_importe_total,factura
-rend-debedsar-amiquero-2026,29,monto_total,35.00,29.66,35.00,0,1,1,monto_subtotal_label+monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,29,monto_subtotal,29.66,29.66,,1,0,-1,monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,29,monto_igv,5.34,5.34,5.34,1,1,0,monto_igv+monto_importe_total,factura
+rend-debedsar-amiquero-2026,29,monto_total,35.00,29.66,35.00,0,1,1,monto_igv+monto_importe_total,factura
 rend-debedsar-amiquero-2026,29,ruc_receptor,20380795907,20380795907,20380795907,1,1,0,factura_ruc_cliente,factura
-rend-debedsar-amiquero-2026,29,razon_social_emisor,MULTISERVICIOS ASIEL S.A.C.,E001-2203,MULTISERVICIOS ASIEL S.A.C.,0,1,1,razon_legal_suffix_prioritaria,factura
+rend-debedsar-amiquero-2026,29,razon_social_emisor,MULTISERVICIOS ASIEL S.A.C.,E001-2203,MULTISERVICIOS ASIEL S.A.C. MULTISERVICIOS ASIEL S.A.C.,0,0,0,razon_lineas_previas_a_ruc,factura
 rend-debedsar-amiquero-2026,5,ruc_emisor,20380795907,,,0,0,0,nota_ruc_none,nota_pago
 rend-debedsar-amiquero-2026,5,tipo_documento,nota_pago,,nota_pago,0,1,1,anchor_nota_pago,nota_pago
 rend-debedsar-amiquero-2026,5,serie_numero,1792-26-95-2601620,,1792-26-95-2601620,0,1,1,nota_serie_linea_encabezado,nota_pago

@@ -68,9 +68,10 @@
       },
       "razon_social_emisor": {
         "tipo_doc_inferido": "factura",
-        "regla": "razon_primera_linea_candidata",
+        "regla": "razon_lineas_previas_a_ruc",
         "lineas_usadas": [
-          "RESTAURANT HATUN WASI"
+          "RESTAURANT HATUN WASI",
+          "De: PACHECO COYLLO GLORIA YOLANDA"
         ]
       }
     }
@@ -144,9 +145,10 @@
       },
       "razon_social_emisor": {
         "tipo_doc_inferido": "factura",
-        "regla": "razon_primera_linea_candidata",
+        "regla": "razon_lineas_previas_a_ruc",
         "lineas_usadas": [
-          "RESTAURANT HATUN WASI"
+          "RESTAURANT HATUN WASI",
+          "De: PACHECO COYLLO GLORIA YOLANDA"
         ]
       }
     }
@@ -220,9 +222,10 @@
       },
       "razon_social_emisor": {
         "tipo_doc_inferido": "factura",
-        "regla": "razon_primera_linea_candidata",
+        "regla": "razon_lineas_previas_a_ruc",
         "lineas_usadas": [
-          "RESTAURANT HATUN WASI"
+          "RESTAURANT HATUN WASI",
+          "De: PACHECO COYLLO GLORIA YOLANDA"
         ]
       }
     }
@@ -296,9 +299,11 @@
       },
       "razon_social_emisor": {
         "tipo_doc_inferido": "factura",
-        "regla": "razon_primera_linea_candidata",
+        "regla": "razon_lineas_previas_a_ruc",
         "lineas_usadas": [
-          "POLLOS A LA"
+          "POLLOS A LA",
+          "BRASA",
+          "RESTAURANTE EL"
         ]
       }
     }
@@ -372,9 +377,10 @@
       },
       "razon_social_emisor": {
         "tipo_doc_inferido": "factura",
-        "regla": "razon_primera_linea_candidata",
+        "regla": "razon_lineas_previas_a_ruc",
         "lineas_usadas": [
-          "RESTAURANT HATUN WASI"
+          "RESTAURANT HATUN WASI",
+          "De: PACHECO COYLLO GLORIA YOLANDA"
         ]
       }
     }
@@ -416,27 +422,24 @@
       },
       "monto_subtotal": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 29.66",
           "IGV : S/ 5.34",
           "Importe Total : S/ 35.00"
         ]
       },
       "monto_igv": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 29.66",
           "IGV : S/ 5.34",
           "Importe Total : S/ 35.00"
         ]
       },
       "monto_total": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 29.66",
           "IGV : S/ 5.34",
           "Importe Total : S/ 35.00"
         ]
@@ -448,8 +451,9 @@
       },
       "razon_social_emisor": {
         "tipo_doc_inferido": "factura",
-        "regla": "razon_legal_suffix_prioritaria",
+        "regla": "razon_lineas_previas_a_ruc",
         "lineas_usadas": [
+          "POLLOS & PARRILLAS AMIGOS",
           "POLLOS A LA BRASA AMIGOS S.A.C."
         ]
       }
@@ -492,27 +496,24 @@
       },
       "monto_subtotal": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 271.49",
           "IGV : S/ 28.51",
           "Importe Total : S/ 300.00"
         ]
       },
       "monto_igv": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 271.49",
           "IGV : S/ 28.51",
           "Importe Total : S/ 300.00"
         ]
       },
       "monto_total": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 271.49",
           "IGV : S/ 28.51",
           "Importe Total : S/ 300.00"
         ]
@@ -524,10 +525,8 @@
       },
       "razon_social_emisor": {
         "tipo_doc_inferido": "factura",
-        "regla": "razon_legal_suffix_scan_global",
-        "lineas_usadas": [
-          "HOTEL SUMAC SAMARI S.A.C."
-        ]
+        "regla": "razon_none",
+        "lineas_usadas": []
       }
     }
   },
@@ -568,27 +567,24 @@
       },
       "monto_subtotal": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 40.00",
           "IGV : S/ 0.00",
           "Importe Total : S/ 40.00"
         ]
       },
       "monto_igv": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 40.00",
           "IGV : S/ 0.00",
           "Importe Total : S/ 40.00"
         ]
       },
       "monto_total": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 40.00",
           "IGV : S/ 0.00",
           "Importe Total : S/ 40.00"
         ]
@@ -600,7 +596,7 @@
       },
       "razon_social_emisor": {
         "tipo_doc_inferido": "factura",
-        "regla": "razon_legal_suffix_prioritaria",
+        "regla": "razon_lineas_previas_a_ruc",
         "lineas_usadas": [
           "E T M TOURS PUQUIO-NASCA SOCIEDAD ANONIMA CERRADA"
         ]
@@ -644,27 +640,24 @@
       },
       "monto_subtotal": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 29.66",
           "IGV : S/ 5.34",
           "Importe Total : S/ 35.00"
         ]
       },
       "monto_igv": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 29.66",
           "IGV : S/ 5.34",
           "Importe Total : S/ 35.00"
         ]
       },
       "monto_total": {
         "tipo_doc_inferido": "factura",
-        "regla": "monto_subtotal_label+monto_igv+monto_importe_total",
+        "regla": "monto_igv+monto_importe_total",
         "lineas_usadas": [
-          "Sub Total Ventas : S/ 29.66",
           "IGV : S/ 5.34",
           "Importe Total : S/ 35.00"
         ]
@@ -676,8 +669,9 @@
       },
       "razon_social_emisor": {
         "tipo_doc_inferido": "factura",
-        "regla": "razon_legal_suffix_prioritaria",
+        "regla": "razon_lineas_previas_a_ruc",
         "lineas_usadas": [
+          "MULTISERVICIOS ASIEL S.A.C.",
           "MULTISERVICIOS ASIEL S.A.C."
         ]
       }
