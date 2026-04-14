@@ -78,17 +78,19 @@ fac-lote-b,raw/fac-lote-b.pdf,5,5,"1,2,3,4,5",ejemplo
 
 ---
 
-## 7. Entorno de ejecución (OCR, bake-off PASO 2, GPU)
+## 7. Criterio operativo preferente — entorno de ejecución (OCR avanzado, bake-off PASO 2, GPU)
 
-**Propósito:** evitar conclusiones injustas cuando un motor o herramienta **falla por incompatibilidad de runtime** (drivers, oneDNN, PyTorch/CUDA, etc.) y no por calidad intrínseca del modelo.
+Esta sección es **criterio de trabajo preferente** para el proyecto (no una nota marginal): define **dónde** debe ejecutarse preferentemente el **OCR avanzado**, el **bake-off PASO 2** y las pruebas con herramientas **sensibles al runtime o a GPU**, para que los resultados sean **reproducibles** y no se confunda fallo de entorno con calidad del motor.
 
-| Criterio | Regla operativa |
-|----------|-----------------|
-| **Windows** | Válido para fases del piloto (etiquetado, baseline, bake-off ligero) cuando el entorno sea estable. Algunas dependencias OCR/parsing (p. ej. ciertas pilas con aceleración **GPU** o backends **oneDNN**) pueden ser **poco reproducibles o frágiles** en Windows concreto. |
-| **Linux / Ubuntu / WSL** | Entorno **preferente** para **bake-off** y para pruebas de motores **sensibles al runtime** (PaddleOCR, Docling con modelos pesados, etc.) cuando allí la pila sea **más estable** o permita **aprovechar GPU** (p. ej. RTX 5090) de forma fiable. |
-| **Interpretación de métricas PASO 2** | Los CSV/Excel/informes deben poder relacionarse con **OS, CPU/GPU y versiones** (documentar en `run_log` o en el informe de la corrida). **No** interpretar un resultado como “el motor perdió” si **no** se ha descartado antes un fallo **puramente de entorno** en esa máquina. |
-| **Descarte de herramienta** | Una herramienta **no** se da por descartada definitivamente **solo** por error de runtime en Windows si el fallo es **típico de incompatibilidad** (binarios, DLL, CUDA/oneDNN). La decisión debe apoyarse en **repetición en entorno estable** (p. ej. Linux/WSL con GPU si está disponible) o en criterio explícito documentado. |
-| **Prioridad para pruebas reproducibles** | Si **Linux/WSL con GPU** está disponible y ofrece mayor estabilidad para OCR avanzado, **priorizarlo** para corridas de **comparación seria** de motores; Windows puede seguir usándose para el resto del flujo según convenga al equipo. |
+**Propósito:** evitar conclusiones injustas cuando un motor **falla por incompatibilidad de runtime** (drivers, oneDNN, PyTorch/CUDA, etc.) y no por calidad intrínseca del modelo; y evitar que **Windows** actúe como **referencia principal** del bake-off cuando **Linux/Ubuntu vía WSL** (p. ej. con RTX 5090) es el entorno **más estable** o el único donde la herramienta es reproducible.
+
+| Rol | Regla operativa |
+|-----|-----------------|
+| **Entorno preferente** | **Linux / Ubuntu vía WSL** es el entorno **preferente y de primera opción** para: **OCR avanzado**, **bake-off PASO 2**, y pruebas con motores o dependencias **sensibles al runtime o GPU** (p. ej. PaddleOCR, pilas con CUDA, modelos pesados), cuando en ese entorno la pila es **más estable** o permite **aprovechar la GPU** de forma fiable. |
+| **Windows (secundario / auxiliar)** | **Windows** puede usarse como entorno **alterno o auxiliar** (etiquetado, baseline ligero, tareas que no dependan de una pila frágil). **No** debe tratarse como entorno **principal de referencia** para bake-off ni para decisiones finales sobre motores cuando en Windows aparecen **fallos de runtime o incompatibilidades** que **no** se reproducen o se evitan en **Linux/WSL** y **distorsionan** la comparación. |
+| **Interpretación de métricas PASO 2** | Los resultados deben **interpretarse siempre según el entorno de ejecución** documentado (OS, CPU/GPU, versiones, en `run_log` o informe). Una tabla de bake-off corrida solo en Windows **no** sustituye por sí sola a una evaluación en el entorno preferente cuando este último está disponible para el tipo de prueba. |
+| **Descarte de herramienta** | Una herramienta **no** se da por descartada definitivamente **solo** porque falló en **Windows** si el fallo es **típico de entorno** (DLL, oneDNN, CUDA). La decisión debe apoyarse en **repetición en Linux/WSL** (u otro runtime estable) o en criterio explícito documentado. |
+| **Resumen** | Si **Linux/WSL** ofrece mayor estabilidad y uso adecuado de **GPU** para OCR avanzado, las **corridas de comparación seria** (bake-off) deben **priorizar** ese entorno; Windows queda como **secundario** cuando existan limitaciones que afecten la equidad o reproducibilidad de la medición. |
 
 **Subvención:** esta sección no altera normativa de negocio; solo criterio de **ingeniería y medición**.
 

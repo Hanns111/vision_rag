@@ -136,7 +136,7 @@ Definición única para poder comparar motores sobre las **mismas 15 páginas** 
 | **Tiempo** | `segundos_por_pagina` medido en la corrida (misma máquina al comparar motores). |
 | **% páginas con fallo** | Páginas donde existe al menos un campo con exactitud 0. |
 
-**Interpretación:** los valores anteriores deben leerse **en contexto del entorno de ejecución** (OS, hardware, versiones). Un fallo de runtime (p. ej. incompatibilidad GPU/oneDNN en Windows) **no** sustituye por sí solo a una conclusión sobre la calidad del motor; ver `data/piloto_ocr/PILOTO_OPERATIVO.md` §7 y `docs/DECISIONES_TECNICAS.md` **D-12**.
+**Interpretación:** los valores anteriores deben leerse **en contexto del entorno de ejecución** (OS, hardware, versiones). **Criterio preferente:** para bake-off y OCR avanzado, **Linux/Ubuntu vía WSL** es el entorno de **primera opción** cuando sea más estable o reproducible (p. ej. GPU); **Windows** es **secundario** si los fallos de runtime **distorsionan** la comparación. Un fallo de runtime en Windows **no** sustituye por sí solo a una conclusión sobre la calidad del motor ni a un descarte definitivo; ver `data/piloto_ocr/PILOTO_OPERATIVO.md` §7 y `docs/DECISIONES_TECNICAS.md` **D-12**.
 
 Plantilla de nombre de archivo de resultado: `metrics/baseline_paso1_YYYYMMDD.csv`, `metrics/bakeoff_paso2_motor_YYYYMMDD.csv`.
 
