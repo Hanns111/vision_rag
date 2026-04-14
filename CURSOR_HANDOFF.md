@@ -1,6 +1,7 @@
-# Handoff para Cursor (al volver al proyecto)
+# Handoff para Cursor (apoyo secundario)
 
-**Propósito:** retomar el hilo sin el chat. Detalle RAG: `CURRENT_STATE.md`.  
+**Rol actual de Cursor:** apoyo secundario / contraste operativo — convocado por Hans cuando se necesite. Ejecutor principal: **Claude Code** (ver `CURRENT_STATE.md` § Gobernanza).  
+**Propósito de este archivo:** retomar el hilo sin el chat. Detalle RAG: `CURRENT_STATE.md`.  
 **Roadmap (PASO 0–7):** [`docs/ROADMAP_PROYECTO.md`](docs/ROADMAP_PROYECTO.md) · **PASO 0 / raw + baseline:** [`data/piloto_ocr/PILOTO_OPERATIVO.md`](data/piloto_ocr/PILOTO_OPERATIVO.md) · `data/piloto_ocr/README.md`  
 **Decisiones:** [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md) (D-09 = etiquetado pendiente)  
 **Normativa / expedientes por categoría:** [`control_previo/README.md`](control_previo/README.md) · manifiestos: `control_previo/MANIFEST_INGESTION_TODO.csv` (regenerar con `python scripts/gen_control_previo_manifests.py`).
@@ -51,4 +52,4 @@ Todo lo demás es relativo a esta carpeta salvo que se indique lo contrario.
 
 ---
 
-*Actualizar cuando cambie alcance o arquitectura.*
+*Actualizado 2026-04-14 — Cursor pasa a apoyo secundario; Claude Code es ejecutor principal (ver `CURRENT_STATE.md`).*

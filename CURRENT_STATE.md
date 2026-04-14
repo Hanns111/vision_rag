@@ -75,6 +75,19 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 ---
 
+## GOBERNANZA OPERATIVA (vigente desde 2026-04-14)
+
+| Rol | Quién | Alcance |
+|-----|-------|---------|
+| **Decisor final** | Hans | Aprueba fases, cambios de rumbo, push a remoto |
+| **Ejecutor principal** | Claude Code | Modifica archivos, hace commit y push — siempre bajo decisión de Hans |
+| **Apoyo secundario** | Cursor | Ejecución/documentación operativa cuando Hans lo convoque |
+| **Auditor / continuidad estratégica** | ChatGPT | Control de fase, validación de consistencia entre herramientas |
+
+**Regla:** Claude Code puede ejecutar cambios en el repo (edición, commit, push) pero **no** toma decisiones de alcance ni abre fases sin aprobación explícita de Hans.
+
+---
+
 ## REGLA IMPORTANTE
 
 - **SANTO_GRIAL** = laboratorio / sandbox normativo (RAG + agente modular bajo `agent_sandbox/`).
@@ -108,4 +121,4 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 ---
 
-*Última actualización: 2026-04-09 — alineado con PASO 0 ejecutable y documentación cruzada.*
+*Última actualización: 2026-04-14 — PASO 4.1 cerrado; gobernanza operativa documentada.*
