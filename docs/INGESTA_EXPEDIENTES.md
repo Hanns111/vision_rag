@@ -148,18 +148,21 @@ Fuente: `scripts/ingesta/extractor.py`.
 
 ---
 
-## 6-bis. Validaciones normativas
+## 6-bis. Resolución de identidad + validaciones normativas
 
-Tras la extracción y antes del export, el pipeline ejecuta validaciones
-normativas opcionales:
+**Resolución de identidad administrativa** (`scripts/ingesta/id_resolver.py` +
+`scripts/consolidador.py`): tras la extracción, detecta SINAD/SIAF/EXP/AÑO en
+cada documento y los consolida en `expediente.json` (schema `expediente.v2`).
+Detalle: `docs/RESOLUCION_EXPEDIENTE_ID.md`. Resultado en 9 columnas nuevas de
+la hoja `documentos` y en la nueva hoja `resolucion_ids`.
 
-- **Firmas en Anexo 3** (`scripts/validaciones/firmas_anexo3.py`): solo si
-  `tipo_detectado == "rendicion"`. Detalle: `docs/VALIDACION_FIRMAS_ANEXO3.md`.
-  Resultado en columnas `validacion_firmas`, `estado_firmas`, `errores_firmas`,
-  `confianza_firmas`.
+**Firmas en Anexo 3** (`scripts/validaciones/firmas_anexo3.py`): solo si
+`tipo_detectado == "rendicion"`. Detalle: `docs/VALIDACION_FIRMAS_ANEXO3.md`.
+Resultado en columnas `validacion_firmas`, `estado_firmas`, `errores_firmas`,
+`confianza_firmas`.
 
-Desacopladas: si el módulo falla, el pipeline continúa (`validaciones = null`
-en el JSON). `--skip-validaciones` en el CLI para omitirlas.
+Ambas son desacopladas: si el módulo falla, el pipeline continúa.
+Flags: `--skip-resolucion` y `--skip-validaciones`.
 
 ---
 
