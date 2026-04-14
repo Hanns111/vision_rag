@@ -2,7 +2,7 @@
 
 > Orden de trabajo y capas **validado**. No sustituye `CURRENT_STATE.md` / `docs/CURRENT_STATE_RAG.md`. **Subvención** y matriz de caso real: **después** de PASO 0–2 cerrados según criterio de este documento.
 
-**Actualizado:** 2026-04-09 · **PASO 0 operativo:** §4.1–4.3 · **Seguimiento:** §9
+**Actualizado:** 2026-04-11 · **PASO 0 operativo:** §4.1–4.3 · **Seguimiento:** §9 · **Líneas futuras:** §11
 
 ---
 
@@ -217,5 +217,25 @@ PyMuPDF, OpenCV, Tesseract, RAG en `pdf_rag.py`; bake-off: PaddleOCR, Docling, e
 | `data/piloto_ocr/PILOTO_OPERATIVO.md` | Reglas y PASO 1 baseline |
 | `data/piloto_ocr/CHECKLIST_POBLADO.md` | Poblar piloto paso a paso |
 | `data/piloto_ocr/metrics/METRICAS_MINIMAS.md` | Métricas §4.3 |
-| `docs/DECISIONES_TECNICAS.md` | D-01…D-09 |
+| `docs/DECISIONES_TECNICAS.md` | D-01…D-11 |
 | `docs/CURRENT_STATE_RAG.md` | Retrieval |
+
+---
+
+## 11. Líneas futuras documentadas (sin número de PASO)
+
+> **Alcance:** registro prudente de direcciones posibles. **No** constituyen el siguiente paso operativo, **no** sustituyen PASO 3–7, **no** reciben numeración de PASO y **no** implican implementación inmediata. **Subvención** y expediente real siguen gobernados por las secciones ya definidas de este documento.
+
+### 11.1 OCR dirigido por regiones (ROI-based extraction)
+
+**Idea (referencia técnica):** detectar regiones relevantes con un modelo tipo **YOLO**, recortar esas regiones y aplicar **OCR o VLM solo sobre esas zonas** (no sobre la página entera por defecto).
+
+**Valor potencial:** puede mejorar precisión y coste cuando el problema deja de ser “qué motor lee la página” y pasa a ser “dónde está cada campo” en layouts densos, siempre que se demuestre con datos.
+
+**Condición para explorarla más adelante:** solo si las **métricas de PASO 2–3** muestran que el cuello de botella está en la **localización de campos dentro de páginas complejas**, y **no** en el motor OCR de página completa. Hasta entonces **no es prioritaria** frente al trabajo acordado del piloto OCR (PASO 2 en curso / cerrado según estado real) y PASO 3.
+
+**Auditoría:** cualquier exploración futura en esta línea debe preservar **trazabilidad por región** (p. ej. bounding box, confianza del detector, texto extraído y relación explícita con el documento fuente), alineado con un sistema **determinista y auditable**.
+
+**Texto de criterio acordado (referencia única):**
+
+Explorar OCR dirigido por regiones (ROI-based extraction) como línea futura solo si las métricas de PASO 2–3 muestran que el cuello de botella está en la localización de campos dentro de páginas complejas, y no en el motor OCR de página completa. Cualquier exploración futura debe preservar trazabilidad por región (bounding box, confianza, texto extraído y relación con el documento fuente).

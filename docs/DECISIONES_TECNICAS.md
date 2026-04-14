@@ -14,6 +14,7 @@
 | D-08 | PASO 0 v1 **documentado**: N=15, 11 campos, `piloto_ocr.v1`, rutas `data/piloto_ocr/` | Cerrada (documentación) |
 | D-09 | **15 JSON** de etiquetas reales + `MANIFEST_PILOTO.csv` completo | Cerrada (piloto DEBEDSAR2026-INT-0103251; 2026-04-10) |
 | D-10 | Validación obligatoria de **identidad única del expediente** (`EXPEDIENTE_ID` y reglas en [`GUARDARRAILES_AUDITORIA.md`](GUARDARRAILES_AUDITORIA.md)) antes de revisión documental o validación de gasto; sin ello **prohibido** declarar expediente válido | Cerrada (documentación) |
+| D-11 | **OCR por regiones (ROI)** como **línea futura documentada** en [`ROADMAP_PROYECTO.md`](ROADMAP_PROYECTO.md) §11: sin número de PASO, sin implementación inmediata; exploración condicionada a métricas PASO 2–3 y trazabilidad por región | Documentada (no implementación) |
 
 **Fuera de alcance inmediato:** GraphRAG sustitutivo sin evaluación; un solo proveedor OCR sin bake-off; tunear chunking RAG antes de baseline OCR en el piloto.
 
