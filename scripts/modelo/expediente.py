@@ -18,7 +18,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Any
 
 
-SCHEMA_VERSION = "expediente.v2"
+SCHEMA_VERSION = "expediente.v3"
 
 
 @dataclass
@@ -89,6 +89,44 @@ class ResolucionId:
 
 
 @dataclass
+class Comprobante:
+    """Comprobante de pago detectado dentro de un documento (factura/boleta/ticket)."""
+    archivo: str                   # nombre del PDF contenedor
+    pagina_inicio: int
+    pagina_fin: int
+    tipo: str                      # factura_electronica | boleta_venta | ticket | desconocido
+    ruc: str | None = None
+    razon_social: str | None = None
+    serie_numero: str | None = None
+    fecha: str | None = None       # YYYY-MM-DD
+    monto_total: str | None = None
+    moneda: str | None = None      # PEN | USD
+    monto_igv: str | None = None
+    confianza: float = 0.0
+    hash_deduplicacion: str = ""   # (ruc|serie|fecha|monto) o hash(texto[:200])
+    texto_resumen: str = ""        # primeros ~300 chars del bloque
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
+class FlujoFinanciero:
+    """Agregado monetario a nivel expediente — solo desde evidencia, no inventa."""
+    total_detectado: str = "0.00"          # suma de monto_total de comprobantes (moneda mayoritaria)
+    moneda: str = ""                        # moneda dominante (PEN|USD|"")
+    n_comprobantes: int = 0
+    n_facturas: int = 0
+    n_boletas: int = 0
+    n_tickets: int = 0
+    n_desconocidos: int = 0
+    inconsistencias: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass
 class Expediente:
     """Consolidado del expediente; placeholders para campos v1 (aún no poblados)."""
     expediente_id_carpeta: str
@@ -100,6 +138,9 @@ class Expediente:
     estado: str = "EN_PROCESO"
     documentos_archivos: list[str] = field(default_factory=list)
     validaciones: list[dict[str, Any]] = field(default_factory=list)
+    # --- v3: comprobantes y flujo financiero ---
+    comprobantes: list[Comprobante] = field(default_factory=list)
+    flujo_financiero: FlujoFinanciero | None = None
     observaciones: list[str] = field(default_factory=list)
     traza: list[dict[str, Any]] = field(default_factory=list)
 
@@ -113,6 +154,8 @@ class Expediente:
             "resolucion_id": self.resolucion_id.to_dict() if self.resolucion_id else None,
             "documentos_archivos": list(self.documentos_archivos),
             "validaciones": list(self.validaciones),
+            "comprobantes": [c.to_dict() for c in self.comprobantes],
+            "flujo_financiero": self.flujo_financiero.to_dict() if self.flujo_financiero else None,
             "observaciones": list(self.observaciones),
             "traza": list(self.traza),
         }
