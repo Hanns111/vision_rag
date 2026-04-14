@@ -148,6 +148,21 @@ Fuente: `scripts/ingesta/extractor.py`.
 
 ---
 
+## 6-bis. Validaciones normativas
+
+Tras la extracción y antes del export, el pipeline ejecuta validaciones
+normativas opcionales:
+
+- **Firmas en Anexo 3** (`scripts/validaciones/firmas_anexo3.py`): solo si
+  `tipo_detectado == "rendicion"`. Detalle: `docs/VALIDACION_FIRMAS_ANEXO3.md`.
+  Resultado en columnas `validacion_firmas`, `estado_firmas`, `errores_firmas`,
+  `confianza_firmas`.
+
+Desacopladas: si el módulo falla, el pipeline continúa (`validaciones = null`
+en el JSON). `--skip-validaciones` en el CLI para omitirlas.
+
+---
+
 ## 7. Limitaciones conocidas (primer piloto)
 
 - PDFs **consolidados** (rendiciones con facturas/pasajes pegados adentro)
