@@ -181,9 +181,15 @@ Fuente: `scripts/ingesta/extractor.py`.
 
 **Resolución de identidad administrativa** (`scripts/ingesta/id_resolver.py` +
 `scripts/consolidador.py`): tras la extracción, detecta SINAD/SIAF/EXP/AÑO en
-cada documento y los consolida en `expediente.json` (schema `expediente.v2`).
-Detalle: `docs/RESOLUCION_EXPEDIENTE_ID.md`. Resultado en 9 columnas nuevas de
-la hoja `documentos` y en la nueva hoja `resolucion_ids`.
+cada documento y los consolida en `expediente.json`. Detalle:
+`docs/RESOLUCION_EXPEDIENTE_ID.md`. Resultado en 9 columnas nuevas de
+la hoja `documentos` y en la hoja `resolucion_ids`.
+
+**Análisis de comprobantes** (`scripts/ingesta/comprobante_detector.py` +
+`comprobante_extractor.py`): solo sobre `tipo_detectado == "rendicion"`.
+Segmenta bloques de factura/boleta/ticket, extrae RUC/serie/fecha/monto
+con PASO 4.1 y agrega `FlujoFinanciero` al `expediente.json` (schema v3).
+Detalle: `docs/ANALISIS_COMPROBANTES.md`. Resultado en hoja `comprobantes`.
 
 **Firmas en Anexo 3** (`scripts/validaciones/firmas_anexo3.py`): solo si
 `tipo_detectado == "rendicion"`. Detalle: `docs/VALIDACION_FIRMAS_ANEXO3.md`.
