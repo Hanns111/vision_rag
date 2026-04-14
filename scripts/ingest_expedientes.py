@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
+from typing import Any
 
 _REPO = Path(__file__).resolve().parent.parent
 if str(_REPO / "scripts") not in sys.path:
@@ -39,9 +40,12 @@ def _cmd_scan(args: argparse.Namespace) -> int:
 
 
 def _cmd_process(args: argparse.Namespace) -> int:
-    """Lee texto (PyMuPDF/OCR) y lo cachea. Clasificación y extracción: commit 3-4."""
+    """Lee texto → clasifica → extrae → escribe extractions/{archivo}.json."""
     import json
+    from dataclasses import asdict
     from ingesta.text_reader import read_pdf_with_cache
+    from ingesta.classifier import classify
+    from ingesta.extractor import extract_campos
 
     dest = Path(args.dest).resolve()
     exp_id = args.expediente_id or (Path(args.src).name if args.src else None)
@@ -56,20 +60,195 @@ def _cmd_process(args: argparse.Namespace) -> int:
 
     meta = json.loads(meta_file.read_text(encoding="utf-8"))
     cache_dir = exp_dir / "ocr_cache"
+    extractions_dir = exp_dir / "extractions"
+    extractions_dir.mkdir(exist_ok=True)
+
     for d in meta["documentos"]:
         src_pdf = Path(d["ruta_destino"])
-        print(f"[process] leyendo {d['nombre']}...", flush=True)
-        res = read_pdf_with_cache(src_pdf, d["sha1"], cache_dir, force=args.force)
+        nombre = d["nombre"]
+        print(f"[process] {nombre}...", flush=True)
+
+        try:
+            txt_meta = read_pdf_with_cache(src_pdf, d["sha1"], cache_dir, force=args.force)
+            texto = Path(txt_meta.texto_concatenado_path).read_text(
+                encoding="utf-8", errors="replace"
+            )
+        except Exception as exc:
+            estado = "error"
+            error_msg = f"lectura:{exc!s}"
+            payload = {
+                "archivo": nombre,
+                "expediente_id": exp_id,
+                "estado_procesamiento": estado,
+                "error": error_msg,
+            }
+            (extractions_dir / f"{nombre}.json").write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+            print(f"[process]   ERROR lectura: {exc!s}")
+            continue
+
+        cls = classify(texto, nombre)
+        ext = extract_campos(texto, cls.tipo_detectado)
+
+        if cls.tipo_detectado == "tipo_desconocido":
+            estado = "bajo_confianza"
+        elif cls.confianza < 0.5:
+            estado = "bajo_confianza"
+        else:
+            estado = "ok"
+
+        payload = {
+            "archivo": nombre,
+            "expediente_id": exp_id,
+            "sha1": d["sha1"],
+            "ruta_origen": d["ruta_origen"],
+            "ruta_destino": d["ruta_destino"],
+            "paginas": d["paginas"],
+            "lectura": {
+                "len_total": txt_meta.len_total,
+                "paginas_con_texto": txt_meta.paginas_con_texto,
+                "motores": sorted({p.motor for p in txt_meta.paginas}),
+            },
+            "clasificacion": {
+                "tipo_detectado": cls.tipo_detectado,
+                "confianza": cls.confianza,
+                "subtipos_detectados": cls.subtipos_detectados,
+                "nota": cls.nota,
+                "puntajes": cls.puntajes,
+                "reglas_activadas": [
+                    {"regla": r.regla, "peso": r.peso, "fragmento": r.fragmento}
+                    for r in cls.reglas_activadas
+                ],
+            },
+            "extraccion": {
+                "tipo_doc_interno": ext.tipo_doc_interno,
+                "monto": asdict(ext.monto),
+                "fecha": asdict(ext.fecha),
+                "ruc": asdict(ext.ruc),
+                "razon_social": asdict(ext.razon_social),
+                "numero_documento": asdict(ext.numero_documento),
+                "tipo_gasto": asdict(ext.tipo_gasto),
+                "texto_resumen": ext.texto_resumen,
+            },
+            "estado_procesamiento": estado,
+        }
+        (extractions_dir / f"{nombre}.json").write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
         print(
-            f"[process]   paginas={res.total_paginas} "
-            f"con_texto={res.paginas_con_texto} len={res.len_total}"
+            f"[process]   tipo={cls.tipo_detectado} conf={cls.confianza} "
+            f"estado={estado} subtipos={cls.subtipos_detectados or '-'}"
         )
     return 0
 
 
+def _cargar_extractions(exp_dir: Path) -> list[dict]:
+    import json
+
+    out: list[dict] = []
+    for f in sorted((exp_dir / "extractions").glob("*.json")):
+        try:
+            out.append(json.loads(f.read_text(encoding="utf-8")))
+        except Exception:
+            continue
+    return out
+
+
 def _cmd_export(args: argparse.Namespace) -> int:
-    print("[export] aún no implementado (commit 5)")
-    return 2
+    """Lee extractions/*.json de TODOS los expedientes en `dest` y genera el Excel."""
+    import json
+    from ingesta.excel_export import (
+        DocumentoValidacion,
+        ExpedienteValidacion,
+        exportar_excel,
+    )
+
+    dest = Path(args.dest).resolve()
+    xlsx = Path(args.xlsx).resolve()
+    if not dest.exists():
+        print(f"[export] no existe {dest}")
+        return 2
+
+    documentos: list[DocumentoValidacion] = []
+    expedientes: list[ExpedienteValidacion] = []
+
+    # filtrar por expediente_id si se pidió, o todos los subdirs
+    if args.expediente_id:
+        exp_dirs = [dest / args.expediente_id]
+    elif args.src:
+        exp_dirs = [dest / Path(args.src).name]
+    else:
+        exp_dirs = [p for p in sorted(dest.iterdir()) if p.is_dir()]
+
+    for exp_dir in exp_dirs:
+        meta_file = exp_dir / "metadata.json"
+        if not meta_file.exists():
+            continue
+        meta = json.loads(meta_file.read_text(encoding="utf-8"))
+        docs = _cargar_extractions(exp_dir)
+        if not docs:
+            continue
+
+        n_ok = sum(1 for d in docs if d.get("estado_procesamiento") == "ok")
+        n_bc = sum(1 for d in docs if d.get("estado_procesamiento") == "bajo_confianza")
+        n_er = sum(1 for d in docs if d.get("estado_procesamiento") == "error")
+        tipos = sorted(
+            {
+                d.get("clasificacion", {}).get("tipo_detectado", "")
+                for d in docs
+                if d.get("clasificacion")
+            }
+        )
+
+        expedientes.append(
+            ExpedienteValidacion(
+                expediente_id=meta["expediente_id"],
+                ruta_origen=meta["ruta_origen"],
+                ruta_destino=meta["ruta_destino"],
+                n_documentos=len(docs),
+                n_ok=n_ok,
+                n_bajo_confianza=n_bc,
+                n_error=n_er,
+                tipos_detectados=", ".join(t for t in tipos if t),
+                fecha_ingesta=meta.get("fecha_ingesta", ""),
+            )
+        )
+
+        for d in docs:
+            cls = d.get("clasificacion", {}) or {}
+            ext = d.get("extraccion", {}) or {}
+            def _v(k: str) -> Any:
+                c = ext.get(k) or {}
+                return c.get("valor") if isinstance(c, dict) else None
+
+            nota = cls.get("nota", "") or ""
+            if d.get("estado_procesamiento") == "error":
+                nota = f"error: {d.get('error', '')}"
+
+            documentos.append(
+                DocumentoValidacion(
+                    expediente_id=d.get("expediente_id", ""),
+                    archivo=d.get("archivo", ""),
+                    ruta_origen=d.get("ruta_origen", ""),
+                    tipo_documento_detectado=cls.get("tipo_detectado", "tipo_desconocido"),
+                    confianza_tipo=float(cls.get("confianza", 0.0) or 0.0),
+                    monto_detectado=_v("monto"),
+                    fecha_detectada=_v("fecha"),
+                    ruc_detectado=_v("ruc"),
+                    razon_social_detectada=_v("razon_social"),
+                    numero_documento_detectado=_v("numero_documento"),
+                    tipo_gasto_detectado=_v("tipo_gasto"),
+                    texto_extraido_resumen=(ext.get("texto_resumen") or "")[:1000],
+                    estado_procesamiento=d.get("estado_procesamiento", "error"),
+                    nota_sistema=nota,
+                )
+            )
+
+    path = exportar_excel(xlsx, documentos, expedientes)
+    print(f"[export] xlsx={path}")
+    print(f"[export] documentos={len(documentos)} expedientes={len(expedientes)}")
+    return 0
 
 
 def _cmd_run_all(args: argparse.Namespace) -> int:
