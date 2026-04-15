@@ -77,9 +77,12 @@ def extraer_de_bloque(bloque) -> Comprobante:
     }
     conf = _confianza_promedio(presentes)
 
-    # Clave de deduplicación
+    # Clave de deduplicación. Solo colapsar cuando hay señal ÚNICA: serie o
+    # monto. RUC+fecha aislados no garantizan unicidad (un proveedor puede
+    # emitir varios comprobantes el mismo día).
     claves_llenas = [v for v in (ruc, serie, fecha, monto_total) if v]
-    if len(claves_llenas) >= 2:
+    tiene_id_fuerte = bool(serie) or bool(monto_total)
+    if len(claves_llenas) >= 2 and tiene_id_fuerte:
         clave = "|".join(str(v) for v in (ruc or "", serie or "", fecha or "", monto_total or ""))
     else:
         clave = _hash_bloque(bloque.archivo, bloque.pagina_inicio, bloque.pagina_fin, bloque.texto)

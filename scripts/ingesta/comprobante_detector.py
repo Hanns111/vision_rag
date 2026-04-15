@@ -23,6 +23,8 @@ import re
 from dataclasses import dataclass, field
 from typing import Any
 
+from ingesta.classifier import classify_page
+
 
 _RE_PAGE = re.compile(
     r"=====\s*PAGE\s+(\d+)\s*\(motor=([^)]*)\)\s*=====\s*\n?"
@@ -57,6 +59,9 @@ class SenalesPagina:
     rucs: list[str]               # 0..n RUCs de 11 dígitos en la página
     monto_fuerte: bool            # IGV / IMPORTE TOTAL / Total a pagar presente
     cuerpo: bool                  # tiene al menos 1 RUC + monto fuerte
+    # Clasificación tripartita (F1): comprobante_real | soporte_sunat | administrativo | otros
+    categoria_pagina: str = "otros"
+    subtipo_pagina: str = ""
 
 
 @dataclass
@@ -115,6 +120,10 @@ def _analizar_pagina(pagina: int, motor: str, texto_pag: str) -> SenalesPagina:
     monto_fuerte = any(re.search(p, texto_pag, re.IGNORECASE) for p in _RE_MONTO_FUERTE)
     cuerpo = bool(rucs) and monto_fuerte
 
+    # F1: clasificación tripartita por página. Gana sobre las heurísticas
+    # locales; si la página es SUNAT o administrativa NUNCA abrirá un bloque.
+    pc = classify_page(texto_pag)
+
     return SenalesPagina(
         pagina=pagina,
         motor=motor,
@@ -124,6 +133,8 @@ def _analizar_pagina(pagina: int, motor: str, texto_pag: str) -> SenalesPagina:
         rucs=rucs,
         monto_fuerte=monto_fuerte,
         cuerpo=cuerpo,
+        categoria_pagina=pc.categoria_pagina,
+        subtipo_pagina=pc.subtipo,
     )
 
 
@@ -181,24 +192,32 @@ def detectar_bloques(
     for s in senales:
         if s.pagina in usadas:
             continue
-        # Criterio de inicio: página con cabecera O página con cuerpo (RUC+monto) y
-        # no ya incluida
-        if not (s.cabecera or s.cuerpo):
+        # Nuevo criterio de inicio (F2): SOLO páginas clasificadas como
+        # `comprobante_real` pueden abrir un bloque. Las páginas SUNAT y
+        # administrativas se excluyen aquí (antes se colaban como "ticket"
+        # por tener RUC + monto).
+        if s.categoria_pagina != "comprobante_real":
             continue
 
         pagina_inicio = s.pagina
         pagina_fin = s.pagina
-        # Extender hasta encontrar "cuerpo" dentro de ventana_maxima si aún no hay
         tiene_cuerpo = s.cuerpo
         for delta in range(1, ventana_maxima):
             sig = por_pagina.get(s.pagina + delta)
             if not sig:
                 break
-            # Parar si la página siguiente inicia OTRA cabecera de comprobante
-            if sig.cabecera and (sig.cabecera != s.cabecera or sig.serie_detectada != s.serie_detectada) and delta > 0:
+            # Cerrar si la página siguiente es SUNAT o administrativa — esas
+            # nunca extienden el comprobante (irán a sus propias hojas).
+            if sig.categoria_pagina in ("soporte_sunat", "administrativo"):
                 break
-            # Incluir si aporta cuerpo o continuidad
-            if sig.cuerpo or sig.rucs or sig.cabecera == s.cabecera:
+            # Cerrar si la página siguiente inicia OTRO comprobante distinto.
+            if sig.cabecera and (sig.cabecera != s.cabecera or sig.serie_detectada != s.serie_detectada):
+                break
+            # Solo extender dentro de páginas comprobante_real que aporten
+            # cuerpo, RUC o continuidad de cabecera.
+            if sig.categoria_pagina == "comprobante_real" and (
+                sig.cuerpo or sig.rucs or sig.cabecera == s.cabecera
+            ):
                 pagina_fin = sig.pagina
                 tiene_cuerpo = tiene_cuerpo or sig.cuerpo
             else:
@@ -219,9 +238,6 @@ def detectar_bloques(
         serie = _serie_bloque(sub_senales)
         texto = "\n".join(x.texto for x in sub_senales)
 
-        # División por RUCs múltiples: si hay 2+ RUCs distintos y el bloque es
-        # suficientemente grande, generar un solo bloque pero marcarlo; la
-        # extracción posterior elegirá el primer RUC como emisor.
         bloques.append(
             BloqueComprobante(
                 archivo=nombre_archivo,

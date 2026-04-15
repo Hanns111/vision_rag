@@ -1,0 +1,571 @@
+================================================================================
+  vision_rag — CONSOLIDADO MAESTRO DEL PROYECTO (para handoff a otro chat)
+================================================================================
+
+Generado: 2026-04-15
+Ruta local del workspace: C:\Users\Hans\Proyectos\vision_rag
+Repositorio remoto típico: Hanns111/vision_rag (confirmar con: git remote -v)
+Rama actual al generar este archivo: main
+Último commit conocido en sesión de generación: 8c92c87 (docs: reglas de alineacion para agentes)
+
+Propósito de este TXT:
+  Unificar en un solo documento QUÉ es el proyecto, QUÉ hay en el repo, QUÉ se
+  hizo, DÓNDE está cada pieza, HACIA DÓNDE apunta el roadmap, y CÓMO retomar el
+  trabajo sin leer docenas de archivos sueltos.
+
+--------------------------------------------------------------------------------
+0. ¿TODO ESTÁ EN ESTE TXT O NO? (LECTURA OBLIGATORIA PARA OTROS CHATS / IAs)
+--------------------------------------------------------------------------------
+
+Respuesta corta: NO. Este archivo NO sustituye al repositorio vivo ni permite,
+por sí solo, verificar datos ni ejecutar código.
+
+Qué SÍ incluye este consolidado:
+  - Narrativa de propósito, arquitectura en capas, roadmap PASO 0–7, gobernanza.
+  - Resumen de qué hace cada carpeta y scripts principales (referencia por ruta).
+  - Inventario de rutas versionadas en Git (salida de "git ls-files" al final).
+  - Nota sobre qué suele estar fuera de Git por .gitignore (corpus RAG, etc.).
+
+Qué NO incluye (y por tanto otra IA sin acceso al repo NO puede afirmar ni
+ejecutar solo con este TXT):
+  - El texto completo de docs/AGENT_RULES.md, CURRENT_STATE.md, ROADMAP §9,
+    MANIFEST_PILOTO.csv, ni el contenido de los 15 JSON en labels/ (solo pueden
+    aparecer listados de rutas al final, no el cuerpo de cada archivo).
+  - Código fuente ejecutable de scripts/ingest_expedientes.py ni dependencias
+    instaladas; tampoco PDFs del piloto fuera de lo versionado.
+  - Un "segundo expediente real" colocado por el usuario: no está en el TXT
+    hasta que exista en el workspace y el agente tenga acceso al disco o clone.
+
+Regla práctica (alineada a docs/AGENT_RULES.md):
+  - El TXT describe; el repo (clone local o mismo workspace) verifica y ejecuta.
+  - Para tareas del tipo "cerrar PASO 0 en §9 con evidencia", "correr ingesta
+    sobre expediente nuevo", "diagnosticar Excel": hace falta el repositorio
+    accesible en el entorno del agente O subir explícitamente los archivos
+    mínimos listados abajo.
+
+Paquete mínimo recomendado si otra sesión solo puede recibir archivos (sin clone):
+  - docs/AGENT_RULES.md
+  - CURRENT_STATE.md
+  - SESSION_STATE.md
+  - LLM_HANDOFF_MASTER.md
+  - docs/ROADMAP_PROYECTO.md
+  - data/piloto_ocr/MANIFEST_PILOTO.csv
+  - data/piloto_ocr/labels/ (los 15 JSON + plantilla si aplica)
+  - Salida esperada tras ingesta: ruta al Excel y expediente.json si ya existen
+  - Carpeta o ZIP del nuevo expediente a procesar (según docs/INGESTA_EXPEDIENTES.md)
+
+Repo remoto de referencia: https://github.com/Hanns111/vision_rag
+  (Clonar o abrir en IDE/Cursor es la forma más fiable de cumplir AGENT_RULES.)
+
+Última actualización de esta sección: 2026-04-15 (aclaración límites del TXT).
+
+================================================================================
+1. QUÉ ES ESTE PROYECTO (VISIÓN EN UNA FRASE)
+================================================================================
+
+Sistema de análisis documental para contexto MINEDU / expedientes de pago
+(sector público peruano), con DOS LÍNEAS TÉCNICAS QUE NO SE INTEGRAN HASTA
+PASO 7 (decisión D-07):
+
+  A) RAG normativo + agente modular  →  carpeta agent_sandbox/
+     Consultas sobre PDFs de normativa con recuperación híbrida, evidencia
+     (archivo, página, fragmento), chunking que separa índice vs cuerpo,
+     boost por intención (p. ej. "objetivo"), salida legible en consola.
+
+  B) Pipeline OCR + extracción estructurada  →  scripts/, data/piloto_ocr/
+     Medición formal PASO 0–7: ground truth, baseline, bake-off de motores,
+     preproceso (PASO 3), parsing por reglas trazable (PASO 4 / 4.1), posible
+     fallback LLM acotado (PASO 5, no prioritario), y más adelante integración
+     con revisión de expediente (PASO 7).
+
+Contexto de nombres:
+  "SANTO_GRIAL" en CURRENT_STATE.md = laboratorio / sandbox normativo (RAG).
+  "AG-EVIDENCE" = posible línea de producto separada; no asumir integración de
+  código hasta decisión explícita (ver agent_sandbox/RELATION_TO_AG_EVIDENCE.md,
+  INTEGRATION_GATE.md).
+
+================================================================================
+2. GOBERNANZA OPERATIVA (QUIÉN HACE QUÉ)
+================================================================================
+
+  Decisor final:        Hans (fases, alcance, push remoto)
+  Ejecutor principal:   Claude Code (edición, commit, push bajo decisión de Hans)
+  Apoyo secundario:     Cursor (ejecución / documentación cuando se convoque)
+  Auditor / continuidad: ChatGPT (consistencia entre herramientas)
+
+Regla: Claude Code no abre fases ni cambia alcance sin aprobación explícita.
+
+================================================================================
+3. ESTADO DEL ROADMAP (PASO 0–7) — SÍNTESIS
+================================================================================
+
+Definición de PASO (orden de ingeniería, NO carpetas control_previo/01_*):
+
+  PASO 0  Ground truth + métricas (N=15 páginas, esquema piloto_ocr.v1)
+  PASO 1  Baseline OCR (p. ej. document_ocr_runner.py + Tesseract)
+  PASO 2  Bake-off de motores (Tesseract vs PaddleOCR vs Docling; WSL preferente)
+  PASO 3  Preprocesado de imagen (A/B documentado)
+  PASO 4  Parsing con reglas + JSON trazable
+  PASO 4.1  Estabilización del extractor (correcciones sin regresiones)
+  PASO 5  Fallback LLM (no iniciado; no prioridad inmediata)
+  PASO 6  RAG normativo (agent_sandbox/) — implementado en paralelo
+  PASO 7  Expediente real E2E + checklist negocio + integración OCR↔agente (D-07)
+
+Documento normativo del orden: docs/ROADMAP_PROYECTO.md
+
+Estado narrativo según LLM_HANDOFF_MASTER.md (2026-04-14):
+  Pasos 0 a 4.1: cerrados en el sentido de piloto medible y extractor 4.1.
+  PASO 5: no abierto.
+  PASO 6: prototipo operativo (RAG).
+  PASO 7: integración bloqueada hasta contrato de datos.
+
+Nota de consistencia:
+  docs/ROADMAP_PROYECTO.md §9 puede mostrar checkboxes sin marcar en plantilla;
+  el estado real debe contrastarse con CURRENT_STATE.md, LLM_HANDOFF_MASTER.md
+  y commits recientes.
+
+Principios (docs/DECISIONES_TECNICAS.md, roadmap §1):
+  - LLM no es motor principal de OCR masivo.
+  - Pipeline: preproceso → OCR/parsing auditable → reglas → LLM solo en baja
+    confianza (futuro).
+  - RAG no sustituye extracción de facturas escaneadas.
+  - Medir antes de elegir motor.
+
+================================================================================
+4. QUÉ HACE CADA PARTE DEL SISTEMA (ARQUITECTURA RESUMIDA)
+================================================================================
+
+4.1 RAG + agente (agent_sandbox/)
+  - main.py           Punto de entrada CLI; eval RAG con --rag-eval
+  - pdf_rag.py        Chunking PyMuPDF, índice JSON, búsqueda híbrida, tipo de
+                      chunk (p. ej. objetivo), ranking con boost por intención
+  - orchestrator.py Ciclo: razonamiento → herramienta buscar_en_pdf → validación
+                      (máx. 2 vueltas)
+  - nodes/            input, reasoning (fallback a RAG si no hay tool), tool,
+                      validation, output (respuesta + fuente + fragmentos)
+  - tools.py          Herramienta buscar_en_pdf
+  - embeddings.py     Embeddings locales
+  - llm_client.py     Cliente LLM para razonamiento (p. ej. OpenRouter)
+  - corpus/           PDFs normativos (no listados aquí si son voluminosos)
+  - index/index.json  Índice generado
+  - eval_questions.json  Preguntas de evaluación
+  - cross_encoder_rerank.py, agent_audit_log.py  Utilidades / auditoría
+
+  Referencia de arquitectura: agent_sandbox/ARCHITECTURE.md
+  Copia para auditoría: agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/
+
+4.2 OCR baseline y experimentos (scripts/)
+  - document_ocr_runner.py     Baseline PyMuPDF + OpenCV + Tesseract
+  - bakeoff_paso2.py           Bake-off PASO 2
+  - bakeoff_paso2_human_export.py
+  - paso3_ab_mini.py           Mini A/B PASO 3
+  - piloto_field_extract_minimal.py   Extracción mínima
+  - piloto_field_extract_paso4.py       Extractor por reglas PASO 4 / 4.1
+  - piloto_paso4_eval.py                Evaluación vs gold
+  - ocr_adaptive_engine.py     Motor OCR adaptativo (experimentación)
+  - gen_control_previo_manifests.py   Manifiestos control previo
+  - requirements-ocr.txt, requirements-paso2.txt   Dependencias
+
+4.3 Ingesta de expedientes reales (infra validación humana; alimenta PASO 0)
+  - ingest_expedientes.py      CLI orquestador
+  - ingesta/scanner.py         Escaneo de carpetas/PDFs
+  - ingesta/text_reader.py     Texto por página (OCR por página, caché)
+  - ingesta/classifier.py      Clasificación por reglas
+  - ingesta/extractor.py       Wrapper extractor PASO 4.1
+  - ingesta/comprobante_detector.py, comprobante_extractor.py
+  - ingesta/id_resolver.py     Resolución identidad administrativa
+  - ingesta/excel_export.py    Export Excel multi-hoja
+  - consolidador.py            expediente.json consolidado (modelo v3)
+  - modelo/expediente.py       Modelo de datos expediente
+  - validaciones/firmas_anexo3.py  Validación firmas Anexo 3 (determinista)
+
+  Flujo documentado: docs/INGESTA_EXPEDIENTES.md
+  Identidad: docs/RESOLUCION_EXPEDIENTE_ID.md
+  Firmas: docs/VALIDACION_FIRMAS_ANEXO3.md
+  Comprobantes: docs/ANALISIS_COMPROBANTES.md
+
+4.4 Datos del piloto OCR (data/piloto_ocr/)
+  - raw/                PDFs del expediente piloto (ej. rendición, solicitud)
+  - labels/             15 JSON ground truth (piloto_ocr.v1) + plantilla
+  - MANIFEST_PILOTO.csv Inventario de PDFs del piloto
+  - metrics/            CSV, informes .md, textos OCR por motor/corrida,
+                        paso4_eval_*, validacion_expedientes.xlsx
+  Convenciones: data/piloto_ocr/README.md, PILOTO_OPERATIVO.md, CHECKLIST_POBLADO.md
+
+4.5 Normativa y control previo
+  - control_previo/README.md        Categorías de negocio MINEDU (viáticos, etc.)
+  - normativa_control_previo/README.md  Variante / duplicado documental
+  - docs/CONTROL_PREVIO_TAXONOMIA_EXPEDIENTES.md
+
+4.6 Otros en raíz
+  - analyze.js, detect-brain.js, extract.js, index-project.js  Utilidades JS
+  - SESSION_STATE.md        Cierre de sesión 2026-04-14 (pipeline ingesta E2E)
+  - CURSOR_HANDOFF.md       Handoff rápido para Cursor
+  - LLM_HANDOFF_MASTER.md   Contexto maestro para cualquier LLM
+  - CURRENT_STATE.md        Estado vivo RAG + OCR + limitaciones
+
+================================================================================
+5. RESULTADOS DESTACADOS (PARA NO PERDER EL HILO)
+================================================================================
+
+RAG (CURRENT_STATE.md):
+  - Recuperación de sección OBJETIVO con chunk dedicado y ranking por intención
+  - Fallback obligatorio a buscar_en_pdf si el clasificador no elige herramienta
+  - Salida con fuente, chunk_id/confidence, fragmentos
+
+OCR / parsing (LLM_HANDOFF_MASTER.md + métricas en data/piloto_ocr/metrics/):
+  - Bake-off PASO 2: Tesseract fuerte en F1; PaddleOCR en WSL; Docling evaluado
+  - PASO 3: sin mejora significativa → cuello de botella en parsing, no solo preproceso
+  - PASO 4.1: +33 aciertos vs minimal, 0 regresiones, extracción determinista
+
+Infra ingesta (SESSION_STATE.md):
+  - Pipeline E2E: ingesta → OCR por página → clasificación → extracción →
+    identidad → comprobantes → consolidación → firmas → Excel
+  - Expediente piloto documentado: DIED2026-INT-0250235
+
+================================================================================
+6. HACIA DÓNDE APUNTA EL SIGUIENTE TRABAJO
+================================================================================
+
+Según CURRENT_STATE.md y LLM_HANDOFF_MASTER.md:
+  1) Cerrar formalmente checklist PASO 0 en roadmap §9 si algún ítem quedara pendiente
+     (coherencia manifest + 15 labels).
+  2) Validar el pipeline en MÁS expedientes reales (segundo viático, 10–15 páginas
+     nuevas) antes de abrir PASO 5 (LLM).
+  3) No integrar OCR en orchestrator hasta PASO 7 con contrato de datos (D-07).
+  4) Backlog RAG: acortar salida output_node, modo verbose, UX CLI (sin bloquear OCR).
+
+================================================================================
+7. CÓMO EJECUTAR / VERIFICAR (REFERENCIA RÁPIDA)
+================================================================================
+
+  Raíz del repo:
+    cd C:\Users\Hans\Proyectos\vision_rag
+
+  RAG / agente (desde agent_sandbox):
+    python main.py
+    (Eval: ver main.py --help para --rag-eval)
+
+  Eval piloto PASO 4 (según LLM_HANDOFF_MASTER):
+    set PYTHONPATH=scripts
+    python scripts/piloto_paso4_eval.py
+
+  Dependencias OCR:
+    pip install -r scripts/requirements-ocr.txt
+    (Tesseract instalado en el sistema)
+
+  Agente RAG:
+    pip install -r agent_sandbox/requirements.txt
+
+  Git (Windows, rutas largas):
+    git config core.longpaths true
+
+================================================================================
+8. DOCUMENTOS CLAVE (LEER EN ESTE ORDEN SI RETOMAS EN FRÍO)
+================================================================================
+
+  1. LLM_HANDOFF_MASTER.md      Contexto maestro + decisiones D-01…D-12 + artefactos
+  2. CURRENT_STATE.md           Estado vivo + gobernanza + rutas
+  3. docs/ROADMAP_PROYECTO.md   PASO 0–7, métricas §4.3, bloqueos §5
+  4. docs/DECISIONES_TECNICAS.md
+  5. CURSOR_HANDOFF.md          Mapa rápido para Cursor
+  6. SESSION_STATE.md           Cierre sesión ingesta/comprobantes
+  7. data/piloto_ocr/PILOTO_OPERATIVO.md, CHECKLIST_POBLADO.md
+  8. docs/INGESTA_EXPEDIENTES.md, RESOLUCION_EXPEDIENTE_ID.md, VALIDACION_FIRMAS_ANEXO3.md
+
+================================================================================
+9. INVENTARIO COMPLETO DE ARCHIVOS VERSIONADOS EN GIT (267 rutas)
+================================================================================
+
+La lista siguiente es la salida exacta de: git ls-files
+(Incluye PDFs de piloto, muchos .txt de métricas OCR, y artefactos de datos.)
+
+--------------------------------------------------------------------------------
+.gitignore
+CURRENT_STATE.md
+CURSOR_HANDOFF.md
+LLM_HANDOFF_MASTER.md
+README.md
+SESSION_STATE.md
+agent_sandbox/.rag_cache/ee4383a4673423852fcf048a47fbaf5b.pkl
+agent_sandbox/ARCHITECTURE.md
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/ARCHITECTURE.md
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/README.md
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/README_AUDITORIA.md
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/agent_audit_log.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/embeddings.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/llm_client.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/main.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/nodes/__init__.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/nodes/input_node.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/nodes/output_node.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/nodes/reasoning_node.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/nodes/tool_node.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/nodes/validation_node.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/orchestrator.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/pdf_rag.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/requirements.txt
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/state.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/AGENT_SANDBOX_SOURCE_FOR_AUDIT/tools.py
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/CLAVES_REINGENIERIA_SINTESIS.md
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/INDICE_MAESTRO.md
+agent_sandbox/CLAUDE_CODE_SOURCE_REFERENCE/README.md
+agent_sandbox/INTEGRATION_GATE.md
+agent_sandbox/PASTE_INTO_AG_EVIDENCE_EXPERIMENTAL_SANDBOX.md
+agent_sandbox/README.md
+agent_sandbox/RELATION_TO_AG_EVIDENCE.md
+agent_sandbox/_bench_gpu_ce.txt
+agent_sandbox/_benchmark_debug_run.txt
+agent_sandbox/agent_audit_log.py
+agent_sandbox/cross_encoder_rerank.py
+agent_sandbox/embeddings.py
+agent_sandbox/eval_questions.json
+agent_sandbox/llm_client.py
+agent_sandbox/main.py
+agent_sandbox/nodes/__init__.py
+agent_sandbox/nodes/input_node.py
+agent_sandbox/nodes/output_node.py
+agent_sandbox/nodes/reasoning_node.py
+agent_sandbox/nodes/tool_node.py
+agent_sandbox/nodes/validation_node.py
+agent_sandbox/orchestrator.py
+agent_sandbox/pdf_rag.py
+agent_sandbox/requirements.txt
+agent_sandbox/state.py
+agent_sandbox/tools.py
+analyze.js
+control_previo/README.md
+data/.gitkeep
+data/README.md
+data/piloto_ocr/CHECKLIST_POBLADO.md
+data/piloto_ocr/MANIFEST_PILOTO.csv
+data/piloto_ocr/PILOTO_OPERATIVO.md
+data/piloto_ocr/README.md
+data/piloto_ocr/labels/.gitkeep
+data/piloto_ocr/labels/_PLANTILLA_pagina.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p13.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p15.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p17.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p19.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p21.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p23.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p25.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p27.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p29.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p5.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p7.json
+data/piloto_ocr/labels/rend-debedsar-amiquero-2026_p8.json
+data/piloto_ocr/labels/ri-debedsar-amiquero-2026_p1.json
+data/piloto_ocr/labels/sol-viat-debedsar-2026_p1.json
+data/piloto_ocr/labels/sol-viat-debedsar-2026_p2.json
+data/piloto_ocr/logs/ocr_adaptive_log.txt
+data/piloto_ocr/metrics/.gitkeep
+data/piloto_ocr/metrics/INFORME_PASO1_20260410.md
+data/piloto_ocr/metrics/INFORME_PASO2_20260410.md
+data/piloto_ocr/metrics/INFORME_PASO2_REVISION_20260413.md
+data/piloto_ocr/metrics/INFORME_PASO2_REVISION_20260414_linux_wsl.md
+data/piloto_ocr/metrics/METRICAS_MINIMAS.md
+data/piloto_ocr/metrics/bakeoff_paso2_consolidado_20260413.csv
+data/piloto_ocr/metrics/bakeoff_paso2_consolidado_20260414_linux_wsl.csv
+data/piloto_ocr/metrics/bakeoff_paso2_docling_20260410.csv
+data/piloto_ocr/metrics/bakeoff_paso2_easyocr_raster_20260410.csv
+data/piloto_ocr/metrics/bakeoff_paso2_resumen_20260410.csv
+data/piloto_ocr/metrics/bakeoff_paso2_revision_20260413.xlsx
+data/piloto_ocr/metrics/bakeoff_paso2_revision_20260414_linux_wsl.xlsx
+data/piloto_ocr/metrics/bakeoff_paso2_run_log_20260410.txt
+data/piloto_ocr/metrics/bakeoff_paso2_tesseract_baseline_20260410.csv
+data/piloto_ocr/metrics/baseline_paso1_20260410.csv
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p13.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p15.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p17.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p19.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p21.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p23.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p25.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p27.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p29.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p5.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p7.txt
+data/piloto_ocr/metrics/paso2/docling/rend-debedsar-amiquero-2026_p8.txt
+data/piloto_ocr/metrics/paso2/docling/ri-debedsar-amiquero-2026_p1.txt
+data/piloto_ocr/metrics/paso2/docling/sol-viat-debedsar-2026_p1.txt
+data/piloto_ocr/metrics/paso2/docling/sol-viat-debedsar-2026_p2.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p13.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p15.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p17.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p19.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p21.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p23.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p25.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p27.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p29.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p5.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p7.txt
+data/piloto_ocr/metrics/paso2/paddleocr/rend-debedsar-amiquero-2026_p8.txt
+data/piloto_ocr/metrics/paso2/paddleocr/ri-debedsar-amiquero-2026_p1.txt
+data/piloto_ocr/metrics/paso2/paddleocr/sol-viat-debedsar-2026_p1.txt
+data/piloto_ocr/metrics/paso2/paddleocr/sol-viat-debedsar-2026_p2.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p13.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p15.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p17.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p19.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p21.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p23.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p25.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p27.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p29.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p5.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p7.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/rend-debedsar-amiquero-2026_p8.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/ri-debedsar-amiquero-2026_p1.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/sol-viat-debedsar-2026_p1.txt
+data/piloto_ocr/metrics/paso2/tesseract_baseline/sol-viat-debedsar-2026_p2.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p13.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p15.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p17.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p19.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p21.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p23.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p25.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p27.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p29.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p5.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p7.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/rend-debedsar-amiquero-2026_p8.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/ri-debedsar-amiquero-2026_p1.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/sol-viat-debedsar-2026_p1.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/docling/sol-viat-debedsar-2026_p2.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p13.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p15.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p17.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p19.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p21.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p23.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p25.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p27.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p29.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p5.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p7.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/rend-debedsar-amiquero-2026_p8.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/ri-debedsar-amiquero-2026_p1.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/sol-viat-debedsar-2026_p1.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/paddleocr/sol-viat-debedsar-2026_p2.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p13.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p15.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p17.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p19.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p21.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p23.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p25.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p27.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p29.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p5.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p7.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/rend-debedsar-amiquero-2026_p8.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/ri-debedsar-amiquero-2026_p1.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/sol-viat-debedsar-2026_p1.txt
+data/piloto_ocr/metrics/paso2_linux_wsl/tesseract_baseline/sol-viat-debedsar-2026_p2.txt
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/INFORME_PASO3_AB_MINI.md
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/ocr_txt/rend-debedsar-amiquero-2026_p19_A.txt
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/ocr_txt/rend-debedsar-amiquero-2026_p19_B1.txt
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/ocr_txt/rend-debedsar-amiquero-2026_p19_B2.txt
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/ocr_txt/rend-debedsar-amiquero-2026_p5_A.txt
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/ocr_txt/rend-debedsar-amiquero-2026_p5_B1.txt
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/ocr_txt/rend-debedsar-amiquero-2026_p5_B2.txt
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/ocr_txt/sol-viat-debedsar-2026_p2_A.txt
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/ocr_txt/sol-viat-debedsar-2026_p2_B1.txt
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/ocr_txt/sol-viat-debedsar-2026_p2_B2.txt
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/paso3_ab_delta_por_campo.csv
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/paso3_ab_por_variante.csv
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/paso3_ab_revision.xlsx
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/rasters/rend-debedsar-amiquero-2026_p19_A_bgr.png
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/rasters/rend-debedsar-amiquero-2026_p19_B1_clahe.png
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/rasters/rend-debedsar-amiquero-2026_p19_B2_unsharp.png
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/rasters/rend-debedsar-amiquero-2026_p5_A_bgr.png
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/rasters/rend-debedsar-amiquero-2026_p5_B1_clahe.png
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/rasters/rend-debedsar-amiquero-2026_p5_B2_unsharp.png
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/rasters/sol-viat-debedsar-2026_p2_A_bgr.png
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/rasters/sol-viat-debedsar-2026_p2_B1_clahe.png
+data/piloto_ocr/metrics/paso3_ab_linux_wsl/rasters/sol-viat-debedsar-2026_p2_B2_unsharp.png
+data/piloto_ocr/metrics/paso4_eval_linux_wsl/INFORME_PASO4_EVAL_20260414.md
+data/piloto_ocr/metrics/paso4_eval_linux_wsl/INFORME_PASO4_EVAL_20260414_pre41.md
+data/piloto_ocr/metrics/paso4_eval_linux_wsl/paso4_eval_detalle_20260414.csv
+data/piloto_ocr/metrics/paso4_eval_linux_wsl/paso4_eval_detalle_20260414_pre41.csv
+data/piloto_ocr/metrics/paso4_eval_linux_wsl/paso4_eval_trazas_20260414.json
+data/piloto_ocr/metrics/paso4_eval_linux_wsl/paso4_eval_trazas_20260414_pre41.json
+data/piloto_ocr/metrics/run_log_20260410.txt
+data/piloto_ocr/metrics/validacion_expedientes.xlsx
+data/piloto_ocr/raw/.gitkeep
+data/piloto_ocr/raw/rend-debedsar-amiquero-2026.pdf
+data/piloto_ocr/raw/ri-debedsar-amiquero-2026.pdf
+data/piloto_ocr/raw/sol-viat-debedsar-2026.pdf
+detect-brain.js
+docs/.gitkeep
+docs/AGENT_RULES.md
+docs/ANALISIS_COMPROBANTES.md
+docs/CHANGELOG.md
+docs/CONTROL_PREVIO_TAXONOMIA_EXPEDIENTES.md
+docs/CURRENT_STATE_RAG.md
+docs/DECISIONES_TECNICAS.md
+docs/EXPEDIENTE_FGE2025-INT-1081440_ORGANIZACION.md
+docs/GUARDARRAILES_AUDITORIA.md
+docs/INGESTA_EXPEDIENTES.md
+docs/MIGRACION_NORMATIVAS_2026-02-06.md
+docs/RESOLUCION_EXPEDIENTE_ID.md
+docs/ROADMAP_PROYECTO.md
+docs/VALIDACION_FIRMAS_ANEXO3.md
+docs/modulos/reembolsos/reembolso_mayor_gasto.md
+docs/modulos/reembolsos/reembolso_mayor_gasto_base.txt
+docs/modulos/reembolsos/rules_reembolso.yaml
+docs/modulos/reembolsos/schema_reembolso.json
+extract.js
+index-project.js
+normativa_control_previo/README.md
+scripts/bakeoff_paso2.py
+scripts/bakeoff_paso2_human_export.py
+scripts/consolidador.py
+scripts/document_ocr_runner.py
+scripts/gen_control_previo_manifests.py
+scripts/ingest_expedientes.py
+scripts/ingesta/__init__.py
+scripts/ingesta/classifier.py
+scripts/ingesta/comprobante_detector.py
+scripts/ingesta/comprobante_extractor.py
+scripts/ingesta/excel_export.py
+scripts/ingesta/extractor.py
+scripts/ingesta/id_resolver.py
+scripts/ingesta/scanner.py
+scripts/ingesta/text_reader.py
+scripts/modelo/__init__.py
+scripts/modelo/expediente.py
+scripts/ocr_adaptive_engine.py
+scripts/paso3_ab_mini.py
+scripts/piloto_field_extract_minimal.py
+scripts/piloto_field_extract_paso4.py
+scripts/piloto_paso4_eval.py
+scripts/requirements-ocr.txt
+scripts/requirements-paso2.txt
+scripts/validaciones/__init__.py
+scripts/validaciones/firmas_anexo3.py
+tests/.gitkeep
+
+================================================================================
+10. QUÉ NO ESTÁ EN GIT (IMPORTANTE PARA “TODOS LOS ARCHIVOS” EN DISCO)
+================================================================================
+
+Este consolidado lista los 267 paths versionados (git ls-files). En el disco pueden
+existir carpetas y archivos ignorados. Resumen de .gitignore:
+
+  - agent_sandbox/corpus/, agent_sandbox/index/, agent_sandbox/logs/  (corpus RAG pesado)
+  - data/* salvo data/.gitkeep, data/README.md y todo data/piloto_ocr/**
+  - *.pdf en general; excepción explícita: data/piloto_ocr/raw/*.pdf del piloto
+  - control_previo/  (normativas MINEDU locales; solo README puede forzarse)
+  - output/, SANTO_GRIAL_ANALYSIS/, CONSOLIDADO_PARA_COMPARTIR/
+  - .env, .venv/, __pycache__/
+  - Carpetas drop-zone: DIED*/, EXP*/, raw_input/
+  - Varios índices generados: PROJECT_INDEX.json, DEPENDENCY_GRAPH.md, etc.
+
+Para listar solo lo no rastreado en tu máquina: git status -u
+
+Fin del documento consolidado.
+================================================================================

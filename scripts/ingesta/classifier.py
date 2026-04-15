@@ -20,6 +20,16 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
+from ingesta.patrones_sunat import (
+    PATRONES_ADMINISTRATIVO,
+    PATRONES_COMPROBANTE_CABECERA,
+    PATRONES_SOPORTE_SUNAT,
+    PATRONES_SUNAT_DEBIL,
+    PATRONES_SUNAT_FUERTE,
+    PATRONES_TOTAL_POSITIVO,
+    PATRON_SERIE_FE,
+)
+
 
 CATEGORIAS = (
     "solicitud",
@@ -198,4 +208,167 @@ def classify(texto: str, nombre_archivo: str = "") -> ClassificationResult:
         reglas_activadas=[r for r in activadas if r.categoria == top],
         subtipos_detectados=subtipos,
         nota=nota,
+    )
+
+
+# =============================================================================
+# Clasificación PÁGINA-POR-PÁGINA (tripartita) — para pipeline de comprobantes
+# depurados. No reemplaza `classify()`; coexiste.
+# =============================================================================
+
+CATEGORIAS_PAGINA = ("comprobante_real", "soporte_sunat", "administrativo", "otros")
+
+
+@dataclass
+class PageClassification:
+    """Resultado de clasificar UNA página del expediente."""
+    categoria_pagina: str          # comprobante_real | soporte_sunat | administrativo | otros
+    subtipo: str                   # tipo específico dentro de la categoría
+    senales_comprobante: bool      # cabecera FACTURA/BOLETA/TICKET/... matcheó
+    senales_total_positivo: bool   # IMPORTE TOTAL > 0 presente
+    senales_serie_fe: bool         # serie E/F/B 001-NNNN matcheó
+    senales_sunat: list[str]       # subtipos SUNAT que matchearon (puede haber varios)
+    senales_admin: list[str]       # subtipos administrativos que matchearon
+    nota: str = ""
+
+
+def _match_alguno(patrones_labelled: list[tuple[str, str]], texto: str) -> list[str]:
+    """Devuelve los subtipos cuyos patrones hacen match (dedup, orden de aparición)."""
+    vistos: list[str] = []
+    for patron, label in patrones_labelled:
+        try:
+            if re.search(patron, texto, re.IGNORECASE | re.MULTILINE):
+                if label not in vistos:
+                    vistos.append(label)
+        except re.error:
+            continue
+    return vistos
+
+
+def _tiene_total_positivo(texto: str) -> bool:
+    for patron in PATRONES_TOTAL_POSITIVO:
+        try:
+            if re.search(patron, texto, re.IGNORECASE):
+                return True
+        except re.error:
+            continue
+    return False
+
+
+def classify_page(texto_pagina: str) -> PageClassification:
+    """
+    Clasifica una página de un expediente en una de 4 categorías.
+
+    Reglas (orden de prioridad — primera que aplique manda):
+
+      1. SUNAT FUERTE (consulta RUC, validez CPE, "La Factura X es válida")
+         → soporte_sunat. Gana sobre cabecera: las consultas CPE citan la
+         cabecera del comprobante consultado como referencia y no deben
+         contarse como comprobante.
+
+      2. Cabecera comprobante + (total positivo O serie E/F/B)
+         → comprobante_real. El footer "Sistema de Emisión Electrónica"
+         (SUNAT débil) NO descalifica aquí — aparece también en boletas reales.
+
+      3. Patrones administrativos presentes → administrativo.
+
+      4. Cabecera comprobante sin total (ticket manual posible)
+         → comprobante_real con nota `cabecera_sin_total_positivo`.
+
+      5. Resto → otros.
+
+    NO usa nombre de archivo ni contexto externo; solo el texto de la página.
+    """
+    if not texto_pagina:
+        return PageClassification(
+            categoria_pagina="otros",
+            subtipo="",
+            senales_comprobante=False,
+            senales_total_positivo=False,
+            senales_serie_fe=False,
+            senales_sunat=[],
+            senales_admin=[],
+            nota="pagina_vacia",
+        )
+
+    cabecera_subtipo = ""
+    for patron, subtipo in PATRONES_COMPROBANTE_CABECERA:
+        try:
+            if re.search(patron, texto_pagina, re.IGNORECASE):
+                cabecera_subtipo = subtipo
+                break
+        except re.error:
+            continue
+    tiene_cabecera = bool(cabecera_subtipo)
+
+    tiene_total = _tiene_total_positivo(texto_pagina)
+    tiene_serie = bool(re.search(PATRON_SERIE_FE, texto_pagina))
+
+    senales_sunat_fuerte = _match_alguno(PATRONES_SUNAT_FUERTE, texto_pagina)
+    senales_sunat_debil = _match_alguno(PATRONES_SUNAT_DEBIL, texto_pagina)
+    senales_sunat_todas = senales_sunat_fuerte + senales_sunat_debil
+    senales_admin = _match_alguno(PATRONES_ADMINISTRATIVO, texto_pagina)
+
+    # Regla 1: SUNAT fuerte gana sobre cabecera (consulta CPE cita comprobantes).
+    if senales_sunat_fuerte:
+        return PageClassification(
+            categoria_pagina="soporte_sunat",
+            subtipo=senales_sunat_fuerte[0],
+            senales_comprobante=tiene_cabecera,
+            senales_total_positivo=tiene_total,
+            senales_serie_fe=tiene_serie,
+            senales_sunat=senales_sunat_todas,
+            senales_admin=senales_admin,
+            nota=("cita_cabecera_comprobante" if tiene_cabecera else ""),
+        )
+
+    # Regla 2: cabecera + corroboración → comprobante real.
+    if tiene_cabecera and (tiene_total or tiene_serie):
+        nota = ""
+        if senales_sunat_debil:
+            nota = f"sunat_footer_presente:{','.join(senales_sunat_debil)}"
+        return PageClassification(
+            categoria_pagina="comprobante_real",
+            subtipo=cabecera_subtipo,
+            senales_comprobante=True,
+            senales_total_positivo=tiene_total,
+            senales_serie_fe=tiene_serie,
+            senales_sunat=senales_sunat_todas,
+            senales_admin=senales_admin,
+            nota=nota,
+        )
+
+    # Regla 3: administrativo.
+    if senales_admin:
+        return PageClassification(
+            categoria_pagina="administrativo",
+            subtipo=senales_admin[0],
+            senales_comprobante=False,
+            senales_total_positivo=tiene_total,
+            senales_serie_fe=tiene_serie,
+            senales_sunat=senales_sunat_todas,
+            senales_admin=senales_admin,
+        )
+
+    # Regla 4: cabecera sin total (ticket manual posible).
+    if tiene_cabecera:
+        return PageClassification(
+            categoria_pagina="comprobante_real",
+            subtipo=cabecera_subtipo,
+            senales_comprobante=True,
+            senales_total_positivo=False,
+            senales_serie_fe=tiene_serie,
+            senales_sunat=senales_sunat_todas,
+            senales_admin=senales_admin,
+            nota="cabecera_sin_total_positivo",
+        )
+
+    return PageClassification(
+        categoria_pagina="otros",
+        subtipo="",
+        senales_comprobante=False,
+        senales_total_positivo=tiene_total,
+        senales_serie_fe=tiene_serie,
+        senales_sunat=senales_sunat_todas,
+        senales_admin=senales_admin,
     )
