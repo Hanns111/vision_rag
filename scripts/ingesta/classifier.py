@@ -266,6 +266,13 @@ def classify_page(texto_pagina: str) -> PageClassification:
          cabecera del comprobante consultado como referencia y no deben
          contarse como comprobante.
 
+      1b. RESUMEN SIGA / ANEXO 3 (listado de comprobantes del sistema de
+          tesorería): ≥2 series [EFB]NNN-... distintas en la misma página
+          + cabecera "RENDICIÓN DE CUENTAS" o "ANEXO N° 3".
+          → administrativo (subtipo `resumen_siga`). Evita que p1 del
+          RENDIC se clasifique como comprobante por tener cabecera
+          "BOLETA DE VENTA" en el listado interno.
+
       2. Cabecera comprobante + (total positivo O serie E/F/B)
          → comprobante_real. El footer "Sistema de Emisión Electrónica"
          (SUNAT débil) NO descalifica aquí — aparece también en boletas reales.
@@ -320,6 +327,28 @@ def classify_page(texto_pagina: str) -> PageClassification:
             senales_sunat=senales_sunat_todas,
             senales_admin=senales_admin,
             nota=("cita_cabecera_comprobante" if tiene_cabecera else ""),
+        )
+
+    # Regla 1b: resumen SIGA / Anexo 3. Si la página lista ≥2 comprobantes
+    # (≥2 series distintas [EFB]NNN-... en el mismo texto) y muestra cabecera
+    # de rendición o Anexo 3, es el resumen del sistema de tesorería, no un
+    # comprobante real. Margen de seguridad: el p1 típico tiene 13+ series;
+    # las páginas de comprobantes reales del piloto tienen 0 o 1.
+    series_distintas = set(re.findall(PATRON_SERIE_FE, texto_pagina))
+    es_cabecera_rendicion = bool(
+        re.search(r"RENDICI[ÓO]N\s+DE\s+CUENTAS", texto_pagina, re.IGNORECASE)
+        or re.search(r"ANEXO\s*N[º°]?\s*3\b", texto_pagina, re.IGNORECASE)
+    )
+    if len(series_distintas) >= 2 and es_cabecera_rendicion:
+        return PageClassification(
+            categoria_pagina="administrativo",
+            subtipo="resumen_siga",
+            senales_comprobante=tiene_cabecera,
+            senales_total_positivo=tiene_total,
+            senales_serie_fe=True,
+            senales_sunat=senales_sunat_todas,
+            senales_admin=senales_admin,
+            nota=f"resumen_siga_{len(series_distintas)}_series",
         )
 
     # Regla 2: cabecera + corroboración → comprobante real.
