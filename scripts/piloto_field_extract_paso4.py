@@ -46,12 +46,14 @@ def _norm_date(s: str | None) -> str | None:
     if not s:
         return None
     s = s.strip()
-    m = re.match(r"^(\d{4})-(\d{2})-(\d{2})$", s)
+    m = re.match(r"^(\d{4})[-/.](\d{2})[-/.](\d{2})$", s)
     if m:
-        return s
-    m = re.match(r"^(\d{1,2})/(\d{1,2})/(\d{4})$", s)
+        return f"{int(m.group(1)):04d}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+    m = re.match(r"^(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})$", s)
     if m:
         d, mo, y = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        if y < 100:
+            y += 2000
         return f"{y:04d}-{mo:02d}-{d:02d}"
     return None
 
@@ -112,9 +114,10 @@ def _fecha_moneda(text: str, upper: str) -> tuple[str | None, str | None]:
         fecha = m.group(1)
         break
     if not fecha:
-        for m in re.finditer(r"\b(\d{1,2}/\d{1,2}/\d{4})\b", text):
+        for m in re.finditer(r"\b(\d{1,2}[-/.](\d{1,2})[-/.](\d{2,4}))\b", text):
             fecha = _norm_date(m.group(1))
-            break
+            if fecha:
+                break
     moneda = None
     if re.search(r"\bPEN\b", upper) or "S/" in text:
         moneda = "PEN"
