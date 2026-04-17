@@ -63,7 +63,7 @@ def extraer_de_bloque(bloque) -> Comprobante:
         ruc = bloque.rucs_candidatos[0]
 
     serie = fields.get("serie_numero") or bloque.serie_tentativa
-    razon = fields.get("razon_social_emisor")
+    razon = getattr(bloque, "razon_social_tentativa", None) or fields.get("razon_social_emisor")
     fecha = fields.get("fecha_emision")
     monto_total = fields.get("monto_total") or fields.get("monto_subtotal")
     moneda = fields.get("moneda")

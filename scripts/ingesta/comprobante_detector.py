@@ -73,6 +73,7 @@ class BloqueComprobante:
     serie_tentativa: str | None   # "E001-16" si lo encontró
     rucs_candidatos: list[str]    # RUCs que aparecen dentro del bloque
     texto: str                    # texto concatenado de las páginas del bloque
+    razon_social_tentativa: str | None = None  # desde página consulta RUC (texto seleccionable)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -82,6 +83,7 @@ class BloqueComprobante:
             "tipo_tentativo": self.tipo_tentativo,
             "serie_tentativa": self.serie_tentativa,
             "rucs_candidatos": list(self.rucs_candidatos),
+            "razon_social_tentativa": self.razon_social_tentativa,
             "len_texto": len(self.texto),
         }
 
@@ -299,4 +301,36 @@ def detectar_bloques(
         )
 
     bloques.sort(key=lambda b: b.pagina_inicio)
+
+    # -----------------------------------------------------------------
+    # Enriquecimiento: razón social desde páginas de consulta RUC.
+    #
+    # Para cada bloque, buscar por posición la primera sunat_validez_cpe
+    # después de pagina_fin, luego la primera sunat_ruc después de esa
+    # CPE. Extraer razón social del formato SUNAT:
+    #   "Número de RUC:\n XXXXXXXXXXX - RAZÓN SOCIAL"
+    # -----------------------------------------------------------------
+    _re_razon = re.compile(
+        r"N[uú\ufffd]mero\s+de\s+RUC\s*:\s*\n?\s*(\d{11})\s*-\s*(.+)", re.IGNORECASE
+    )
+    max_pag = max(por_pagina) if por_pagina else 0
+    for bloque in bloques:
+        if bloque.razon_social_tentativa:
+            continue
+        pag_cpe = None
+        for delta in range(1, 4):
+            sp = por_pagina.get(bloque.pagina_fin + delta)
+            if sp and sp.subtipo_pagina == "sunat_validez_cpe":
+                pag_cpe = sp.pagina
+                break
+        if pag_cpe is None:
+            continue
+        for delta in range(1, 3):
+            sp = por_pagina.get(pag_cpe + delta)
+            if sp and sp.subtipo_pagina == "sunat_ruc":
+                m_razon = _re_razon.search(sp.texto)
+                if m_razon:
+                    bloque.razon_social_tentativa = m_razon.group(2).strip()
+                break
+
     return bloques
