@@ -254,9 +254,15 @@ def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
     if not tot:
         tot = grab(r"Total\s+Precio\s+de\s+Venta\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_total_precio_venta")
     if not tot:
-        tot = grab(r"IMPORTE\s+TOTAL\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_importe_total")
+        tot = grab(
+            r"IMPORTE\s+TOTAL[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})",
+            "monto_importe_total",
+        )
     if not tot:
-        tot = grab(r"\bTotal\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_total_generico")
+        tot = grab(
+            r"(?<![Ss][Uu][Bb]\s)\bTotal[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})",
+            "monto_total_generico",
+        )
 
     regla = "+".join(reglas) if reglas else "monto_none"
     return (
