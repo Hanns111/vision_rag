@@ -1,0 +1,11 @@
+---
+description: No ejecutar comandos, git ni acciones con efectos externos salvo petición explícita de Hans
+alwaysApply: true
+---
+
+# Ejecución solo si Hans lo pide
+
+- **No ejecutar** comandos de terminal (shell), **ni operaciones Git** (`commit`, `push`, `merge`, `rebase`, etc.), **ni instalación de dependencias**, **ni despliegues**, **ni herramientas que modifiquen sistemas externos** (remotos, APIs de escritura, etc.), **salvo que Hans lo pida de forma explícita** en el mensaje.
+- Si hace falta un comando para cumplir lo que pidió, **pedir confirmación** antes de ejecutarlo o **describir el comando** para que Hans lo ejecute él, según prefiera.
+- **No asumir** que “actualizar GitHub” o “subir cambios” autoriza `push` sin que lo ordene literalmente.
+- Lectura de archivos, búsqueda en el repo y edición de archivos **solo** en el marco de una tarea que Hans haya solicitado; **no** abrir tareas colaterales no pedidas.
