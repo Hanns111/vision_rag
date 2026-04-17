@@ -1,0 +1,216 @@
+HANDOFF FINAL — ETAPA DETERMINISTA DE COMPROBANTES
+=====================================================================
+Proyecto: vision_rag
+Repo: https://github.com/Hanns111/vision_rag
+Ruta local: C:\Users\Hans\Proyectos\vision_rag
+Fecha de cierre: 2026-04-17
+Rama: main
+Hash remoto final: 3244768e1dc8240eb341dcf49d9cb7cc1a95a1ed
+Estado git: up to date, working tree limpio, push completado
+
+
+=====================================================================
+1. ETAPA CERRADA
+=====================================================================
+
+Se cerro el tramo determinista de deteccion, segmentacion y
+extraccion de campos de comprobantes dentro de rendiciones de
+viaticos MINEDU. Se implementaron 6 cambios (Regla 1b + Fix #1-#5),
+validados en 2 expedientes reales independientes.
+
+
+=====================================================================
+2. FIXES IMPLEMENTADOS
+=====================================================================
+
+REGLA 1b — classifier.py — commit 1de9f17
+  Problema: pagina 1 del RENDIC (resumen SIGA/Anexo 3 con listado
+  de comprobantes del sistema de tesoreria) se clasificaba como
+  boleta_venta por tener cabecera interna, generando comprobante espurio.
+  Cambio: si la pagina tiene >=2 series distintas + cabecera
+  RENDICION DE CUENTAS o ANEXO 3, clasificar como administrativo
+  subtipo resumen_siga.
+
+FIX #1 — comprobante_detector.py — commit 8f8cdcf
+  Problema: 14/29 comprobantes detectados. Las paginas de comprobantes
+  reales son escaneos donde el OCR no captura cabeceras FACTURA/BOLETA.
+  Cambio: segundo pase en detectar_bloques(). Recorre paginas CPE
+  (sunat_validez_cpe), toma la pagina anterior si es "otros" y no
+  usada, la promueve a BloqueComprobante. Tipo y serie del texto CPE,
+  RUC de la pagina consulta RUC.
+  Resultado: 14 -> 29 comprobantes.
+
+FIX #2 — comprobante_detector.py + comprobante_extractor.py — commit b32ba74
+  Problema: razon_social presente en 8/29 (28%), 5 con basura OCR.
+  Cambio: enriquecimiento posicional. Para cada bloque, buscar CPE
+  despues de pagina_fin, luego la primera sunat_ruc, extraer razon
+  social del formato SUNAT "Numero de RUC: XXXXXXXXXXX - RAZON SOCIAL".
+  Extractor prefiere razon_social_tentativa del bloque sobre PASO 4.1.
+  Resultado: 8/29 -> 29/29 (100%), texto limpio.
+
+FIX #3 — comprobante_detector.py — commit b1b8c93
+  Problema: serie presente en 12/29 (41%). El regex _RE_SERIE no
+  capturaba prefijos con letra intermedia (FA01, FB02, FF01, FW01,
+  EB01) ni correlativos zero-padded de hasta 10 digitos.
+  Cambio: regex local _re_serie_cpe amplio en el bucle de
+  enriquecimiento. No modifica _RE_SERIE del primer pase.
+  Resultado: 12/29 -> 29/29 (100%), match perfecto con ground truth.
+
+FIX #4 MENOR — piloto_field_extract_paso4.py — commit 0d7f0d9
+  Problema: fecha presente en 13/29 (44%). _norm_date() y
+  _fecha_moneda() solo aceptaban dd/mm/yyyy con slash.
+  Cambio: soportar separadores [-/.] y anios de 2 digitos (+2000).
+  Resultado: 13/29 -> 18/29 (62%). 11 restantes: OCR ilegible.
+
+FIX #5 MENOR — piloto_field_extract_paso4.py — commit df2fa07
+  Problema: monto presente en 4/29 (13%). Paginas con "Importe Total:
+  S/109.00" legible, pero tipo_doc=desconocido y el fallback solo
+  extraia RUC sin intentar montos.
+  Cambio: agregar _factura_montos(text) en el fallback desconocido.
+  Resultado: 4/29 -> 8/29 (27%). 21 restantes: OCR ilegible o
+  decimales sin etiqueta.
+
+
+=====================================================================
+3. VALIDACION EN 2 EXPEDIENTES
+=====================================================================
+
+Expediente piloto: DIED2026-INT-0250235
+  Comisionado: CHAVEZ TERRONES LILIANA
+  PDFs: 2 (solicitud 9p + rendicion 150p)
+  Comprobantes: 29
+
+Segundo expediente: DEBEDSAR2026-INT-0103251
+  Comisionado: AMIQUERO NAHUI CARLOS FERNANDO
+  PDFs: 3 (solicitud 7p + RI 1p + rendicion 31p)
+  Comprobantes: 10
+
+Conclusion: los fixes generalizan correctamente. No aparecieron
+patrones de fallo nuevos. El segundo expediente tiene mejor calidad
+de escaneo, lo que resulta en mejor cobertura de fecha y monto.
+
+
+=====================================================================
+4. COBERTURA FINAL
+=====================================================================
+
+Campo             Piloto (29 comp)    Segundo exp (10 comp)
+----------------  ------------------  ---------------------
+Comprobantes      29/29 (100%)        10/10 (100%)
+RUC               29/29 (100%)        10/10 (100%)
+razon_social      29/29 (100%)        10/10 (100%)
+serie_numero      29/29 (100%)        10/10 (100%)
+fecha_emision     18/29 (62%)         10/10 (100%)
+monto_total        8/29 (27%)          9/10 (90%)
+Total detectado   S/ 790.53           S/ 663.00
+
+
+=====================================================================
+5. RESIDUAL CONOCIDO
+=====================================================================
+
+fecha_emision (11 sin fecha en piloto):
+  7 paginas con OCR crasheado (0 chars extraidos)
+  2 paginas con OCR muy degradado (<50 chars)
+  2 paginas con texto parcial sin ningun numero
+  Recuperables con regex: 0/11
+
+monto_total (21 sin monto en piloto, 1 en segundo exp):
+  7 paginas con OCR crasheado (0 chars)
+  2 paginas con OCR muy degradado
+  2 paginas sin numeros decimales
+  9 paginas con decimales sueltos pero sin etiqueta TOTAL/S/
+  1 pagina con formato "TOTAL (S/): 80.00" (gap de parentesis en regex)
+  Recuperables con regex: 0-1 (solo el gap de parentesis)
+
+Por que no se resolvio con determinismo puro:
+  1. Todo lo que Tesseract capturo legiblemente ya se extrajo.
+  2. Tesseract es el mejor motor disponible (bakeoff PASO 2:
+     F1=0.7388 vs PaddleOCR=0.6194 vs Docling=0.6852).
+  3. ROI+OCR con Tesseract sobre el mismo scan tiene retorno
+     incierto y alto costo de infraestructura (~200 lineas).
+  4. Los 9 con decimales sin ancla: tomar "el mas grande"
+     seria adivinacion, no determinismo.
+
+Detalle completo en: DIAGNOSTICO_RESIDUAL_PILOTO.txt
+
+
+=====================================================================
+6. GOBERNANZA
+=====================================================================
+
+  - Anexo 3 SIGA NO se usa como fuente para poblar campos del
+    comprobante real. Es un resumen del sistema de tesoreria,
+    no el comprobante en si.
+  - No se usa IA general ni LLM en este tramo.
+  - Si no hay senal suficiente en el texto, el campo queda NULL.
+  - No se inventan montos, fechas ni razones sociales.
+  - Trazabilidad: cada comprobante lleva archivo + pagina_inicio +
+    pagina_fin + texto_resumen. El humano puede abrir el PDF exacto.
+  - Columnas humanas del Excel (amarillas) se preservan entre
+    re-corridas por clave (expediente_id, archivo, pagina_inicio,
+    pagina_fin).
+
+
+=====================================================================
+7. SIGUIENTE FRONTERA TECNICA
+=====================================================================
+
+Esto ya es OTRA ETAPA distinta. No se implemento en este tramo.
+
+Opcion A: Fix menor de regex para parentesis en monto
+  Cobertura: +1 monto (segundo exp p11, "TOTAL (S/): 80.00").
+  Costo: trivial, ~2 caracteres por patron.
+
+Opcion B: Parsing del Anexo 3 SIGA
+  Cobertura: potencialmente 29/29 para fecha Y monto.
+  Tipo: determinista, texto seleccionable.
+  Costo: medio (~50-70 lineas).
+  Requiere decision de gobernanza sobre usar Anexo 3 como fuente.
+
+Opcion C: Mas expedientes
+  Validar robustez del pipeline antes de invertir en infraestructura.
+  Expediente disponible: VIATICO_DIPLAN2026-INT-0283297 (8 PDFs).
+
+Opcion D: LLM fallback acotado (PASO 5 del roadmap)
+  Para interpretar texto parcialmente legible.
+  Requiere decision de gobernanza sobre uso de IA.
+
+Opcion E: Validacion humana directa
+  Las columnas amarillas del Excel existen para esto.
+
+
+=====================================================================
+8. ARCHIVOS CLAVE
+=====================================================================
+
+Pipeline:
+  scripts/ingesta/comprobante_detector.py     Detector + enriquecimiento
+  scripts/ingesta/comprobante_extractor.py     Extractor con fallbacks
+  scripts/ingesta/classifier.py               Clasificacion por pagina
+  scripts/ingesta/patrones_sunat.py           Constantes regex
+  scripts/piloto_field_extract_paso4.py        Extraccion PASO 4.1
+  scripts/ingest_expedientes.py               CLI principal
+
+Datos:
+  data/piloto_ocr/metrics/validacion_expedientes.xlsx   Excel con 39 comprobantes
+  control_previo/procesados/DIED2026-INT-0250235/       Piloto procesado
+  control_previo/procesados/DEBEDSAR2026-INT-0103251/   Segundo exp procesado
+
+Documentacion:
+  CIERRE_ETAPA_DETERMINISTA.txt               Cierre tecnico de la etapa
+  DIAGNOSTICO_RESIDUAL_PILOTO.txt             Gaps residuales clasificados
+  HANDOFF_FINAL_ETAPA_DETERMINISTA.txt        Este archivo
+  docs/ANALISIS_COMPROBANTES.md               Especificacion funcional
+  SESSION_STATE.md                            Cierre sesion anterior
+
+Comandos para correr el pipeline:
+  python scripts/ingest_expedientes.py run-all --src <carpeta_expediente>
+  python scripts/ingest_expedientes.py process --expediente-id <id>
+  python scripts/ingest_expedientes.py consolidate --expediente-id <id>
+  python scripts/ingest_expedientes.py export
+
+
+=====================================================================
+FIN DEL HANDOFF
+=====================================================================
