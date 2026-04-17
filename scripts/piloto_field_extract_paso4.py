@@ -618,6 +618,12 @@ def extract_fields_paso4(text: str) -> tuple[dict[str, Any], dict[str, Any]]:
     if rucs:
         fields["ruc_emisor"] = rucs[0][0]
         trace["ruc_emisor"] = _trace(tipo_doc, "fallback_primer_ruc", [rucs[0][1]])
+    montos, mreg, mlines = _factura_montos(text)
+    if montos["monto_total"]:
+        fields["monto_total"] = montos["monto_total"]
+        fields["monto_subtotal"] = montos["monto_subtotal"]
+        fields["monto_igv"] = montos["monto_igv"]
+        trace["monto_total"] = _trace(tipo_doc, "fallback_" + mreg, mlines)
     return fields, trace
 
 
