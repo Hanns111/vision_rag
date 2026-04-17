@@ -5,9 +5,9 @@ Repo: https://github.com/Hanns111/vision_rag
 Ruta local: C:\Users\Hans\Proyectos\vision_rag
 Fecha de cierre: 2026-04-17
 Rama: main
-Hash HEAD main (punta actual): d261b62b4e6a2cc76f7212f0fd2eda4b310217a1
+Remoto: https://github.com/Hanns111/vision_rag/commits/main
 Commit cierre etapa determinista (fixes validados, 2 expedientes): 3244768e1dc8240eb341dcf49d9cb7cc1a95a1ed
-Estado git: up to date con origin/main; working tree limpio (ver remoto: https://github.com/Hanns111/vision_rag )
+Punta actual de main: ver ultimo commit en el enlace anterior o ejecutar git log -1 en el clone.
 
 
 =====================================================================
