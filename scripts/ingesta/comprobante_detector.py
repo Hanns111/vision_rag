@@ -250,4 +250,53 @@ def detectar_bloques(
             )
         )
 
+    # -----------------------------------------------------------------
+    # Segundo pase: recuperar comprobantes escaneados vía CPE.
+    #
+    # Las páginas CPE (sunat_validez_cpe) citan la cabecera del
+    # comprobante consultado.  Si la página inmediata anterior está
+    # clasificada como "otros" y no fue usada, es un comprobante real
+    # cuyo OCR no capturó la cabecera.  Tipo y serie se extraen del
+    # texto CPE (más fiable que el escaneo); RUC de la página de
+    # consulta RUC que sigue a la CPE.
+    # -----------------------------------------------------------------
+    for s in senales:
+        if s.subtipo_pagina != "sunat_validez_cpe":
+            continue
+        cand = por_pagina.get(s.pagina - 1)
+        if not cand or cand.categoria_pagina != "otros" or cand.pagina in usadas:
+            continue
+
+        tipo_cpe = "desconocido"
+        for patron, tipo_label in _RE_CABECERA:
+            if re.search(patron, s.texto, re.IGNORECASE):
+                tipo_cpe = tipo_label
+                break
+
+        serie_cpe = None
+        m_serie = _RE_SERIE.search(s.texto)
+        if m_serie:
+            serie_cpe = f"{m_serie.group(1)}{m_serie.group(2)}-{m_serie.group(3)}"
+
+        rucs_cpe: list[str] = []
+        ruc_pag = por_pagina.get(s.pagina + 1)
+        if ruc_pag and ruc_pag.subtipo_pagina == "sunat_ruc":
+            rucs_cpe = list(dict.fromkeys(_RE_RUC.findall(ruc_pag.texto)))
+        if not rucs_cpe:
+            rucs_cpe = list(dict.fromkeys(_RE_RUC.findall(cand.texto)))
+
+        usadas.add(cand.pagina)
+        bloques.append(
+            BloqueComprobante(
+                archivo=nombre_archivo,
+                pagina_inicio=cand.pagina,
+                pagina_fin=cand.pagina,
+                tipo_tentativo=tipo_cpe,
+                serie_tentativa=serie_cpe,
+                rucs_candidatos=rucs_cpe,
+                texto=cand.texto,
+            )
+        )
+
+    bloques.sort(key=lambda b: b.pagina_inicio)
     return bloques
