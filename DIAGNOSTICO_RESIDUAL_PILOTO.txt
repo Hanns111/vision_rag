@@ -1,0 +1,105 @@
+DIAGNOSTICO RESIDUAL — PILOTO DIED2026-INT-0250235
+=====================================================================
+Fecha: 2026-04-17
+Post: Fix #1 a #5 (tramo determinista cerrado)
+Pipeline: 29/29 comprobantes detectados
+
+
+=====================================================================
+FECHA_EMISION — 11 comprobantes sin fecha (de 29)
+=====================================================================
+
+Pag  Serie            Proveedor                            Categoria                Explicacion
+---  ---------------  -----------------------------------  -----------------------  ------------------------------------------
+ 46  F006-00002488    AR REPRESENTACIONES GASTRONOMICAS     ocr_fallido_sin_texto    Tesseract crasheo, 0 chars extraidos
+ 50  F001-00001460    TARANTELLA TRX S.A.C                  ocr_muy_degradado        Solo 44 chars, basura ilegible
+ 54  F003-2478        LLF INVERSIONES E.I.R.L.              ocr_fallido_sin_texto    Tesseract crasheo, 0 chars extraidos
+ 74  F001-543         RAFO ALFARO CAFE S.A.C.               ocr_ilegible_sin_nums    186 chars pero sin ningun numero
+ 86  FW01-1136        QUE BONITA VECINDAD S.A.C.            ocr_fallido_sin_texto    Tesseract crasheo, 0 chars extraidos
+ 90  FW01-759         SABORES DE TRADICION PERUANA E.I.R.L. ocr_fallido_sin_texto    Tesseract crasheo, 0 chars extraidos
+ 98  F002-2057        LA ESTAMPIDA DEL MALL S.A.C.          ocr_fallido_sin_texto    Tesseract crasheo, 0 chars extraidos
+102  F018-26030       LUCHA PARTNERS S.A.C.                 ocr_fallido_sin_texto    Tesseract crasheo, 0 chars extraidos
+106  FW01-763         SABORES DE TRADICION PERUANA E.I.R.L. ocr_fallido_sin_texto    Tesseract crasheo, 0 chars extraidos
+110  F002-2258        INVERSIONES CASA BLANCA A & A S.A.C.  ocr_ilegible_sin_nums    269 chars pero sin ningun numero
+118  F219-11456       INVERSIONES FISA S.A.                 ocr_muy_degradado        Solo 21 chars, basura ilegible
+
+Distribucion por categoria:
+  ocr_fallido_sin_texto:    7/11 — Tesseract crasheo, 0 chars
+  ocr_muy_degradado:        2/11 — <50 chars, ilegible
+  ocr_ilegible_sin_nums:    2/11 — texto parcial pero sin numeros
+
+Recuperables con regex/reglas: 0/11
+Requieren mejor OCR o fuente alternativa: 11/11
+
+
+=====================================================================
+MONTO_TOTAL — 21 comprobantes sin monto (de 29)
+=====================================================================
+
+Pag  Serie            Proveedor                            Categoria                Decimales encontrados     Explicacion
+---  ---------------  -----------------------------------  -----------------------  -----------------------   ------------------------------------------
+ 34  F003-0000002453  LLF INVERSIONES E.I.R.L.              texto_parcial            ninguno                  417 chars, tiene fecha pero no montos
+ 38  FF01-0002114     JULCA ULLOA RONALD ALBERTO            decimales_sin_ancla      40.00 30.00 20.00 10.50  Items sueltos sin etiqueta TOTAL
+ 42  FF01-0002122     JULCA ULLOA RONALD ALBERTO            decimales_sin_ancla      40.00 25.00 15.00 10.50  Items sueltos sin etiqueta TOTAL
+ 46  F006-00002488    AR REPRESENTACIONES GASTRONOMICAS     ocr_fallido_sin_texto    ninguno                  Tesseract crasheo
+ 50  F001-00001460    TARANTELLA TRX S.A.C                  ocr_muy_degradado        ninguno                  Solo 44 chars
+ 54  F003-2478        LLF INVERSIONES E.I.R.L.              ocr_fallido_sin_texto    ninguno                  Tesseract crasheo
+ 58  FF01-0002135     JULCA ULLOA RONALD ALBERTO            decimales_sin_ancla      50.00 15.00 10.50        Items sueltos sin etiqueta TOTAL
+ 62  FF01-0002136     JULCA ULLOA RONALD ALBERTO            decimales_sin_ancla      30.00 20.00 10.50        Items sueltos sin etiqueta TOTAL
+ 74  F001-543         RAFO ALFARO CAFE S.A.C.               ocr_ilegible_sin_nums    ninguno                  186 chars sin numeros
+ 78  FF01-0002139     JULCA ULLOA RONALD ALBERTO            decimales_sin_ancla      40.00 20.00 10.50        Items sueltos sin etiqueta TOTAL
+ 82  FF01-0002141     JULCA ULLOA RONALD ALBERTO            decimales_sin_ancla      25.00 20.00 10.50        Items sueltos sin etiqueta TOTAL
+ 86  FW01-1136        QUE BONITA VECINDAD S.A.C.            ocr_fallido_sin_texto    ninguno                  Tesseract crasheo
+ 90  FW01-759         SABORES DE TRADICION PERUANA E.I.R.L. ocr_fallido_sin_texto    ninguno                  Tesseract crasheo
+ 94  F001-1258        DAMCO CAFE S.A.C.                     decimales_sin_ancla      15.00 11.06              Decimales sin S/ ni TOTAL
+ 98  F002-2057        LA ESTAMPIDA DEL MALL S.A.C.          ocr_fallido_sin_texto    ninguno                  Tesseract crasheo
+102  F018-26030       LUCHA PARTNERS S.A.C.                 ocr_fallido_sin_texto    ninguno                  Tesseract crasheo
+106  FW01-763         SABORES DE TRADICION PERUANA E.I.R.L. ocr_fallido_sin_texto    ninguno                  Tesseract crasheo
+110  F002-2258        INVERSIONES CASA BLANCA A & A S.A.C.  ocr_ilegible_sin_nums    ninguno                  269 chars sin numeros
+118  F219-11456       INVERSIONES FISA S.A.                 ocr_muy_degradado        ninguno                  Solo 21 chars
+130  FA01-85          BRITO CAMACHO LUMBER                  decimales_sin_ancla      100.00 600.00 542.99     Multiples montos sin etiqueta clara
+134  E001-968         SERV.TURIST.HOSTAL EL PALACIO S.R.L.  decimales_sin_ancla      452.48 7500.00           Montos grandes pero sin ancla TOTAL
+
+Distribucion por categoria:
+  ocr_fallido_sin_texto:    7/21 — Tesseract crasheo, 0 chars, irrecuperable sin otro motor
+  ocr_muy_degradado:        2/21 — <50 chars, ilegible
+  ocr_ilegible_sin_nums:    2/21 — texto parcial pero sin decimales
+  decimales_sin_ancla:      9/21 — hay numeros pero ninguna etiqueta IMPORTE TOTAL / S/
+  texto_parcial:            1/21 — texto legible pero sin montos
+
+Recuperables con regex/reglas sobre OCR actual: 0/21
+  (los 9 con decimales no tienen ancla; tomar "el mas grande" seria adivinacion)
+Requieren mejor OCR o fuente alternativa: 21/21
+
+
+=====================================================================
+SINTESIS
+=====================================================================
+
+Fecha residual:   11 casos, todos por calidad de escaneo (0 recuperables con regex)
+Monto residual:   21 casos (7 sin texto + 2 degradados + 2 ilegibles + 9 sin ancla + 1 parcial)
+
+Comprobantes que fallan en AMBOS campos (fecha Y monto):
+  p46, p50, p54, p74, p86, p90, p98, p102, p106, p110, p118
+  = 11 comprobantes (todos los que fallan en fecha tambien fallan en monto)
+
+Los 10 restantes de monto (fallan en monto pero tienen fecha):
+  p34, p38, p42, p58, p62, p78, p82, p94, p130, p134
+
+Patron observado en los 9 "decimales_sin_ancla":
+  6 de 9 son del mismo proveedor: JULCA ULLOA RONALD ALBERTO (RUC 10181685510)
+  Ese proveedor emite comprobantes donde Tesseract captura items/precios
+  pero NO captura la linea de IMPORTE TOTAL (probablemente esta en zona
+  de la imagen que Tesseract no logra leer o confunde con otro patron).
+
+Proximas opciones tecnicas (NO implementar ahora, referencia para Cowork):
+  1. Fuente alternativa determinista (p.ej. Anexo 3 SIGA) = 29/29 posible
+  2. Mejor motor OCR (PaddleOCR en WSL) + ROI = incierto, bakeoff mostro
+     que Tesseract es mejor en F1 macro para este tipo de documentos
+  3. LLM fallback acotado (PASO 5 del roadmap) = para interpretar texto parcial
+  4. Validacion humana directa en Excel = las columnas humanas existen
+
+
+=====================================================================
+FIN DEL DIAGNOSTICO RESIDUAL
+=====================================================================
