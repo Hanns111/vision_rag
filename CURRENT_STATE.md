@@ -83,6 +83,54 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 ---
 
+## Pipeline de comprobantes — estado técnico (2026-04-18)
+
+### Expedientes validados en esta ronda
+
+| Expediente | Comp. | RUC | Razón | Serie | Fecha | monto_total | bi_gravado | monto_igv | op_exonerada | op_inafecta |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **DIED2026-INT-0344746** (nuevo) | 32 | 32/32 | 32/32 | 32/32 | 32/32 | 24/32 (75%) | 9/32 (28%) | 15/32 (47%) | 16/32 (50%) | 13/32 (41%) |
+| DIED2026-INT-0250235 (piloto) | 29 | 29/29 | 29/29 | 29/29 | 18/29 | 8/29 | 2/29 | 4/29 | 3/29 | 3/29 |
+| DEBEDSAR2026-INT-0103251 (2do) | 10 | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 | 4/10 | 10/10 | 0/10 | 0/10 |
+
+### Qué funciona (100% estable)
+
+- **Detección y segmentación de comprobantes** (detector + enriquecimiento CPE): identidad y número de comprobante correctos en los 3 expedientes.
+- **RUC / razón social / serie_numero**: 100% en los 3 expedientes.
+- **fecha_emision**: 100% en los 2 expedientes con OCR limpio (`DIED-0344746`, `DEBEDSAR-0103251`); 62% en piloto por OCR crasheado en 7 páginas.
+- **monto_total**: regex flexible con paréntesis, `S/` opcional, orden libre con `:`. Captura `IMPORTE TOTAL (S/) 90.00`, `Total : S/ 200.00`, `Importe Total : 60.00`. Lookbehind evita capturar `SUB TOTAL`.
+
+### Qué es parcial (cobertura dependiente de emisor)
+
+- **`bi_gravado`** (nuevo): extracción determinista con prioridad `Valor Venta` > `Op. Gravada` (sin leyenda `$`/`Sin impuestos`) > `SUBTOTAL` > `Base Imponible`. Cobertura ~28% en `DIED-0344746` — residuales son facturas/boletas donde el emisor no imprime desglose contable (ausencia estructural, no fallo OCR).
+- **`monto_igv`** (mejorado): regex flexible `\bIGV\s*[:.]*…`. Captura formatos `IGV:`, `IGV: S/`, `IGV 0.00`. Residuales en `DIED-0344746`: 2 casos con formato raro no cubiertos — `IGV: I.G.v. S/ 2.57` (etiqueta duplicada) y `IGV: [10.5%] 19.00` (porcentaje entre etiqueta y valor).
+- **`op_exonerada`** / **`op_inafecta`** (nuevos): extracción línea por línea con filtro anti-leyenda (`$`, `Sin impuestos`). Boletas SUNAT al 100% con bloque tributario completo (incluye `0.00` legítimo para renglones que no aplican).
+
+### Comportamiento observado en Excel
+
+- **Archivo único**: `data/piloto_ocr/metrics/validacion_expedientes.xlsx`.
+- **El export sobrescribe** el Excel con el último expediente procesado (no acumulativo). Para ver un expediente específico: `python scripts/ingest_expedientes.py export --expediente-id <X>`.
+- **Columnas humanas preservadas**: `monto_correcto`, `ruc_correcto`, `proveedor_correcto`, `observaciones`, `validacion_final`.
+- **Nuevas columnas de sistema** en hoja `comprobantes`: `bi_gravado`, `op_exonerada`, `op_inafecta` (insertadas entre `monto_igv` y `confianza`).
+
+### Qué sigue inconsistente (residuales conocidos)
+
+- `monto_total` residual ~25% global: páginas con OCR crasheado (piloto) o decimales sin ancla (transportes CRUZ).
+- `monto_igv` residual ~50% en `DIED-0344746`: mitad por ausencia estructural + 2 casos con formato OCR raro no cubierto.
+- `bi_gravado` residual ~70% en `DIED-0344746`: principalmente facturas simples sin desglose.
+- `op_exonerada` / `op_inafecta` residual en facturas: muchas no imprimen esos renglones cuando no aplican (ausencia estructural, no bug).
+
+### Archivos del pipeline — última tocada
+
+- `scripts/piloto_field_extract_paso4.py` — extractor PASO 4.1 (funciones `_bi_gravado`, `_grab_op`, regex `monto_igv` flexible, regex `monto_total` flexible).
+- `scripts/modelo/expediente.py` — dataclass `Comprobante` con `bi_gravado`, `op_exonerada`, `op_inafecta`.
+- `scripts/consolidador.py` — propagación al JSON consolidado.
+- `scripts/ingesta/comprobante_extractor.py` — mapeo fields → Comprobante.
+- `scripts/ingesta/excel_export.py` — columnas `bi_gravado`, `op_exonerada`, `op_inafecta` en hoja comprobantes.
+- `scripts/ingest_expedientes.py` — relleno de las nuevas columnas.
+
+---
+
 ## GOBERNANZA OPERATIVA (vigente desde 2026-04-14)
 
 | Rol | Quién | Alcance |
@@ -129,4 +177,4 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 ---
 
-*Última actualización: 2026-04-14 — PASO 4.1 cerrado; gobernanza operativa documentada; infra de ingesta de expedientes operativa (primer caso real DIED2026-INT-0250235).*
+*Última actualización: 2026-04-18 — pipeline de comprobantes extendido: bi_gravado + op_exonerada + op_inafecta agregados; monto_igv y monto_total con regex flexible; validado en 3 expedientes reales; 0 regresiones. Siguiente paso: validación de Excel vs cowork — ver `NEXT_STEP.md`.*
