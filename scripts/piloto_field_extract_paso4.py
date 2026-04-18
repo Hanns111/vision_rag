@@ -224,6 +224,39 @@ def _factura_serie(text: str, head: str) -> tuple[str | None, str, list[str]]:
     return None, "factura_serie_none", []
 
 
+def _bi_gravado(text: str) -> tuple[str | None, str, list[str]]:
+    """Extrae base imponible gravada con prioridad de anclas y filtro anti-leyenda.
+    Prioridad: Valor Venta > Op. Gravada (sin leyenda) > SUBTOTAL > Base Imponible.
+    """
+    tflat = re.sub(r"\s+", " ", text)
+    m = re.search(r"Valor\s+Venta[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})", tflat, re.I)
+    if m:
+        v = _norm_amount_str(m.group(1))
+        if v:
+            return v, "bi_gravado_valor_venta", [m.group(0)[:120]]
+    for linea in text.splitlines():
+        if not re.search(r"Op\.?\s*Gravada", linea, re.I):
+            continue
+        if "$" in linea or re.search(r"Sin\s+impuestos", linea, re.I) or re.match(r"\s*\(", linea):
+            continue
+        m2 = re.search(r"Op\.?\s*Gravada[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})", linea, re.I)
+        if m2:
+            v = _norm_amount_str(m2.group(1))
+            if v:
+                return v, "bi_gravado_op_gravada", [linea.strip()[:120]]
+    m = re.search(r"SUB\s*TOTAL(?:\s+Ventas)?[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})", tflat, re.I)
+    if m:
+        v = _norm_amount_str(m.group(1))
+        if v:
+            return v, "bi_gravado_subtotal", [m.group(0)[:120]]
+    m = re.search(r"Base\s+Imponible[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})", tflat, re.I)
+    if m:
+        v = _norm_amount_str(m.group(1))
+        if v:
+            return v, "bi_gravado_base_imp", [m.group(0)[:120]]
+    return None, "bi_gravado_none", []
+
+
 def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
     """Devuelve dict subkeys + regla + líneas usadas (fragmentos)."""
     tflat = re.sub(r"\s+", " ", text)
@@ -246,9 +279,9 @@ def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
     if not sub:
         sub = grab(r"SUB\s*TOTAL(?:\s+Ventas)?\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_subtotal_label")
 
-    igv = grab(r"IGV\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_igv")
+    igv = grab(r"\bIGV\s*[:.]*\s*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})", "monto_igv")
     if not igv:
-        igv = grab(r"Total\s+I\.?G\.?V\.?\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_igv_total")
+        igv = grab(r"Total\s+I\.?G\.?V\.?[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})", "monto_igv_total")
 
     tot = grab(r"Total\s+a\s+pagar\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_total_pagar")
     if not tot:
@@ -264,9 +297,39 @@ def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
             "monto_total_generico",
         )
 
+    bi, bi_reg, bi_lines = _bi_gravado(text)
+    if bi:
+        reglas.append(bi_reg)
+        lineas.extend(bi_lines)
+
+    def _grab_op(label_pat: str, name: str) -> str | None:
+        for linea in text.splitlines():
+            if not re.search(label_pat, linea, re.I):
+                continue
+            if "$" in linea or re.search(r"Sin\s+impuestos", linea, re.I):
+                continue
+            m = re.search(label_pat + r"[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})", linea, re.I)
+            if m:
+                v = _norm_amount_str(m.group(1))
+                if v is not None:
+                    reglas.append(name)
+                    lineas.append(linea.strip()[:120])
+                    return v
+        return None
+
+    exo = _grab_op(r"Op\.?\s*Exonerada", "op_exonerada")
+    ina = _grab_op(r"Op\.?\s*Inafecta", "op_inafecta")
+
     regla = "+".join(reglas) if reglas else "monto_none"
     return (
-        {"monto_subtotal": sub, "monto_igv": igv, "monto_total": tot},
+        {
+            "monto_subtotal": sub,
+            "monto_igv": igv,
+            "monto_total": tot,
+            "bi_gravado": bi,
+            "op_exonerada": exo,
+            "op_inafecta": ina,
+        },
         regla,
         lineas,
     )
@@ -532,9 +595,15 @@ def extract_fields_paso4(text: str) -> tuple[dict[str, Any], dict[str, Any]]:
         fields["monto_subtotal"] = montos["monto_subtotal"]
         fields["monto_igv"] = montos["monto_igv"]
         fields["monto_total"] = montos["monto_total"]
+        fields["bi_gravado"] = montos.get("bi_gravado")
+        fields["op_exonerada"] = montos.get("op_exonerada")
+        fields["op_inafecta"] = montos.get("op_inafecta")
         trace["monto_subtotal"] = _trace(tipo_doc, mreg, mlines)
         trace["monto_igv"] = _trace(tipo_doc, mreg, mlines)
         trace["monto_total"] = _trace(tipo_doc, mreg, mlines)
+        trace["bi_gravado"] = _trace(tipo_doc, mreg, mlines)
+        trace["op_exonerada"] = _trace(tipo_doc, mreg, mlines)
+        trace["op_inafecta"] = _trace(tipo_doc, mreg, mlines)
         trace["tipo_documento"] = _trace(tipo_doc, regla_tipo, [])
         return fields, trace
 
@@ -629,6 +698,9 @@ def extract_fields_paso4(text: str) -> tuple[dict[str, Any], dict[str, Any]]:
         fields["monto_total"] = montos["monto_total"]
         fields["monto_subtotal"] = montos["monto_subtotal"]
         fields["monto_igv"] = montos["monto_igv"]
+        fields["bi_gravado"] = montos.get("bi_gravado")
+        fields["op_exonerada"] = montos.get("op_exonerada")
+        fields["op_inafecta"] = montos.get("op_inafecta")
         trace["monto_total"] = _trace(tipo_doc, "fallback_" + mreg, mlines)
     return fields, trace
 

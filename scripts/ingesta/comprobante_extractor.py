@@ -68,6 +68,9 @@ def extraer_de_bloque(bloque) -> Comprobante:
     monto_total = fields.get("monto_total") or fields.get("monto_subtotal")
     moneda = fields.get("moneda")
     igv = fields.get("monto_igv")
+    bi = fields.get("bi_gravado")
+    exo = fields.get("op_exonerada")
+    ina = fields.get("op_inafecta")
 
     presentes = {
         "ruc": ruc,
@@ -99,6 +102,9 @@ def extraer_de_bloque(bloque) -> Comprobante:
         monto_total=monto_total,
         moneda=moneda,
         monto_igv=igv,
+        bi_gravado=bi,
+        op_exonerada=exo,
+        op_inafecta=ina,
         confianza=conf,
         hash_deduplicacion=clave,
         texto_resumen=_resumen_texto(bloque.texto),

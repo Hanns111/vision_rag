@@ -291,6 +291,9 @@ def _cmd_export(args: argparse.Namespace) -> int:
                     monto_total=c.get("monto_total") or "",
                     moneda=c.get("moneda") or "",
                     monto_igv=c.get("monto_igv") or "",
+                    bi_gravado=c.get("bi_gravado") or "",
+                    op_exonerada=c.get("op_exonerada") or "",
+                    op_inafecta=c.get("op_inafecta") or "",
                     confianza=c.get("confianza", ""),
                     texto_resumen=(c.get("texto_resumen") or "")[:500],
                 )

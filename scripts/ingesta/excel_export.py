@@ -83,6 +83,9 @@ class ComprobanteExcel:
     monto_total: str
     moneda: str
     monto_igv: str
+    bi_gravado: str
+    op_exonerada: str
+    op_inafecta: str
     confianza: float | str
     texto_resumen: str
     # columnas humanas
@@ -163,6 +166,9 @@ _COLS_SISTEMA_COMP = [
     "monto_total",
     "moneda",
     "monto_igv",
+    "bi_gravado",
+    "op_exonerada",
+    "op_inafecta",
     "confianza",
     "texto_resumen",
 ]
@@ -257,6 +263,9 @@ def _asdict_comp(c: ComprobanteExcel) -> dict[str, Any]:
         "monto_total": c.monto_total,
         "moneda": c.moneda,
         "monto_igv": c.monto_igv,
+        "bi_gravado": c.bi_gravado,
+        "op_exonerada": c.op_exonerada,
+        "op_inafecta": c.op_inafecta,
         "confianza": c.confianza,
         "texto_resumen": c.texto_resumen,
         "monto_correcto": c.monto_correcto,
