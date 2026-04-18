@@ -131,6 +131,56 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 ---
 
+## Políticas operativas, vocabulario tentativo y riesgos (2026-04-18)
+
+Esta sección complementa las decisiones formales de [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md) (D-13…D-17) con convenciones operativas y riesgos reconocidos que **aún no son decisiones cerradas**.
+
+### Convenciones operativas adoptadas
+
+- **Mensaje de commit de evidencia**: cuando se versiona un Excel regenerado o cualquier artefacto binario producto de una corrida, el mensaje del commit debe describir **exactamente** qué expediente(s) refleja. Ejemplo incorrecto: `"metricas de 3 expedientes"` cuando el Excel solo contiene el último. Ejemplo correcto: `"chore(evidencia): Excel regenerado para DIED-0344746 (32 comp, 24/32 monto, 16/32 op_exonerada)"`.
+- **Una validación pendiente no se documenta como cerrada**: si el usuario dice "no estoy cerrando etapa", CURRENT_STATE y NEXT_STEP deben reflejarlo. Ver D-15.
+
+### Vocabulario tentativo — estados de expediente
+
+Uso operativo (no es todavía un campo del JSON ni del Excel; es vocabulario humano para describir dónde está cada expediente):
+
+| Estado | Significado |
+|---|---|
+| `tecnicamente_procesado` | El pipeline corrió `run-all` sin error; JSON consolidado existe. |
+| `pendiente_validacion_excel` | Procesado y exportado al Excel, pero sin revisión humana contra evidencia externa. |
+| `validado_manual_parcial` | Revisión humana iniciada; algunas filas del Excel con columnas humanas llenas. |
+| `validado_manual_final` | Revisión humana completa; `validacion_final` llena para todas las filas. |
+
+**Mapeo actual de los 3 expedientes** (al 2026-04-18):
+
+| Expediente | Estado operativo |
+|---|---|
+| `DIED2026-INT-0250235` (piloto) | `validado_manual_parcial` (ground truth ya construido en PASO 0) |
+| `DEBEDSAR2026-INT-0103251` (2do / robustez) | `tecnicamente_procesado` |
+| `DIED2026-INT-0344746` (validación manual en curso) | `pendiente_validacion_excel` — siguiente paso según `NEXT_STEP.md` |
+
+### Vocabulario tentativo — roles de expediente de prueba
+
+| Rol | Uso | Ejemplo actual |
+|---|---|---|
+| **Piloto** | Ground truth original para construir y calibrar el pipeline | `DIED-0250235` |
+| **Robustez** | Segundo expediente para probar generalización de los fixes | `DEBEDSAR-0103251` |
+| **Validación manual** | Expediente en curso donde se contrasta contra evidencia externa (cowork) | `DIED-0344746` |
+| **Regresión** | Cualquiera de los anteriores, re-ejecutado tras un cambio de código para confirmar 0 regresiones | Los 3 se usan así |
+
+### Riesgos reconocidos (sin acción inmediata)
+
+- **Crecimiento transversal del pipeline**: cada campo nuevo (ej. `bi_gravado`, `op_exonerada`) toca **6 archivos** (`piloto_field_extract_paso4.py`, `modelo/expediente.py`, `consolidador.py`, `comprobante_extractor.py`, `excel_export.py`, `ingest_expedientes.py`). Riesgo de regresión silenciosa si se descuida el alcance. **Mitigación actual**: re-ejecutar los 3 expedientes tras cada cambio y verificar cobertura de todos los campos estables. **Acción pendiente**: no hay plan de refactor (fuera de alcance); registrado como riesgo.
+- **Excel binario versionado**: ver D-17.
+- **Interpretación semántica como cuello de botella**: ver D-16.
+
+### Recomendaciones pendientes (no adoptadas todavía)
+
+- Formalizar los estados de expediente como campo del `expediente.json` — hoy es solo vocabulario humano.
+- Definir umbral cuantitativo para migrar el Excel de evidencia versionada a artefacto de salida (D-17).
+
+---
+
 ## GOBERNANZA OPERATIVA (vigente desde 2026-04-14)
 
 | Rol | Quién | Alcance |
@@ -177,4 +227,4 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 ---
 
-*Última actualización: 2026-04-18 — pipeline de comprobantes extendido: bi_gravado + op_exonerada + op_inafecta agregados; monto_igv y monto_total con regex flexible; validado en 3 expedientes reales; 0 regresiones. Siguiente paso: validación de Excel vs cowork — ver `NEXT_STEP.md`.*
+*Última actualización: 2026-04-18 — pipeline de comprobantes extendido: bi_gravado + op_exonerada + op_inafecta agregados; monto_igv y monto_total con regex flexible; validado en 3 expedientes reales; 0 regresiones. Agregadas decisiones D-13…D-17 y políticas operativas (JSON fuente de verdad, política NULL, vocabulario tentativo de estados). Siguiente paso: validación de Excel vs cowork — ver `NEXT_STEP.md`.*

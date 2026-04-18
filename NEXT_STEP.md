@@ -29,6 +29,8 @@
    - Casos con `0.00` legítimos (boletas SUNAT): confirmar que el renglón en el PDF realmente dice `S/ 0.00` y no un número distinto.
    - Los 2 casos con valor >0 en `op_exonerada` (p22=90.00, p126=100.00 ANFLOR): confirmar contra el PDF.
 
+4. **Clasificar cada NULL residual** según la política D-14 (`docs/DECISIONES_TECNICAS.md`): `ausencia_estructural` | `fallo_ocr` | `gap_regex` | `decimales_sin_ancla`. No usar "sin dato" a secas — cada NULL debe tener categoría explicable.
+
 ### Qué NO hacer todavía
 
 - **No agregar** nuevos campos (ISC, Otros Cargos, Otros Tributos, Redondeo, Valor FISE, etc.).
