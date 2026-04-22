@@ -1,63 +1,81 @@
 # NEXT_STEP — vision_rag
 
-> Documento vivo. Reemplaza/actualiza al cambiar el siguiente paso.
+> Documento vivo. Reemplazar/actualizar al cambiar el siguiente paso.
 
-**Fecha:** 2026-04-18
-**Etapa vigente:** pipeline de comprobantes extendido con desglose tributario (`bi_gravado`, `op_exonerada`, `op_inafecta`) + `monto_total` / `monto_igv` con regex flexible. Etapa **NO cerrada**.
+**Fecha:** 2026-04-21
+**Etapa vigente:** Excel final preparado para validación humana sobre 4 expedientes (86 comprobantes). **Fase NO cerrada** — pendiente revisión manual contra PDFs.
 
 ---
 
-## Siguiente paso — VALIDACIÓN DE EXCEL
+## Estado del artefacto
 
-**No implementar nuevas features.** El foco es verificar que lo ya extraído es correcto.
+- **Ruta Excel:** `data/piloto_ocr/metrics/validacion_expedientes.xlsx`
+- **Hojas:** `resumen`, `comprobantes` (86 filas ordenadas por prioridad), `documentos`, `expedientes`, `errores`, `resolucion_ids`
+- **Expedientes incluidos:** `DEBE2026-INT-0316916` (15), `DEBEDSAR2026-INT-0103251` (10), `DIED2026-INT-0250235` (29), `DIED2026-INT-0344746` (32)
 
-### Qué validar
+### Distribución actual del estado_consistencia
 
-1. **Comparar contra archivo cowork**
-   - Fuente externa: `DIED2026-INT-0344746_VIATICO_17_04_9.42am/COWORK_Comprobantes_0344746.xlsx`.
-   - Pipeline: `data/piloto_ocr/metrics/validacion_expedientes.xlsx` (regenerado para el expediente `DIED2026-INT-0344746`).
-   - Comparar fila por fila: RUC, razón social, serie, fecha, monto_total, bi_gravado, monto_igv, op_exonerada, op_inafecta.
+| Estado | Cantidad | % |
+|---|---|---|
+| DIFERENCIA_CRITICA | 15 | 17.4% |
+| DATOS_INSUFICIENTES | 55 | 64.0% |
+| DIFERENCIA_LEVE | 1 | 1.2% |
+| OK | 15 | 17.4% |
 
-2. **Detectar discrepancias reales**
-   - Montos distintos entre cowork y pipeline.
-   - Comprobantes que cowork lista pero pipeline no detectó, o viceversa.
-   - Proveedores mal normalizados.
-   - Clasificar cada discrepancia: ¿error del OCR, error de regex, error de cowork humano, o diferencia de criterio?
+**Requieren revisión manual (`flag_revision_manual=SI`):** 70 de 86 (81.4%).
 
-3. **Confirmar cobertura de desglose tributario**
-   - Los 16 casos con `op_exonerada` y 13 con `op_inafecta` detectados en `DIED-0344746`: verificar manualmente contra el PDF que los valores extraídos coinciden.
-   - Casos con `0.00` legítimos (boletas SUNAT): confirmar que el renglón en el PDF realmente dice `S/ 0.00` y no un número distinto.
-   - Los 2 casos con valor >0 en `op_exonerada` (p22=90.00, p126=100.00 ANFLOR): confirmar contra el PDF.
+---
 
-4. **Clasificar cada NULL residual** según la política D-14 (`docs/DECISIONES_TECNICAS.md`): `ausencia_estructural` | `fallo_ocr` | `gap_regex` | `decimales_sin_ancla`. No usar "sin dato" a secas — cada NULL debe tener categoría explicable.
+## Siguiente paso — VALIDACIÓN HUMANA DEL EXCEL
+
+**La fase no se cierra con generación del Excel.** El Excel es entrada de trabajo, no salida final. El cierre de fase requiere decisión explícita de Hans tras revisión contra PDFs.
+
+### Qué hacer
+
+1. **Abrir** `data/piloto_ocr/metrics/validacion_expedientes.xlsx`.
+2. **Leer** hoja `resumen` para contexto global.
+3. **Filtrar** hoja `comprobantes` por `flag_revision_manual = SI` (70 filas).
+4. **Revisar primero los 15 DIFERENCIA_CRITICA**:
+   - Leer `detalle_inconsistencia` (explica qué componente falla).
+   - Abrir el PDF correspondiente (`archivo` + `pagina_inicio`) y contrastar.
+   - Llenar columnas humanas: `comentario_validacion`, `monto_correcto`, `ruc_correcto`, `proveedor_correcto`, `observaciones`, `validacion_final`.
+5. **Luego los 55 DATOS_INSUFICIENTES**:
+   - La mayoría son casos donde OCR no capturó el desglose tributario (Marcoantonio con columnas pegadas, boletas EB01 simplificadas, decimales truncados por OCR).
+   - Completar lo que sea observable directamente del PDF y dejar trazabilidad en `observaciones`.
+6. **Los 15 OK** — muestreo opcional; la suma de componentes ya cuadra ±1.00.
+
+### Criterio de cierre de fase
+
+La fase queda **cerrada** cuando:
+
+- `validacion_final` llena para todos los comprobantes con `flag_revision_manual=SI`, o
+- Hans decide explícitamente aceptar el Excel con lagunas conocidas y documenta la aceptación.
+
+Mientras tanto, el estado operativo del proyecto es **"pipeline técnicamente estable + Excel listo para revisión; fase en curso, sin cierre"**.
 
 ### Qué NO hacer todavía
 
-- **No agregar** nuevos campos (ISC, Otros Cargos, Otros Tributos, Redondeo, Valor FISE, etc.).
-- **No tocar** regex de monto_total, IGV, bi_gravado, op_exonerada, op_inafecta (a menos que la validación revele un bug real, en cuyo caso reportar antes de cambiar).
-- **No abrir** clasificador MEF / concepto presupuestal.
-- **No integrar** con AG-EVIDENCE ni con el agente normativo.
+- **No iterar más OCR** — el OCR agresivo ya corrió y alcanzó su techo (+4/59 recuperados, ~6.8%). Los 55 restantes no son recuperables solo con preprocesamiento.
+- **No agregar más campos contables** (recargo_consumo, ISC, Otros Tributos ya están o no aplican).
+- **No abrir integración AG-EVIDENCE**.
+- **No refactorizar el Excel** — el esquema actual (26 columnas) basta para validación humana.
 
-### Criterio de salida de este paso
+---
 
-- Evidencia tabular (Excel o reporte) de concordancia pipeline vs cowork en `DIED2026-INT-0344746`.
-- Lista cerrada de discrepancias con categoría asignada.
-- Decisión explícita de Hans sobre qué hacer con cada discrepancia (fix, ignorar, escalar).
+## Criterio de salida de este paso
+
+- Excel con todas las filas `flag_revision_manual=SI` revisadas contra PDF, columnas humanas llenas.
+- Decisión explícita de Hans sobre: (a) aceptar el estado actual como "validado parcialmente", (b) exigir mejoras adicionales al pipeline, o (c) pasar a la siguiente fase del roadmap.
 
 ---
 
 ## Referencias rápidas
 
 - Estado técnico completo: [`CURRENT_STATE.md`](CURRENT_STATE.md)
-- Handoff de cierre determinista previo: `HANDOFF_FINAL_ETAPA_DETERMINISTA.txt`
-- Roadmap PASO 0–7: `docs/ROADMAP_PROYECTO.md`
-- Comandos pipeline:
-  ```
-  python scripts/ingest_expedientes.py run-all --src <carpeta> --expediente-id <id>
-  python scripts/ingest_expedientes.py export --expediente-id <id>
-  ```
-- Ruta Excel: `data/piloto_ocr/metrics/validacion_expedientes.xlsx` (hoja `comprobantes`).
+- Decisiones D-01…D-17: [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md)
+- Regenerar Excel tras cambios: `python scripts/ingest_expedientes.py export`
+- Reprocesar un expediente puntual: `python scripts/ingest_expedientes.py run-all --src <carpeta> --expediente-id <id>`
 
 ---
 
-*Al completar la validación de Excel, reemplazar este documento con el siguiente paso o archivarlo.*
+*Al completar la validación humana, reemplazar este documento con el siguiente paso o archivarlo.*

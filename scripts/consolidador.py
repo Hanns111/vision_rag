@@ -341,6 +341,7 @@ def consolidar(exp_dir: Path | str) -> Expediente:
                     bi_gravado=c_raw.get("bi_gravado"),
                     op_exonerada=c_raw.get("op_exonerada"),
                     op_inafecta=c_raw.get("op_inafecta"),
+                    recargo_consumo=c_raw.get("recargo_consumo"),
                     confianza=float(c_raw.get("confianza", 0.0) or 0.0),
                     hash_deduplicacion=h,
                     texto_resumen=c_raw.get("texto_resumen", ""),

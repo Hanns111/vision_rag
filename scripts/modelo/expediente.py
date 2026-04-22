@@ -105,6 +105,7 @@ class Comprobante:
     bi_gravado: str | None = None
     op_exonerada: str | None = None
     op_inafecta: str | None = None
+    recargo_consumo: str | None = None   # recargo al consumo / servicio 10%
     confianza: float = 0.0
     hash_deduplicacion: str = ""   # (ruc|serie|fecha|monto) o hash(texto[:200])
     texto_resumen: str = ""        # primeros ~300 chars del bloque

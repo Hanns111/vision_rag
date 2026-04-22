@@ -83,51 +83,81 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 ---
 
-## Pipeline de comprobantes — estado técnico (2026-04-18)
+## Pipeline de comprobantes — estado técnico (2026-04-21)
 
-### Expedientes validados en esta ronda
+> **Estado de fase:** Excel final preparado para revisión humana, **fase NO cerrada**.
+> Pendiente validación manual contra PDFs (ver [`NEXT_STEP.md`](NEXT_STEP.md)).
 
-| Expediente | Comp. | RUC | Razón | Serie | Fecha | monto_total | bi_gravado | monto_igv | op_exonerada | op_inafecta |
-|---|---|---|---|---|---|---|---|---|---|---|
-| **DIED2026-INT-0344746** (nuevo) | 32 | 32/32 | 32/32 | 32/32 | 32/32 | 24/32 (75%) | 9/32 (28%) | 15/32 (47%) | 16/32 (50%) | 13/32 (41%) |
-| DIED2026-INT-0250235 (piloto) | 29 | 29/29 | 29/29 | 29/29 | 18/29 | 8/29 | 2/29 | 4/29 | 3/29 | 3/29 |
-| DEBEDSAR2026-INT-0103251 (2do) | 10 | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 | 4/10 | 10/10 | 0/10 | 0/10 |
+### Expedientes procesados (86 comprobantes, 4 expedientes)
 
-### Qué funciona (100% estable)
+| Expediente | Comp. | RUC | Razón | Serie | Fecha | monto_total | bi_gravado | monto_igv | op_exonerada | op_inafecta | recargo |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| **DEBE2026-INT-0316916** (nuevo, 2026-04-21) | 15 | 15/15 | 9/15 | 14/15 | 12/15 | 15/15 (100%) | 4/15 | 4/15 | 1/15 | 2/15 | 0/15 |
+| DIED2026-INT-0344746 | 32 | 32/32 | 32/32 | 32/32 | 32/32 | 29/32 (91%) | 11/32 | 18/32 | 16/32 | 13/32 | 0/32 |
+| DIED2026-INT-0250235 (piloto) | 29 | 29/29 | 29/29 | 29/29 | 18/29 | 14/29 (48%) | 2/29 | 5/29 | 3/29 | 3/29 | 0/29 |
+| DEBEDSAR2026-INT-0103251 (2do) | 10 | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 (100%) | 4/10 | 10/10 | 0/10 | 0/10 | 0/10 |
 
-- **Detección y segmentación de comprobantes** (detector + enriquecimiento CPE): identidad y número de comprobante correctos en los 3 expedientes.
-- **RUC / razón social / serie_numero**: 100% en los 3 expedientes.
-- **fecha_emision**: 100% en los 2 expedientes con OCR limpio (`DIED-0344746`, `DEBEDSAR-0103251`); 62% en piloto por OCR crasheado en 7 páginas.
-- **monto_total**: regex flexible con paréntesis, `S/` opcional, orden libre con `:`. Captura `IMPORTE TOTAL (S/) 90.00`, `Total : S/ 200.00`, `Importe Total : 60.00`. Lookbehind evita capturar `SUB TOTAL`.
+*recargo_consumo en corpus real: 0 casos (capacidad implementada y testeada sintéticamente; se activará con facturas que impriman "RECARGO AL CONSUMO" o "SERVICIO 10%").*
+
+### Qué funciona (estable tras refactor de parsing 2026-04-21)
+
+- **Detección y segmentación de comprobantes** (detector + enriquecimiento CPE): identidad y número de comprobante correctos en los 4 expedientes.
+- **RUC / razón social / serie_numero**: ~100% en los 4 expedientes (salvo p56 0316916 con serie None por OCR roto).
+- **fecha_emision**: 100% en 3 expedientes con OCR limpio; 62% en piloto DIED-0250235 por OCR crasheado.
+- **monto_total**: regex flexible + **oráculo SON en letras** (convención peruana obligatoria) + alias `I.T.`/`IT`. Cobertura global: 68/86 (79%) — recuperó +21 montos vs baseline pre-SON.
+- **Parsing tributario con jerarquía conceptual (D-18, 2026-04-21)**: separa campos base (`SUBTOTAL`, `V.V.`, `Base Imponible`) de componentes tributarios (`Op.Gravada/Exonerada/Inafecta`, `IGV`, `Recargo`) de total final (`IMPORTE TOTAL`, `IMPORTE A PAGAR`, `I.T.`). No usa base como fallback de total.
+- **Validador de consistencia contable (D-19, 2026-04-21)**: clasifica comprobante en `GRAVADA / EXONERADA / INAFECTA / MIXTA / NO_DETERMINABLE` y valida `total ≈ suma(componentes del tipo)` ±1.00. Estados: `OK / DIFERENCIA_LEVE / DIFERENCIA_CRITICA / DATOS_INSUFICIENTES`.
 
 ### Qué es parcial (cobertura dependiente de emisor)
 
-- **`bi_gravado`** (nuevo): extracción determinista con prioridad `Valor Venta` > `Op. Gravada` (sin leyenda `$`/`Sin impuestos`) > `SUBTOTAL` > `Base Imponible`. Cobertura ~28% en `DIED-0344746` — residuales son facturas/boletas donde el emisor no imprime desglose contable (ausencia estructural, no fallo OCR).
-- **`monto_igv`** (mejorado): regex flexible `\bIGV\s*[:.]*…`. Captura formatos `IGV:`, `IGV: S/`, `IGV 0.00`. Residuales en `DIED-0344746`: 2 casos con formato raro no cubiertos — `IGV: I.G.v. S/ 2.57` (etiqueta duplicada) y `IGV: [10.5%] 19.00` (porcentaje entre etiqueta y valor).
-- **`op_exonerada`** / **`op_inafecta`** (nuevos): extracción línea por línea con filtro anti-leyenda (`$`, `Sin impuestos`). Boletas SUNAT al 100% con bloque tributario completo (incluye `0.00` legítimo para renglones que no aplican).
+- **`bi_gravado`**: prioridad `Valor Venta` / `V.V.` > `Op. Gravada` > `SUBTOTAL` > `Base Imponible`. Filtro anti-leyenda (`$`, `Sin impuestos`). Cobertura global 21/86 (24%) — residuales por ausencia estructural o decimales truncados por OCR.
+- **`monto_igv`**: regex tolerante a OCR (`IGV | IGY | 15V | IBV | IOV`) + `Total I.G.V.` como fallback. Cobertura global 37/86 (43%).
+- **`op_exonerada` / `op_inafecta`**: extracción línea por línea, acepta plural (`Exoneradas`, `Inafectas`), filtro anti-leyenda. Con cross-check que descarta valores > 1.5× total (fija columnas pegadas como `4160.00` → `None`).
+- **`recargo_consumo`** (nuevo 2026-04-21): regex tolerante a OCR (`RECARGO AL CONSUMO`, `SERVICIO 10%`, `SERV1C1O`, `SERVCIO`, `SERVICE CHARGE`) con tolerancia O↔0, I↔1. 15 tests sintéticos pasando. Capacidad latente (0 casos en corpus actual — facturas de provincia no usan este renglón).
+- **`clasificadores_gasto_expediente`** (nuevo 2026-04-21): extracción de códigos MEF `2.3.X Y.ZZ W` desde planilla/solicitud del expediente. Propagado a cada comprobante. Se capturan 4-5 clasificadores por expediente.
 
-### Comportamiento observado en Excel
+### Excel para validación humana (2026-04-21)
 
-- **Archivo único**: `data/piloto_ocr/metrics/validacion_expedientes.xlsx`.
-- **El export sobrescribe** el Excel con el último expediente procesado (no acumulativo). Para ver un expediente específico: `python scripts/ingest_expedientes.py export --expediente-id <X>`.
-- **Columnas humanas preservadas**: `monto_correcto`, `ruc_correcto`, `proveedor_correcto`, `observaciones`, `validacion_final`.
-- **Nuevas columnas de sistema** en hoja `comprobantes`: `bi_gravado`, `op_exonerada`, `op_inafecta` (insertadas entre `monto_igv` y `confianza`).
+- **Archivo único**: `data/piloto_ocr/metrics/validacion_expedientes.xlsx` (47 KB).
+- **Export acumulativo por expediente**: al correr `python scripts/ingest_expedientes.py export` sin filtro se exportan los 4 expedientes; el upsert preserva columnas humanas ya llenas.
+- **Hojas (orden de apertura)**:
+  1. `resumen` — métricas ejecutivas, % por estado, desglose por expediente, instrucciones.
+  2. `comprobantes` — 86 filas **ordenadas por prioridad**: CRITICA → INSUFICIENTES → LEVE → OK.
+  3. `documentos`, `expedientes`, `errores`, `resolucion_ids` — hojas auxiliares.
+- **Columnas nuevas (2026-04-21)** en hoja `comprobantes`:
+  - `recargo_consumo` — extraído por regex tolerante a OCR.
+  - `estado_consistencia` — `OK | DIFERENCIA_LEVE | DIFERENCIA_CRITICA | DATOS_INSUFICIENTES`.
+  - `tipo_tributario` — `GRAVADA | EXONERADA | INAFECTA | MIXTA | NO_DETERMINABLE`.
+  - `flag_revision_manual` — `SI` si el estado requiere revisión humana (70/86 = 81.4%).
+  - `detalle_inconsistencia` — explicación textual auditable.
+  - `clasificadores_gasto_expediente` — lista de códigos MEF del expediente.
+  - `comentario_validacion` (humana) — para llenado libre durante revisión.
 
 ### Qué sigue inconsistente (residuales conocidos)
 
-- `monto_total` residual ~25% global: páginas con OCR crasheado (piloto) o decimales sin ancla (transportes CRUZ).
-- `monto_igv` residual ~50% en `DIED-0344746`: mitad por ausencia estructural + 2 casos con formato OCR raro no cubierto.
-- `bi_gravado` residual ~70% en `DIED-0344746`: principalmente facturas simples sin desglose.
-- `op_exonerada` / `op_inafecta` residual en facturas: muchas no imprimen esos renglones cuando no aplican (ausencia estructural, no bug).
+- **Marcoantonio (pp 30, 38, 46, 54 del 0316916)**: columnas ultra-compactas en tabla → Tesseract pega dígitos (`160` → `4160` / `460`). Filtro cross-check 1.5× descarta el valor contaminado pero no lo recupera. Requiere revisión manual contra PDF.
+- **Boletas EB01 simplificadas**: el PDF imprime `OP.GRAVADA: 0.00 / EXONERADA: 0.00 / INAFECTA: 0.00` sin base real → clasificador las marca `DATOS_INSUFICIENTES` (honesto).
+- **Restaurantes con decimales OCR-truncados (`S/ 80.0C`, `Si 4?.0;`)**: glifos rotos en imagen original, irrecuperables por preprocesamiento.
+- **DIED-0250235**: OCR globalmente degradado → 24/29 son `DATOS_INSUFICIENTES`. Requiere reescaneo o validación manual completa.
+
+### OCR agresivo como segunda pasada (2026-04-21)
+
+- **Módulo**: `scripts/ingesta/ocr_region_totales.py`.
+- **Estrategia**: render 500 DPI + 4 variantes preproc (soft / binary / deskew) × 2 PSM (6, 4) + mejor-de-N por longitud.
+- **Hook**: `_cmd_process` llama `rellenar_desde_ocr_agresivo` solo para comprobantes con campos tributarios vacíos. NO sobrescribe valores ya capturados.
+- **Resultado**: recuperó **4 de 59** `DATOS_INSUFICIENTES` (6.8%) — p56 (Transportes Rioja), p70/p78 (San Carlos), p94 (0344746). Los 55 restantes no son recuperables solo con preprocesamiento (límite de Tesseract en tablas densas + pixeles perdidos en escaneo).
+- **Flag CLI**: `--skip-ocr-agresivo` para desactivar.
 
 ### Archivos del pipeline — última tocada
 
-- `scripts/piloto_field_extract_paso4.py` — extractor PASO 4.1 (funciones `_bi_gravado`, `_grab_op`, regex `monto_igv` flexible, regex `monto_total` flexible).
-- `scripts/modelo/expediente.py` — dataclass `Comprobante` con `bi_gravado`, `op_exonerada`, `op_inafecta`.
-- `scripts/consolidador.py` — propagación al JSON consolidado.
-- `scripts/ingesta/comprobante_extractor.py` — mapeo fields → Comprobante.
-- `scripts/ingesta/excel_export.py` — columnas `bi_gravado`, `op_exonerada`, `op_inafecta` en hoja comprobantes.
-- `scripts/ingest_expedientes.py` — relleno de las nuevas columnas.
+- `scripts/piloto_field_extract_paso4.py` — oráculo SON español→número, regex tolerantes OCR (IGV variantes, V.V., I.T., RECARGO/SERVICIO), cross-check físico 1.5×, cross-check suma informativo.
+- `scripts/modelo/expediente.py` — `Comprobante.recargo_consumo` agregado.
+- `scripts/consolidador.py` — propaga `recargo_consumo` al JSON.
+- `scripts/ingesta/comprobante_extractor.py` — mapeo + función `rellenar_desde_ocr_agresivo`.
+- `scripts/ingesta/ocr_region_totales.py` (NUEVO) — módulo OCR agresivo.
+- `scripts/ingesta/excel_export.py` — columnas nuevas, sort por prioridad, hoja `resumen`.
+- `scripts/ingest_expedientes.py` — `_clasificar_tipo_tributario`, `_evaluar_consistencia`, `_clasificadores_gasto_expediente`, parsing de tipo desde detalle, hook OCR agresivo.
+- `scripts/document_ocr_runner.py` — preproc multi-pasada conservador-primero (de turno previo).
 
 ---
 
@@ -151,13 +181,16 @@ Uso operativo (no es todavía un campo del JSON ni del Excel; es vocabulario hum
 | `validado_manual_parcial` | Revisión humana iniciada; algunas filas del Excel con columnas humanas llenas. |
 | `validado_manual_final` | Revisión humana completa; `validacion_final` llena para todas las filas. |
 
-**Mapeo actual de los 3 expedientes** (al 2026-04-18):
+**Mapeo actual de los 4 expedientes** (al 2026-04-21):
 
 | Expediente | Estado operativo |
 |---|---|
-| `DIED2026-INT-0250235` (piloto) | `validado_manual_parcial` (ground truth ya construido en PASO 0) |
-| `DEBEDSAR2026-INT-0103251` (2do / robustez) | `tecnicamente_procesado` |
-| `DIED2026-INT-0344746` (validación manual en curso) | `pendiente_validacion_excel` — siguiente paso según `NEXT_STEP.md` |
+| `DIED2026-INT-0250235` (piloto) | `pendiente_validacion_excel` — incluido en Excel consolidado |
+| `DEBEDSAR2026-INT-0103251` (2do / robustez) | `pendiente_validacion_excel` — incluido en Excel consolidado |
+| `DIED2026-INT-0344746` | `pendiente_validacion_excel` — incluido en Excel consolidado |
+| `DEBE2026-INT-0316916` (nuevo 2026-04-21) | `pendiente_validacion_excel` — incluido en Excel consolidado |
+
+**Todos los 4 expedientes están en Excel y esperan validación humana.**
 
 ### Vocabulario tentativo — roles de expediente de prueba
 
@@ -227,4 +260,4 @@ Uso operativo (no es todavía un campo del JSON ni del Excel; es vocabulario hum
 
 ---
 
-*Última actualización: 2026-04-18 — pipeline de comprobantes extendido: bi_gravado + op_exonerada + op_inafecta agregados; monto_igv y monto_total con regex flexible; validado en 3 expedientes reales; 0 regresiones. Agregadas decisiones D-13…D-17 y políticas operativas (JSON fuente de verdad, política NULL, vocabulario tentativo de estados). Siguiente paso: validación de Excel vs cowork — ver `NEXT_STEP.md`.*
+*Última actualización: 2026-04-21 — 4to expediente (`DEBE2026-INT-0316916`) incorporado. Parsing determinista completado con oráculo SON en letras (+21 montos recuperados vs baseline), regex tolerantes OCR (IGV/V.V./I.T./RECARGO), cross-check físico 1.5×, cross-check suma. Validador refactorizado con jerarquía conceptual tributaria (GRAVADA/EXONERADA/INAFECTA/MIXTA) y estado_consistencia en 4 niveles. Excel final preparado con hoja `resumen`, orden por prioridad, columnas `tipo_tributario` / `flag_revision_manual` / `comentario_validacion`. OCR agresivo como 2da pasada implementado (recuperó 4/59 INSUFICIENTES). Agregadas decisiones D-18, D-19, D-20. **Fase abierta: pendiente validación humana del Excel** — ver [`NEXT_STEP.md`](NEXT_STEP.md).*

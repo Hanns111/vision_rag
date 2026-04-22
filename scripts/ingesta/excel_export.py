@@ -86,9 +86,16 @@ class ComprobanteExcel:
     bi_gravado: str
     op_exonerada: str
     op_inafecta: str
+    recargo_consumo: str
     confianza: float | str
     texto_resumen: str
+    estado_consistencia: str = ""       # OK | DIFERENCIA_LEVE | DIFERENCIA_CRITICA | DATOS_INSUFICIENTES
+    tipo_tributario: str = ""           # GRAVADA | EXONERADA | INAFECTA | MIXTA | NO_DETERMINABLE | ""
+    flag_revision_manual: str = ""      # "SI" si estado en {CRITICA, DATOS_INSUFICIENTES}
+    detalle_inconsistencia: str = ""    # explicación auditable, vacío si OK
+    clasificadores_gasto_expediente: str = ""  # lista propagada desde planilla/solicitud
     # columnas humanas
+    comentario_validacion: str = ""     # llenado humano libre durante revisión
     monto_correcto: str = ""
     ruc_correcto: str = ""
     proveedor_correcto: str = ""
@@ -169,10 +176,17 @@ _COLS_SISTEMA_COMP = [
     "bi_gravado",
     "op_exonerada",
     "op_inafecta",
+    "recargo_consumo",
+    "estado_consistencia",
+    "tipo_tributario",
+    "flag_revision_manual",
+    "detalle_inconsistencia",
     "confianza",
+    "clasificadores_gasto_expediente",
     "texto_resumen",
 ]
 _COLS_HUMANAS_COMP = [
+    "comentario_validacion",
     "monto_correcto",
     "ruc_correcto",
     "proveedor_correcto",
@@ -266,8 +280,15 @@ def _asdict_comp(c: ComprobanteExcel) -> dict[str, Any]:
         "bi_gravado": c.bi_gravado,
         "op_exonerada": c.op_exonerada,
         "op_inafecta": c.op_inafecta,
+        "recargo_consumo": c.recargo_consumo,
+        "estado_consistencia": c.estado_consistencia,
+        "tipo_tributario": c.tipo_tributario,
+        "flag_revision_manual": c.flag_revision_manual,
+        "detalle_inconsistencia": c.detalle_inconsistencia,
         "confianza": c.confianza,
+        "clasificadores_gasto_expediente": c.clasificadores_gasto_expediente,
         "texto_resumen": c.texto_resumen,
+        "comentario_validacion": c.comentario_validacion,
         "monto_correcto": c.monto_correcto,
         "ruc_correcto": c.ruc_correcto,
         "proveedor_correcto": c.proveedor_correcto,
@@ -397,6 +418,13 @@ def _escribir_hoja(
         "monto_correcto": 14,
         "ruc_correcto": 14,
         "proveedor_correcto": 28,
+        "recargo_consumo": 14,
+        "estado_consistencia": 22,
+        "tipo_tributario": 18,
+        "flag_revision_manual": 18,
+        "detalle_inconsistencia": 50,
+        "comentario_validacion": 36,
+        "clasificadores_gasto_expediente": 42,
         "tipo_correcto": 18,
         "monto_correcto": 14,
         "fecha_correcta": 14,
@@ -499,9 +527,157 @@ def exportar_excel(
             for col in _COLS_HUMANAS_COMP:
                 fila.setdefault(col, None)
             filas_comp.append(fila)
+
+        # Orden por prioridad de revisión humana:
+        # CRITICA → DATOS_INSUFICIENTES → DIFERENCIA_LEVE → OK → (vacío)
+        _prio = {
+            "DIFERENCIA_CRITICA": 0,
+            "DATOS_INSUFICIENTES": 1,
+            "DIFERENCIA_LEVE": 2,
+            "OK": 3,
+        }
+        filas_comp.sort(
+            key=lambda f: (
+                _prio.get(f.get("estado_consistencia") or "", 9),
+                f.get("expediente_id") or "",
+                int(f.get("pagina_inicio") or 0),
+            )
+        )
         _escribir_hoja(wb, "comprobantes", _COLS_COMP, filas_comp)
 
-    orden = ["documentos", "expedientes", "errores", "resolucion_ids", "comprobantes"]
+        # Hoja 'resumen' al inicio: métricas globales y por expediente.
+        _escribir_hoja_resumen(wb, filas_comp)
+
+    orden = ["resumen", "comprobantes", "documentos", "expedientes",
+             "errores", "resolucion_ids"]
     wb._sheets = [wb[n] for n in orden if n in wb.sheetnames]
     wb.save(xlsx_path)
     return xlsx_path
+
+
+def _escribir_hoja_resumen(wb: Any, filas_comp: list[dict[str, Any]]) -> None:
+    """Hoja de resumen ejecutivo: totales globales + % por estado +
+    desglose por expediente. Sin columnas humanas — solo lectura.
+    """
+    from collections import Counter
+    from openpyxl.styles import Alignment, Font, PatternFill
+    from openpyxl.utils import get_column_letter
+
+    if "resumen" in wb.sheetnames:
+        del wb["resumen"]
+    ws = wb.create_sheet("resumen")
+
+    header_fill = PatternFill("solid", fgColor="305496")
+    header_font = Font(bold=True, color="FFFFFF")
+    section_fill = PatternFill("solid", fgColor="D9E1F2")
+    section_font = Font(bold=True)
+    alert_fill = PatternFill("solid", fgColor="F8CBAD")  # naranja suave
+
+    total = len(filas_comp)
+    estados = Counter(f.get("estado_consistencia") or "(vacío)" for f in filas_comp)
+    tipos = Counter(f.get("tipo_tributario") or "(sin_clasificar)" for f in filas_comp)
+
+    def pct(n: int) -> str:
+        return f"{(100.0 * n / total):.1f}%" if total else "—"
+
+    row = 1
+    # Título
+    ws.cell(row=row, column=1, value="RESUMEN DE VALIDACION HUMANA").font = Font(bold=True, size=14)
+    row += 2
+
+    # Métrica global
+    ws.cell(row=row, column=1, value="Total comprobantes").font = section_font
+    ws.cell(row=row, column=2, value=total)
+    row += 2
+
+    # Tabla estado
+    ws.cell(row=row, column=1, value="Estado consistencia").fill = section_fill
+    ws.cell(row=row, column=1).font = section_font
+    ws.cell(row=row, column=2, value="Cantidad").fill = section_fill
+    ws.cell(row=row, column=2).font = section_font
+    ws.cell(row=row, column=3, value="%").fill = section_fill
+    ws.cell(row=row, column=3).font = section_font
+    row += 1
+    for est in ("DIFERENCIA_CRITICA", "DATOS_INSUFICIENTES", "DIFERENCIA_LEVE", "OK"):
+        n = estados.get(est, 0)
+        ws.cell(row=row, column=1, value=est)
+        ws.cell(row=row, column=2, value=n)
+        ws.cell(row=row, column=3, value=pct(n))
+        if est in ("DIFERENCIA_CRITICA", "DATOS_INSUFICIENTES"):
+            for col in (1, 2, 3):
+                ws.cell(row=row, column=col).fill = alert_fill
+        row += 1
+
+    # Flag revisión manual
+    revision = sum(1 for f in filas_comp if f.get("flag_revision_manual") == "SI")
+    row += 1
+    ws.cell(row=row, column=1, value="Requieren revisión manual (CRITICA + INSUFICIENTES)").font = section_font
+    ws.cell(row=row, column=2, value=revision)
+    ws.cell(row=row, column=3, value=pct(revision))
+    row += 2
+
+    # Tabla tipo tributario
+    ws.cell(row=row, column=1, value="Tipo tributario detectado").fill = section_fill
+    ws.cell(row=row, column=1).font = section_font
+    ws.cell(row=row, column=2, value="Cantidad").fill = section_fill
+    ws.cell(row=row, column=2).font = section_font
+    ws.cell(row=row, column=3, value="%").fill = section_fill
+    ws.cell(row=row, column=3).font = section_font
+    row += 1
+    for t in ("GRAVADA", "EXONERADA", "INAFECTA", "MIXTA", "NO_DETERMINABLE", "(sin_clasificar)"):
+        n = tipos.get(t, 0)
+        if n == 0:
+            continue
+        ws.cell(row=row, column=1, value=t)
+        ws.cell(row=row, column=2, value=n)
+        ws.cell(row=row, column=3, value=pct(n))
+        row += 1
+    row += 1
+
+    # Desglose por expediente
+    ws.cell(row=row, column=1, value="Desglose por expediente").fill = section_fill
+    ws.cell(row=row, column=1).font = section_font
+    ws.cell(row=row, column=2, value="Total").fill = section_fill
+    ws.cell(row=row, column=3, value="CRITICA").fill = section_fill
+    ws.cell(row=row, column=4, value="INSUFICIENTES").fill = section_fill
+    ws.cell(row=row, column=5, value="LEVE").fill = section_fill
+    ws.cell(row=row, column=6, value="OK").fill = section_fill
+    for col in range(1, 7):
+        ws.cell(row=row, column=col).font = section_font
+    row += 1
+
+    by_exp: dict[str, list[dict[str, Any]]] = {}
+    for f in filas_comp:
+        by_exp.setdefault(f.get("expediente_id") or "?", []).append(f)
+    for exp in sorted(by_exp):
+        fs = by_exp[exp]
+        c = Counter(f.get("estado_consistencia") or "" for f in fs)
+        ws.cell(row=row, column=1, value=exp)
+        ws.cell(row=row, column=2, value=len(fs))
+        ws.cell(row=row, column=3, value=c.get("DIFERENCIA_CRITICA", 0))
+        ws.cell(row=row, column=4, value=c.get("DATOS_INSUFICIENTES", 0))
+        ws.cell(row=row, column=5, value=c.get("DIFERENCIA_LEVE", 0))
+        ws.cell(row=row, column=6, value=c.get("OK", 0))
+        row += 1
+
+    # Nota de uso
+    row += 2
+    ws.cell(row=row, column=1, value="Instrucciones").font = section_font
+    row += 1
+    for nota in (
+        "1. Abrir hoja 'comprobantes' — filas están ordenadas por prioridad de revisión.",
+        "2. CRITICA y DATOS_INSUFICIENTES (flag_revision_manual='SI') requieren contraste con PDF.",
+        "3. Columna 'comentario_validacion' es para notas humanas libres.",
+        "4. Columnas amarillas ('monto_correcto', 'validacion_final', …) para cierre.",
+        "5. OK = suma componentes cuadra ±1.00; no requiere verificación salvo muestreo.",
+    ):
+        ws.cell(row=row, column=1, value=nota)
+        row += 1
+
+    # Anchos
+    ws.column_dimensions["A"].width = 52
+    ws.column_dimensions["B"].width = 14
+    ws.column_dimensions["C"].width = 14
+    ws.column_dimensions["D"].width = 16
+    ws.column_dimensions["E"].width = 12
+    ws.column_dimensions["F"].width = 10

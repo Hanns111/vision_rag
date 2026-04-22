@@ -30,6 +30,72 @@ _EXCLUDE_RAZON = re.compile(
 )
 
 
+# -------- Oráculo monto en letras (SON: <letras> CON/Y <nn>/100) -------------
+# Usado como cross-check determinista para monto_total. No inventa: solo
+# convierte la convención "SON:" (obligatoria en facturas peruanas).
+_NUMEROS_ES: dict[str, int] = {
+    "cero": 0, "un": 1, "uno": 1, "una": 1,
+    "dos": 2, "tres": 3, "cuatro": 4, "cinco": 5, "seis": 6, "siete": 7,
+    "ocho": 8, "nueve": 9, "diez": 10, "once": 11, "doce": 12, "trece": 13,
+    "catorce": 14, "quince": 15,
+    "dieciseis": 16, "dieciséis": 16, "diecisiete": 17, "dieciocho": 18,
+    "diecinueve": 19, "veinte": 20,
+    "veintiuno": 21, "veintidos": 22, "veintidós": 22, "veintitres": 23,
+    "veintitrés": 23, "veinticuatro": 24, "veinticinco": 25, "veintiseis": 26,
+    "veintiséis": 26, "veintisiete": 27, "veintiocho": 28, "veintinueve": 29,
+    "treinta": 30, "cuarenta": 40, "cincuenta": 50, "sesenta": 60,
+    "setenta": 70, "ochenta": 80, "noventa": 90,
+    "cien": 100, "ciento": 100,
+    "doscientos": 200, "trescientos": 300, "cuatrocientos": 400,
+    "quinientos": 500, "seiscientos": 600, "setecientos": 700,
+    "ochocientos": 800, "novecientos": 900,
+    "mil": 1000,
+}
+
+
+def _monto_desde_son(text: str) -> tuple[str | None, list[str]]:
+    """Parsea 'SON: CIENTO SESENTA CON 00/100' → '160.00'. Seguro: None si dudoso."""
+    # Tolera 'CON' o 'Y' como separador antes de los centavos, y '00/100',
+    # '00/106' (OCR ruido), etc.
+    m = re.search(
+        r"\bSON\s*[:.]?\s*([A-Za-zÁÉÍÓÚÑáéíóúñ\s]+?)\s+(?:CON|Y)\s+(\d{1,3})\s*/\s*1\d{2}",
+        text,
+        re.I,
+    )
+    if not m:
+        return None, []
+    letras_raw = m.group(1).strip()
+    letras = letras_raw.lower()
+    letras = re.sub(r"[áéíóú]", lambda x: "aeiou"["áéíóú".index(x.group(0))], letras)
+    try:
+        cent = int(m.group(2)[:2])
+        if cent > 99:
+            cent = 0
+    except Exception:
+        return None, []
+
+    total_entero = 0
+    bloque = 0
+    for palabra in letras.split():
+        if palabra in ("y", "con"):
+            continue
+        if palabra in ("soles", "sol", "nuevos", "peruanos", "moneda", "nacional"):
+            continue
+        val = _NUMEROS_ES.get(palabra)
+        if val is None:
+            # Palabra desconocida → abortar silencioso (no inventar).
+            return None, []
+        if val == 1000:
+            total_entero += max(bloque, 1) * 1000
+            bloque = 0
+        else:
+            bloque += val
+    total_entero += bloque
+    if total_entero <= 0:
+        return None, []
+    return f"{total_entero + cent / 100:.2f}", [m.group(0)[:120]]
+
+
 def _empty_trace_field(tipo: str) -> dict[str, Any]:
     return {"tipo_doc_inferido": tipo, "regla": None, "lineas_usadas": []}
 
@@ -226,10 +292,16 @@ def _factura_serie(text: str, head: str) -> tuple[str | None, str, list[str]]:
 
 def _bi_gravado(text: str) -> tuple[str | None, str, list[str]]:
     """Extrae base imponible gravada con prioridad de anclas y filtro anti-leyenda.
-    Prioridad: Valor Venta > Op. Gravada (sin leyenda) > SUBTOTAL > Base Imponible.
+    Prioridad: Valor Venta / V.V. > Op. Gravada (sin leyenda) > SUBTOTAL VENTAS
+    > SUBTOTAL > Base Imponible.
     """
     tflat = re.sub(r"\s+", " ", text)
-    m = re.search(r"Valor\s+Venta[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})", tflat, re.I)
+    # "Valor Venta" o "V.V." o "VV" — alias para base gravable
+    m = re.search(
+        r"(?:Valor\s+Venta|\bV\s*\.?\s*V\s*\.?)[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})",
+        tflat,
+        re.I,
+    )
     if m:
         v = _norm_amount_str(m.group(1))
         if v:
@@ -257,8 +329,85 @@ def _bi_gravado(text: str) -> tuple[str | None, str, list[str]]:
     return None, "bi_gravado_none", []
 
 
+def _recargo_consumo(text: str) -> tuple[str | None, str, list[str]]:
+    """Extrae recargo al consumo / servicio 10% con regex tolerante a OCR.
+
+    Tolerancias: O↔0 (CONSUMO ↔ C0NSUM0), I↔1 (SERVICIO ↔ SERV1C1O).
+    La letra inicial (R, S) NO se flexibiliza para evitar falsos positivos —
+    la convención peruana siempre imprime la palabra completa.
+
+    Anclas aceptadas (por prioridad, más específica primero):
+      - RECARGO AL CONSUMO / RECARG0 AL C0NSUM0
+      - RECARGO (solo, con número en la misma línea)
+      - SERVICIO 10% / SERV1C1O 10% (explícito con porcentaje)
+      - SERVICE CHARGE (inglés, hoteles 5-estrellas)
+
+    Ignora líneas con `$` o 'Sin impuestos' (leyendas legales) y la frase
+    'COMISION DE SERVICIOS' (motivo de viaje, no recargo al consumo).
+
+    Devuelve (valor | None, regla, lineas_usadas). NO infiere: si no encuentra
+    ancla explícita con número adjunto, devuelve None.
+    """
+    # RECARGO: tolerar O→0 en ambos 'O' de CONSUMO y el final de RECARGO.
+    # SERVICIO: tolerar I→1 en ambos 'I' y O→0 al final.
+    patrones = [
+        # RECARGO AL CONSUMO (más específico)
+        (
+            r"\bR[Ee]C[Aa4]RG[O0]\s*(?:AL\s+)?\s*C[O0]NSUM[O0]\s*"
+            r"[:.]?\s*(?:\(?S\s*[/7]?\)?)?[\s:]*(\d+[.,]\d{2})",
+            "recargo_al_consumo",
+        ),
+        # RECARGO (solo) + número
+        (
+            r"\bR[Ee]C[Aa4]RG[O0]\b\s*(?:\(\s*\d+\s*%?\s*\))?\s*"
+            r"[:.]?\s*(?:\(?S\s*[/7]?\)?)?[\s:]*(\d+[.,]\d{2})",
+            "recargo_solo",
+        ),
+        # SERVICIO 10% / SERV1C1O 10% (ancla con porcentaje obligatoria)
+        (
+            r"\bSERV[I1L][Cc][I1L][O0]\s*"
+            r"\(?\s*(?:10|5|8)\s*%?\s*\)?\s*"
+            r"[:.]?\s*(?:\(?S\s*[/7]?\)?)?[\s:]*(\d+[.,]\d{2})",
+            "servicio_porcentaje",
+        ),
+        # SERVCIO (OCR se comió una I) + % + número
+        (
+            r"\bSERV[Cc][I1L][O0]\s*\(?\s*(?:10|5|8)\s*%?\s*\)?\s*"
+            r"[:.]?\s*(?:\(?S\s*[/7]?\)?)?[\s:]*(\d+[.,]\d{2})",
+            "servcio_porcentaje_ocr",
+        ),
+        # SERVICE CHARGE (inglés, hoteles internacionales)
+        (
+            r"\bSERVICE\s+CHARGE\s*[:.]?\s*(?:\(?S\s*[/7]?\)?)?[\s:]*(\d+[.,]\d{2})",
+            "service_charge_en",
+        ),
+    ]
+    for linea in text.splitlines():
+        # Filtros anti-falso-positivo
+        if "$" in linea or re.search(r"Sin\s+impuestos", linea, re.I):
+            continue
+        if re.search(r"COMISI[OÓ]N\s+DE\s+SERVICI", linea, re.I):
+            continue
+        if re.search(r"ORDEN\s+DE\s+SERVICIO|CONTRATACI[OÓ]N\s+DE\s+SERVICIO", linea, re.I):
+            continue
+        for pat, nombre in patrones:
+            m = re.search(pat, linea, re.I)
+            if m:
+                v = _norm_amount_str(m.group(1))
+                if v is not None and float(v) > 0:
+                    return v, nombre, [linea.strip()[:120]]
+    return None, "recargo_consumo_none", []
+
+
 def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
-    """Devuelve dict subkeys + regla + líneas usadas (fragmentos)."""
+    """Devuelve dict subkeys + regla + líneas usadas (fragmentos).
+
+    Estrategia multi-fuente + validación cruzada:
+      1. Regex por etiqueta (como antes) para cada campo.
+      2. Oráculo SON: <letras>/100 como cross-check para monto_total.
+      3. Validación cruzada: descartar componentes (exo/ina/bi) que exceden
+         monto_total × 3 (síntoma de columna pegada por OCR).
+    """
     tflat = re.sub(r"\s+", " ", text)
     lineas: list[str] = []
     sub = igv = tot = None
@@ -279,9 +428,16 @@ def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
     if not sub:
         sub = grab(r"SUB\s*TOTAL(?:\s+Ventas)?\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_subtotal_label")
 
-    igv = grab(r"\bIGV\s*[:.]*\s*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})", "monto_igv")
+    # IGV tolerante a OCR: I[GY05]V, 1[GY5]V, IBV. Requiere frontera de palabra.
+    igv = grab(
+        r"\b(?:IGV|IGY|I[05]V|1[5G]V|IBV)\s*[:.]*\s*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})",
+        "monto_igv",
+    )
     if not igv:
-        igv = grab(r"Total\s+I\.?G\.?V\.?[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})", "monto_igv_total")
+        igv = grab(
+            r"Total\s+I\.?G\.?V\.?[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})",
+            "monto_igv_total",
+        )
 
     tot = grab(r"Total\s+a\s+pagar\s*:?\s*S/?\s*([\d]+[.,]\d{2})", "monto_total_pagar")
     if not tot:
@@ -292,10 +448,48 @@ def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
             "monto_importe_total",
         )
     if not tot:
+        # "IMPORTE A PAGAR" — común en Marcoantonio; acepta la etiqueta aunque
+        # esté partida en dos líneas (la comparación se hace sobre tflat).
+        tot = grab(
+            r"IMPORTE\s+A\s+PAGAR\s*[:.]?\s*(?:S/?)?\s*[:.]?\s*([\d]+[.,]\d{2})",
+            "monto_importe_a_pagar",
+        )
+    if not tot:
+        # Alias "IT" ("Importe Total") — abreviado común en papeles compactos.
+        # Ancla estricta: I.T. o IT rodeado por no-letras para evitar falsos positivos.
+        tot = grab(
+            r"(?:\bI\s*\.?\s*T\s*\.?\b)\s*[:.]?\s*(?:\(?S/?\)?)?[\s:]*([\d]+[.,]\d{2})",
+            "monto_it_abreviado",
+        )
+    if not tot:
         tot = grab(
             r"(?<![Ss][Uu][Bb]\s)\bTotal[:\s]*(?:\(?S/?\)?)?[:\s]*([\d]+[.,]\d{2})",
             "monto_total_generico",
         )
+
+    # Oráculo SON: <letras>/100 — cross-check determinista.
+    tot_son, son_lines = _monto_desde_son(text)
+    if tot_son:
+        if not tot:
+            tot = tot_son
+            reglas.append("monto_total_son_letras")
+            lineas.extend(son_lines)
+        else:
+            # Validar concordancia. Si difieren en más del 10% o en más de
+            # 1.00 absoluto, preferir SON: (convención legal peruana).
+            try:
+                a = float(tot)
+                b = float(tot_son)
+                delta = abs(a - b)
+                rel = delta / max(b, 0.01)
+                if delta > 1.0 and rel > 0.10:
+                    tot = tot_son
+                    reglas.append("monto_total_son_override")
+                    lineas.extend(son_lines)
+                else:
+                    reglas.append("monto_total_son_concuerda")
+            except Exception:
+                pass
 
     bi, bi_reg, bi_lines = _bi_gravado(text)
     if bi:
@@ -317,8 +511,61 @@ def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
                     return v
         return None
 
-    exo = _grab_op(r"Op\.?\s*Exonerada", "op_exonerada")
-    ina = _grab_op(r"Op\.?\s*Inafecta", "op_inafecta")
+    # Acepta plural (EXONERADA/EXONERADAS, INAFECTA/INAFECTAS).
+    exo = _grab_op(r"Op\.?\s*Exonerada[s]?", "op_exonerada")
+    ina = _grab_op(r"Op\.?\s*Inafecta[s]?", "op_inafecta")
+
+    # --- Recargo al consumo (servicio 10%) con regex tolerante a OCR ---
+    rec, rec_reg, rec_lines = _recargo_consumo(text)
+    if rec is not None:
+        reglas.append(rec_reg)
+        lineas.extend(rec_lines)
+
+    # --- Validación cruzada: descartar componente físicamente imposible ---
+    # En una factura, ningún componente individual (bi_gravado, op_exonerada,
+    # op_inafecta, recargo_consumo) debe superar 1.5× monto_total. Cuando esto
+    # ocurre, es casi seguramente OCR pegando dígitos de columnas adyacentes.
+    # Ejemplo real: total=160.00, op_exonerada="460.00" o "4160.00" (el "4"
+    # viene de la columna IMPORTE anterior). Se rechaza y queda None + traza.
+    if tot is not None:
+        try:
+            tot_f = float(tot)
+            componentes = [("bi_gravado", bi), ("op_exonerada", exo),
+                           ("op_inafecta", ina), ("recargo_consumo", rec)]
+            for nombre, val in componentes:
+                if val is None:
+                    continue
+                try:
+                    vf = float(val)
+                except Exception:
+                    continue
+                if tot_f > 0 and vf > tot_f * 1.5:
+                    reglas.append(f"{nombre}_descartado_por_crosscheck")
+                    if nombre == "bi_gravado":
+                        bi = None
+                    elif nombre == "op_exonerada":
+                        exo = None
+                    elif nombre == "op_inafecta":
+                        ina = None
+                    elif nombre == "recargo_consumo":
+                        rec = None
+        except Exception:
+            pass
+
+    # --- Validación cruzada suma: bi + igv + recargo ≈ total (tolerancia ±1.00) ---
+    # Solo informativo (anotación en traza). NO modifica valores: si la suma
+    # difiere es evidencia de componente faltante u OCR roto, decisión humana.
+    if tot is not None and bi is not None and igv is not None:
+        try:
+            tot_f = float(tot); bi_f = float(bi); igv_f = float(igv)
+            rec_f = float(rec) if rec is not None else 0.0
+            suma = bi_f + igv_f + rec_f
+            if abs(tot_f - suma) <= 1.00:
+                reglas.append("crosscheck_suma_ok")
+            else:
+                reglas.append(f"crosscheck_suma_difiere_{tot_f - suma:+.2f}")
+        except Exception:
+            pass
 
     regla = "+".join(reglas) if reglas else "monto_none"
     return (
@@ -329,6 +576,7 @@ def _factura_montos(text: str) -> tuple[dict[str, str | None], str, list[str]]:
             "bi_gravado": bi,
             "op_exonerada": exo,
             "op_inafecta": ina,
+            "recargo_consumo": rec,
         },
         regla,
         lineas,
