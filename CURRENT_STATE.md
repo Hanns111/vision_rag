@@ -83,6 +83,22 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 ---
 
+## Entorno real de ejecución (verificado 2026-04-21)
+
+| Aspecto | Valor |
+|---|---|
+| Sistema operativo | Windows 11 (NT-10.0-26200) |
+| Shell de trabajo | Git Bash / MINGW64 (`bash 5.2.37`) |
+| Python | 3.14.3 Windows nativo (`C:\Python314\python.exe`) |
+| GPU instalada | **NVIDIA GeForce RTX 5090 Laptop** (24 GB VRAM, driver 581.83) — **NO usada por el pipeline actual** |
+| OpenCV | 4.13.0 con **0 dispositivos CUDA habilitados** (compilado sin CUDA) |
+| Tesseract | 5.4.0 — **CPU-only por diseño** |
+| WSL / Linux nativo | **no activo** en la ejecución actual |
+
+**Implicación operativa**: el pipeline corre 100% en CPU sobre Windows + Git Bash. La RTX 5090 está presente pero ninguna capa del sistema la explota hoy (D-05 PaddleOCR sigue abierta como opción futura; D-12 preferencia WSL aplica a bake-off PASO 2, no al pipeline actual).
+
+---
+
 ## Pipeline de comprobantes — estado técnico (2026-04-21)
 
 > **Estado de fase:** Excel final preparado para revisión humana, **fase NO cerrada**.
@@ -139,6 +155,21 @@ El sistema, en condiciones normales de corpus e índice generado:
 - **Boletas EB01 simplificadas**: el PDF imprime `OP.GRAVADA: 0.00 / EXONERADA: 0.00 / INAFECTA: 0.00` sin base real → clasificador las marca `DATOS_INSUFICIENTES` (honesto).
 - **Restaurantes con decimales OCR-truncados (`S/ 80.0C`, `Si 4?.0;`)**: glifos rotos en imagen original, irrecuperables por preprocesamiento.
 - **DIED-0250235**: OCR globalmente degradado → 24/29 son `DATOS_INSUFICIENTES`. Requiere reescaneo o validación manual completa.
+
+### Transición del cuello de botella (2026-04-21)
+
+Desde el baseline pre-SON (D-16, 2026-04-18) el cuello de botella ha evolucionado:
+
+1. **Bottleneck histórico (pre-2026-04-18)**: OCR global (calidad de lectura página a página).
+2. **Bottleneck intermedio (2026-04-18)**: interpretación semántica / parsing (jerarquía de anclas, filtros anti-leyenda). Atacado con SON, regex tolerantes, cross-check, validador tributario por tipo.
+3. **Bottleneck actual (post-OCR-agresivo 2026-04-21)**: **layout / geometría / segmentación por regiones**. El OCR agresivo global ya alcanzó su techo (+4/59 recuperados = 6.8%). Los 55 casos residuales ya no son recuperables con más preprocesamiento de página completa; requieren:
+   - lectura por BBoxes / ROI geométrico (columnas, celdas individuales), o
+   - reconocimiento por plantilla del emisor (Marcoantonio vs Salchipapería vs SUNAT EB01), o
+   - información física recuperable solo por reescaneo (decimales pixel-truncados).
+
+**Decisión operativa**: no iterar más preprocesamiento OCR global. Ver D-22. Exploración de ROI geométrico queda como línea futura (ya documentada en D-11), condicionada al cierre de validación humana de esta fase.
+
+---
 
 ### OCR agresivo como segunda pasada (2026-04-21)
 
@@ -211,6 +242,66 @@ Uso operativo (no es todavía un campo del JSON ni del Excel; es vocabulario hum
 
 - Formalizar los estados de expediente como campo del `expediente.json` — hoy es solo vocabulario humano.
 - Definir umbral cuantitativo para migrar el Excel de evidencia versionada a artefacto de salida (D-17).
+
+---
+
+## Política de versionado del Excel de validación (vigente desde 2026-04-21)
+
+Regla operativa vinculante. Detalle formal en **D-23** de [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md).
+
+1. **`data/piloto_ocr/metrics/validacion_expedientes.xlsx` es un artefacto de validación humana**, no la fuente técnica principal.
+2. **La fuente de verdad técnica** es el JSON consolidado por expediente (`control_previo/procesados/<id>/expediente.json`) y la lógica determinista del pipeline. Ante discrepancia, manda el JSON. Ver D-13.
+3. **El Excel NO se commitea automáticamente** durante iteraciones del pipeline. Se regenera libremente en disco local; no entra a Git por defecto.
+4. **El Excel solo puede versionarse cuando Hans indique explícitamente** una frase equivalente a:
+   - `EXCEL VALIDADO`
+   - `AUTORIZADO PARA VERSIONAR`
+5. Mientras el Excel esté en revisión o en estado provisional:
+   - puede generarse y regenerarse con `python scripts/ingest_expedientes.py export`
+   - puede usarse localmente para trabajo humano (rellenar columnas amarillas)
+   - **NO debe entrar en `git add` / `git commit` / `git push`** salvo autorización explícita
+6. Cuando Hans autorice versionar, el commit de evidencia debe describir **exactamente** qué expedientes y qué cobertura refleja (regla ya vigente del commit de evidencia).
+
+**Estado actual del archivo:** está versionado en Git desde commits previos (evidencia incremental de turnos de trabajo). La regla anterior aplica **desde ahora hacia adelante**: no se agregará el `.xlsx` a nuevos commits sin autorización explícita. La opción de `git rm --cached` + migración a carpeta `artifacts/` queda como acción futura según D-17 / D-23.
+
+### Protección operativa aplicada (2026-04-21)
+
+Para que la regla sea efectiva sin requerir un commit ahora, se aplicaron **dos medidas locales**:
+
+1. **`.gitignore`** — agregada entrada explícita para `data/piloto_ocr/metrics/validacion_expedientes.xlsx`. Queda activa el día que el archivo deje de estar trackeado (cuando Hans autorice `git rm --cached`).
+2. **`git update-index --skip-worktree <path>`** — flag local aplicado sobre el archivo. Efecto inmediato: Git ignora cambios en el archivo en `git status`, `git add .`, `git commit -a`. El `.xlsx` **no puede entrar accidentalmente en commits** mientras esta bandera esté activa.
+
+**Cómo se ve en `git ls-files -v`**: fila con prefijo `S` (skip-worktree).
+
+### Cómo desproteger temporalmente para un commit autorizado
+
+Cuando Hans autorice explícitamente versionar el Excel (frase equivalente a `EXCEL VALIDADO` / `AUTORIZADO PARA VERSIONAR`), el procedimiento es:
+
+```bash
+# 1. Quitar skip-worktree para que Git vea el archivo modificado
+git update-index --no-skip-worktree data/piloto_ocr/metrics/validacion_expedientes.xlsx
+
+# 2. Stagear y commitear con mensaje describiendo expedientes y cobertura reflejada
+git add data/piloto_ocr/metrics/validacion_expedientes.xlsx
+git commit -m "evidence: Excel validado — <expedientes, estado, cobertura>"
+
+# 3. Re-aplicar skip-worktree para que siga protegido después del commit
+git update-index --skip-worktree data/piloto_ocr/metrics/validacion_expedientes.xlsx
+
+# 4. (opcional) push
+git push origin main
+```
+
+### Nota sobre otras copias / clones del repo
+
+`skip-worktree` es **local a cada clone del repositorio**. Si Hans trabaja desde otra máquina o hace un clone nuevo, debe re-aplicar:
+
+```bash
+git update-index --skip-worktree data/piloto_ocr/metrics/validacion_expedientes.xlsx
+```
+
+Esta instrucción queda en D-23 del catálogo de decisiones.
+
+---
 
 ---
 

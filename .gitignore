@@ -36,6 +36,13 @@ data/*
 !data/piloto_ocr/
 !data/piloto_ocr/**
 
+# Excel de validación humana — artefacto, no fuente canónica (D-23).
+# Se regenera localmente con `python scripts/ingest_expedientes.py export`.
+# NO versionar sin autorización explícita de Hans ("EXCEL VALIDADO" /
+# "AUTORIZADO PARA VERSIONAR"). Para desproteger temporalmente y permitir
+# un commit autorizado ver la sección "Política Excel" en CURRENT_STATE.md.
+data/piloto_ocr/metrics/validacion_expedientes.xlsx
+
 # Dumps y logs
 *.log
 *.jsonl

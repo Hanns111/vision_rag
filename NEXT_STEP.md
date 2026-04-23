@@ -55,10 +55,11 @@ Mientras tanto, el estado operativo del proyecto es **"pipeline técnicamente es
 
 ### Qué NO hacer todavía
 
-- **No iterar más OCR** — el OCR agresivo ya corrió y alcanzó su techo (+4/59 recuperados, ~6.8%). Los 55 restantes no son recuperables solo con preprocesamiento.
-- **No agregar más campos contables** (recargo_consumo, ISC, Otros Tributos ya están o no aplican).
+- **No iterar más OCR global** — el OCR agresivo ya corrió y alcanzó su techo (+4/59 recuperados, ~6.8%). Los 55 restantes no son recuperables solo con preprocesamiento global. Ver D-22.
+- **No agregar más campos contables** (ISC, Otros Tributos, FISE, Monto de redondeo) hasta cerrar validación humana de esta fase. `recargo_consumo` ya está implementado y latente.
 - **No abrir integración AG-EVIDENCE**.
 - **No refactorizar el Excel** — el esquema actual (26 columnas) basta para validación humana.
+- **No commitear el Excel automáticamente** — queda en estado provisional hasta autorización explícita de Hans (`EXCEL VALIDADO` / `AUTORIZADO PARA VERSIONAR`). Ver D-23.
 
 ---
 
@@ -72,9 +73,10 @@ Mientras tanto, el estado operativo del proyecto es **"pipeline técnicamente es
 ## Referencias rápidas
 
 - Estado técnico completo: [`CURRENT_STATE.md`](CURRENT_STATE.md)
-- Decisiones D-01…D-17: [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md)
-- Regenerar Excel tras cambios: `python scripts/ingest_expedientes.py export`
+- Decisiones D-01…D-23: [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md)
+- Regenerar Excel localmente (no versionar): `python scripts/ingest_expedientes.py export`
 - Reprocesar un expediente puntual: `python scripts/ingest_expedientes.py run-all --src <carpeta> --expediente-id <id>`
+- **Política Excel**: el `.xlsx` NO se commitea automáticamente hasta que Hans autorice con frase equivalente a `EXCEL VALIDADO` / `AUTORIZADO PARA VERSIONAR`. Ver D-23.
 
 ---
 
