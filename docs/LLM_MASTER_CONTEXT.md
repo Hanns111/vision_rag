@@ -1054,4 +1054,76 @@ La integración al repo solo procede si se cumplen todas estas condiciones:
 
 ---
 
+---
+
+## 17. VALIDACIÓN OCR DJ — CUELLO DE BOTELLA CONFIRMADO (2026-04-22)
+
+Tras validación humana contra el PDF del expediente `DEBE2026-INT-0316916` y
+análisis empírico del `ocr_cache/*.txt`, se confirma un diagnóstico que altera
+las prioridades operativas de mejora:
+
+### 17.1 Evidencia resumida
+
+- **PDF real (validación humana):** 21 ítems DJ, total S/ 165.00.
+- **OCR cache (Tesseract baseline):** 19 líneas con fecha en la región `ANEXO N°4`.
+- **2 ítems enteros** se perdieron en la transcripción OCR de la página 2 del Anexo 4 (la página llega al OCR solo con header + intro, sin filas de datos).
+- De los 19 visibles: **7 con importe bien formado** (`5.00`, `6.00`) + **12 con importe corrupto o ilegible** (`500`, `2500`, `ali`, `—`, `Te`, `OO`).
+- El total impreso `I TOTAL Sé | 165.00` **sí aparece correctamente en el OCR** — el dato existe pero no se desglosa por fila.
+
+### 17.2 Tipos de error OCR observados
+
+| Tipo | Ejemplos literales del OCR | Cantidad |
+|---|---|---|
+| Punto decimal perdido | `MOVILIDAD 2500`, `MOVILIDAD 500` | 6 |
+| Carácter ilegible en lugar de número | `MOVILIDAD ali`, `—`, `Te`, `OO` | 4 |
+| Importe no transcrito | línea sin cifra tras `MOVILIDAD` | 2 |
+| Año OCR erróneo | `24/03/2028` en primera fila (debería 2026) | 1 |
+| Concepto recortado | `VILIDAD` por `MOVILIDAD` | 1+ |
+| "TAX!" por "TAXI" | `TAX!`, `TAX)`, `TAX]` | múltiples |
+
+### 17.3 Confirmación de que el parser está correcto
+
+El parser post-fix
+(`sandbox_test_cowork_v2/.../rules/dj_anexo3_conceptos.py::extraer_items_dj`)
+captura **19 / 19** líneas visibles en el OCR, asigna `numero_item` (1..19)
+y `pagina_pdf` (3) a cada una. Aplica regex estricto
+`\d+[\.,\s]\d{2}` para importes, aceptando los 7 bien formados
+(Σ S/ 53.04) y marcando los 12 restantes como `IMPORTE_ILEGIBLE_PENDIENTE`
+para revisión humana. El saneamiento auxiliar `R-AUX-DJ-SANEAMIENTO`
+activa **0 descartes**. El parser funciona correctamente sobre el input
+que tiene.
+
+### 17.4 Conclusión: OCR upstream es el cuello de botella
+
+> El cuello de botella actual es **OCR Tesseract sobre la tabla del
+> Anexo 4 del PDF de rendición**, no el parsing DJ ni el Excel. Ningún
+> refinamiento adicional al parser puede recuperar los 2 ítems perdidos
+> ni los 12 importes corruptos sin caer en heurística prohibida
+> ("rescatar importes DJ mal leídos" fue explícitamente vetado). La
+> corrección que cierra la brecha 19→21 ítems y S/53→S/165 es una
+> **segunda pasada OCR focalizada en la región DJ** (patrón análogo a
+> `scripts/ingesta/ocr_region_totales.py` ya existente para totales de
+> CPs), con DPI elevada y preprocesado orientado a tablas. **Esa
+> intervención vive en el repo `vision_rag`, fuera del sandbox**.
+
+### 17.5 Implicación para el Excel de revisión humana
+
+- El Excel sandbox `AUDIT_HUMANO_DEBE2026-INT-0316916.xlsx` reporta
+  correctamente lo que el OCR expone: 19 ítems trazables, 7 legibles
+  (Σ S/ 53.04) + 12 pendientes con importe 0.00 y observación
+  `IMPORTE_ILEGIBLE_PENDIENTE`.
+- Esa salida es **honesta y reproducible**, pero **no completa**.
+  Completarla exige (a) mejorar el OCR upstream o (b) completar
+  manualmente los 12 pendientes durante revisión humana.
+- Ningún cambio adicional en el sandbox puede cerrar la brecha sin
+  tocar el pipeline del repo.
+
+### 17.6 Evidencia completa
+
+Ver `docs/evidencia/ocr_dj_diagnostico_2026-04-22.md` para el detalle
+con volcado literal del OCR, conteos, clasificación de errores y
+referencias cruzadas de archivos.
+
+---
+
 **Fin del documento.** Este archivo debe regenerarse manualmente cuando el estado real del proyecto cambie sustancialmente (nueva fase, nueva decisión D-24+, cambio de entorno, cierre de validación humana, integración del sandbox).

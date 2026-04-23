@@ -425,3 +425,40 @@ Tras la validación humana:
 ---
 
 *Cierre de sesión: 2026-04-14. Sistema consolidado, documentado y listo para validación humana.*
+
+---
+
+## VALIDACIÓN OCR DJ — CUELLO DE BOTELLA CONFIRMADO (2026-04-22)
+
+### Contexto
+- Validación humana completada contra PDF del expediente `DEBE2026-INT-0316916`.
+- Ronda previa (sandbox) aplicó reescritura acotada al parser DJ con schemas ampliados (`numero_item`, `pagina_pdf`) y regex de importe endurecido a 2 decimales obligatorios.
+- Pese al fix del parser, el Excel DJ sigue reportando S/ 53.04 en lugar de S/ 165.00 (PDF real) y 19 ítems en lugar de 21.
+
+### Evidencia (contrastada con OCR cache)
+- `ocr_cache/.../2026042110383RENDICION*.pdf.txt` región Anexo 4: **19 líneas con fecha**; el PDF tiene **21 ítems**.
+- **2 ítems perdidos enteros** en la transcripción OCR de página 2 del Anexo 4 (solo llega header + intro).
+- Sobre las 19 líneas visibles:
+  - 7 importes bien formados (`5.00`/`6.00`) → Σ S/ 53.04.
+  - 12 importes corruptos o ilegibles: `500`, `2500`, `ali`, `—`, `Te`, `OO`, vacío.
+- El total impreso `I TOTAL Sé | 165.00` **sí aparece en el OCR** (dato íntegro existe a nivel agregado, no a nivel fila).
+
+### Confirmación del parser
+- Parser sandbox post-fix captura 19/19 líneas visibles con `numero_item` (1..19) y `pagina_pdf` (3).
+- Saneamiento auxiliar `R-AUX-DJ-SANEAMIENTO` activa 0 descartes.
+- El parser **no tiene más espacio de mejora** sin violar la regla "sin rescatar importes DJ mal leídos".
+
+### Conclusión
+> **El cuello de botella actual es OCR upstream (Tesseract sobre la tabla del Anexo 4), no parsing DJ ni Excel.**
+
+### Siguiente corrección (bloqueada hoy)
+- Segunda pasada OCR focalizada en región DJ del PDF de rendición.
+- Ubicación: `scripts/ingesta/` del repo (patrón análogo a `ocr_region_totales.py` para CPs).
+- **Vive en el repo**, fuera del sandbox → requiere autorización explícita para tocar pipeline.
+
+### Evidencia completa
+- `docs/evidencia/ocr_dj_diagnostico_2026-04-22.md`
+- `docs/LLM_MASTER_CONTEXT.md` sección 17
+- `docs/SESSION_HANDOFF_NEXT_CHAT.md` sección F
+
+*Cierre OCR DJ diagnóstico: 2026-04-22. Problema localizado en OCR upstream. Parser y Excel validados como correctos.*

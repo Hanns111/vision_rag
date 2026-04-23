@@ -140,3 +140,48 @@ cat docs/LLM_MASTER_CONTEXT.md          # leer completo (§16 obligatorio)
 
 Si `git status` muestra cambios en `scripts/` o `agent_sandbox/` → investigar antes de proceder.
 Si no muestra nada en código: confirma que el sandbox no tocó el repo → todo OK para continuar según lo que Hans pida.
+
+---
+
+## F. VALIDACIÓN OCR DJ — CUELLO DE BOTELLA CONFIRMADO (2026-04-22)
+
+**Hallazgo crítico validado empíricamente en la sesión 2026-04-22:**
+el problema del DJ del expediente `DEBE2026-INT-0316916` **no está en el
+parser ni en el Excel**; está en el **OCR upstream**.
+
+### Evidencia resumida
+- PDF real: **21 ítems DJ**, total S/ 165.00.
+- OCR cache: **19 líneas** con fecha en la región Anexo 4 → 2 ítems enteros perdidos.
+- De esas 19 líneas: **7 importes bien formados + 12 corruptos/ilegibles** (`500`, `2500`, `ali`, `—`, `Te`, `OO`).
+- El total S/ 165.00 **sí se transcribe correctamente** en el OCR — el desglose por fila es lo que falla.
+
+### Confirmación del parser
+- Parser post-fix (sandbox) captura 19/19 líneas visibles.
+- Asigna `numero_item` (1..19) y `pagina_pdf` (3).
+- Aplica regex estricto `\d+[\.,\s]\d{2}` → 7 parseables (Σ S/ 53.04) + 12 pendientes marcados `IMPORTE_ILEGIBLE_PENDIENTE`.
+- Saneamiento auxiliar `R-AUX-DJ-SANEAMIENTO`: **0 descartes**.
+
+### Conclusión
+**OCR upstream es el bloqueo técnico actual, no parsing.**
+
+### Qué sigue mañana (primera corrección si se autoriza)
+
+Segunda pasada OCR focalizada en la región DJ del PDF de rendición.
+Patrón análogo a `scripts/ingesta/ocr_region_totales.py` (ya existe para
+totales de CPs), con DPI 600-800, binarización adaptativa, y opcionalmente
+`pytesseract.image_to_data` para reconstruir importes celda a celda.
+
+**Ubicación:** repo `vision_rag`, carpeta `scripts/ingesta/`. **Fuera del sandbox.**
+**Requiere:** autorización explícita para tocar pipeline principal
+(hoy, bajo el guardián, esa autorización NO está dada).
+
+### Evidencia completa
+
+`docs/evidencia/ocr_dj_diagnostico_2026-04-22.md` — volcado literal del
+OCR, conteos, clasificación de errores, referencias cruzadas.
+
+### Mantra para el continuador
+
+- **NO intentar arreglar DJ tocando más el parser.** Está correcto — se validó.
+- **NO interpretar "500" como "5.00"** — heurística prohibida por decisión del usuario.
+- Si el continuador pregunta "¿qué pasa con el total DJ?", la respuesta es: **OCR upstream, no parser**. Referenciar esta sección y el archivo de evidencia.
