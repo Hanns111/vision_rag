@@ -46,6 +46,7 @@ from modelo.expediente import (  # noqa: E402
     FlujoFinanciero,
     SCHEMA_VERSION,
 )
+from modelo.consistencia_tributaria import evaluar_consistencia  # noqa: E402
 from ingesta.id_resolver import detectar_candidatos  # noqa: E402
 
 
@@ -325,6 +326,16 @@ def consolidar(exp_dir: Path | str) -> Expediente:
             if h in hashes_vistos:
                 continue
             hashes_vistos.add(h)
+            # PRE-PASO 4.5 (D-24): consistencia tributaria se calcula y persiste
+            # aquí, no en el exportador. Fuente única de verdad por comprobante.
+            estado_cons, tipo_trib, detalle_cons = evaluar_consistencia(
+                c_raw.get("monto_total"),
+                c_raw.get("bi_gravado"),
+                c_raw.get("monto_igv"),
+                c_raw.get("op_exonerada"),
+                c_raw.get("op_inafecta"),
+                c_raw.get("recargo_consumo"),
+            )
             comprobantes_agg.append(
                 Comprobante(
                     archivo=c_raw.get("archivo", ""),
@@ -332,6 +343,7 @@ def consolidar(exp_dir: Path | str) -> Expediente:
                     pagina_fin=int(c_raw.get("pagina_fin", 0) or 0),
                     tipo=c_raw.get("tipo", "desconocido"),
                     ruc=c_raw.get("ruc"),
+                    ruc_receptor=c_raw.get("ruc_receptor"),
                     razon_social=c_raw.get("razon_social"),
                     serie_numero=c_raw.get("serie_numero"),
                     fecha=c_raw.get("fecha"),
@@ -345,6 +357,9 @@ def consolidar(exp_dir: Path | str) -> Expediente:
                     confianza=float(c_raw.get("confianza", 0.0) or 0.0),
                     hash_deduplicacion=h,
                     texto_resumen=c_raw.get("texto_resumen", ""),
+                    estado_consistencia=estado_cons,
+                    tipo_tributario=tipo_trib,
+                    detalle_inconsistencia=detalle_cons,
                 )
             )
 

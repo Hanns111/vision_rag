@@ -61,6 +61,7 @@ def extraer_de_bloque(bloque) -> Comprobante:
     if not ruc and bloque.rucs_candidatos:
         # fallback: primer RUC del bloque
         ruc = bloque.rucs_candidatos[0]
+    ruc_receptor = fields.get("ruc_receptor")
 
     serie = fields.get("serie_numero") or bloque.serie_tentativa
     razon = getattr(bloque, "razon_social_tentativa", None) or fields.get("razon_social_emisor")
@@ -97,6 +98,7 @@ def extraer_de_bloque(bloque) -> Comprobante:
         pagina_fin=bloque.pagina_fin,
         tipo=bloque.tipo_tentativo,
         ruc=ruc,
+        ruc_receptor=ruc_receptor,
         razon_social=razon,
         serie_numero=serie,
         fecha=fecha,

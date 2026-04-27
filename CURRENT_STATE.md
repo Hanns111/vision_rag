@@ -103,6 +103,12 @@ El sistema, en condiciones normales de corpus e índice generado:
 
 > **Estado de fase:** Excel final preparado para revisión humana, **fase NO cerrada**.
 > Pendiente validación manual contra PDFs (ver [`NEXT_STEP.md`](NEXT_STEP.md)).
+>
+> **PRE-PASO 4.5 (2026-04-27):** código preparado para schema `expediente.v4` (persistencia
+> de `ruc_receptor` + 3 campos tributarios calculados en el consolidador). **Artefactos
+> reales aún NO regenerados** — los `expediente.json` en `control_previo/procesados/` y el
+> Excel `validacion_expedientes.xlsx` siguen en formato pre-v4. La regeneración controlada
+> de 1 expediente piloto a v4 requiere autorización explícita (ver [`NEXT_STEP.md`](NEXT_STEP.md) y D-24).
 
 ### Expedientes procesados (86 comprobantes, 4 expedientes)
 
@@ -189,6 +195,27 @@ Desde el baseline pre-SON (D-16, 2026-04-18) el cuello de botella ha evolucionad
 - `scripts/ingesta/excel_export.py` — columnas nuevas, sort por prioridad, hoja `resumen`.
 - `scripts/ingest_expedientes.py` — `_clasificar_tipo_tributario`, `_evaluar_consistencia`, `_clasificadores_gasto_expediente`, parsing de tipo desde detalle, hook OCR agresivo.
 - `scripts/document_ocr_runner.py` — preproc multi-pasada conservador-primero (de turno previo).
+
+### PRE-PASO 4.5 — código preparado para `expediente.v4` (2026-04-27)
+
+> Estado: **código mergeado, artefactos NO regenerados**. Las cifras de cobertura y el Excel de la sección anterior reflejan el estado v3 vigente. Esta sub-sección documenta solo qué se preparó a nivel de código.
+
+- **Schema bump**: `scripts/modelo/expediente.py` — `SCHEMA_VERSION = "expediente.v4"`; 4 campos nuevos en `Comprobante`: `ruc_receptor`, `estado_consistencia`, `tipo_tributario`, `detalle_inconsistencia`.
+- **Módulo puro nuevo**: `scripts/modelo/consistencia_tributaria.py` — extrae la lógica determinista (`clasificar_tipo_tributario`, `evaluar_consistencia`) que antes vivía en el exportador. Contrato: `evaluar_consistencia(...)` devuelve `(estado, tipo_tributario, detalle)`.
+- **Propagación de `ruc_receptor`**: `scripts/ingesta/comprobante_extractor.py` — el campo ya extraído por PASO 4.1 ahora llega al `Comprobante` (antes se perdía en el filtro de kwargs).
+- **Persistencia en consolidador**: `scripts/consolidador.py` — llama a `evaluar_consistencia` y rellena los 4 campos al construir cada `Comprobante`. La idempotencia byte-a-byte está cubierta por test sintético.
+- **Exportador Excel adelgazado**: `scripts/ingest_expedientes.py` — borra `_clasificar_tipo_tributario` (33 líneas) y `_evaluar_consistencia` (134 líneas). Ahora **lee** `estado_consistencia` / `tipo_tributario` / `detalle_inconsistencia` desde el JSON. `flag_revision_manual` permanece en el exportador como lógica de presentación (qué fila pintar roja), no de modelo.
+- **Tests sintéticos añadidos** (no tocan expedientes reales):
+  - `tests/conftest.py` — inyecta `scripts/` en `sys.path`.
+  - `tests/test_consistencia_tributaria.py` — 6 casos del módulo puro (gravada OK, leve, crítica, datos insuficientes ×2, exonerada).
+  - `tests/test_consolidador_persistencia.py` — fixture sintético de 2 comprobantes verifica que los 4 campos lleguen al dataclass y al JSON serializado.
+  - `tests/test_idempotencia_consolidador.py` — regla 6 de PASO 4.5: dos `consolidar()` consecutivos producen JSON byte-idéntico.
+- **Lo que NO se hizo en esta fase** (deliberadamente, esperando autorización):
+  - **No** se regeneró ningún `expediente.json` real. Los 4 expedientes en `control_previo/procesados/` siguen con `schema_version = "expediente.v3"` y sin los 4 campos nuevos.
+  - **No** se regeneró el Excel. `validacion_expedientes.xlsx` sigue siendo el archivo v3 calculado por el código viejo del exportador.
+  - **No** se ejecutó pipeline ni `run-all`.
+- **Próximo paso autorizable**: regeneración controlada de 1 expediente piloto a v4 con verificación de que el Excel exportado preserva los mismos `estado_consistencia` / `tipo_tributario` que la versión v3 (no debe haber regresión semántica). Detalle en [`NEXT_STEP.md`](NEXT_STEP.md).
+- **Decisión de respaldo**: D-24 en [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md).
 
 ---
 
@@ -352,3 +379,5 @@ Esta instrucción queda en D-23 del catálogo de decisiones.
 ---
 
 *Última actualización: 2026-04-21 — 4to expediente (`DEBE2026-INT-0316916`) incorporado. Parsing determinista completado con oráculo SON en letras (+21 montos recuperados vs baseline), regex tolerantes OCR (IGV/V.V./I.T./RECARGO), cross-check físico 1.5×, cross-check suma. Validador refactorizado con jerarquía conceptual tributaria (GRAVADA/EXONERADA/INAFECTA/MIXTA) y estado_consistencia en 4 niveles. Excel final preparado con hoja `resumen`, orden por prioridad, columnas `tipo_tributario` / `flag_revision_manual` / `comentario_validacion`. OCR agresivo como 2da pasada implementado (recuperó 4/59 INSUFICIENTES). Agregadas decisiones D-18, D-19, D-20. **Fase abierta: pendiente validación humana del Excel** — ver [`NEXT_STEP.md`](NEXT_STEP.md).*
+
+*Adenda 2026-04-27 — PRE-PASO 4.5: código preparado para `expediente.v4` (persistencia de `ruc_receptor` + `estado_consistencia` + `tipo_tributario` + `detalle_inconsistencia`). Lógica determinista movida del exportador al consolidador vía nuevo módulo puro `scripts/modelo/consistencia_tributaria.py`. Tests sintéticos añadidos (módulo puro, persistencia, idempotencia). **Artefactos reales (`expediente.json` y Excel) siguen en formato v3** — la regeneración controlada de 1 expediente piloto a v4 requiere autorización explícita. Decisión D-24 agregada.*

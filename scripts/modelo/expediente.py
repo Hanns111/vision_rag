@@ -18,7 +18,7 @@ from dataclasses import dataclass, field, asdict
 from typing import Any
 
 
-SCHEMA_VERSION = "expediente.v3"
+SCHEMA_VERSION = "expediente.v4"
 
 
 @dataclass
@@ -109,6 +109,11 @@ class Comprobante:
     confianza: float = 0.0
     hash_deduplicacion: str = ""   # (ruc|serie|fecha|monto) o hash(texto[:200])
     texto_resumen: str = ""        # primeros ~300 chars del bloque
+    # --- v4: receptor + consistencia tributaria persistida (D-24, PRE-PASO 4.5) ---
+    ruc_receptor: str | None = None       # RUC del cliente (UE), extraído por PASO 4.1
+    estado_consistencia: str = ""         # OK | DIFERENCIA_LEVE | DIFERENCIA_CRITICA | DATOS_INSUFICIENTES
+    tipo_tributario: str = ""             # GRAVADA | EXONERADA | INAFECTA | MIXTA | NO_DETERMINABLE | ""
+    detalle_inconsistencia: str = ""      # mensaje legible auditable
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

@@ -2,8 +2,10 @@
 
 > Documento vivo. Reemplazar/actualizar al cambiar el siguiente paso.
 
-**Fecha:** 2026-04-21
-**Etapa vigente:** Excel final preparado para validación humana sobre 4 expedientes (86 comprobantes). **Fase NO cerrada** — pendiente revisión manual contra PDFs.
+**Fecha:** 2026-04-27
+**Etapa vigente:** Dos hilos en paralelo, ambos abiertos:
+1. **Hilo principal (sin cambios):** validación humana del Excel v3 sobre 4 expedientes (86 comprobantes). **Fase NO cerrada** — pendiente revisión manual contra PDFs.
+2. **Hilo PRE-PASO 4.5 (nuevo, 2026-04-27):** código preparado para `expediente.v4` (persistencia de 4 campos en JSON). **Artefactos reales aún en v3.** Próximo paso autorizable: regeneración controlada de 1 expediente piloto a v4 para validar que no hay regresión semántica antes de migrar el resto. Ver D-24.
 
 ---
 
@@ -60,6 +62,37 @@ Mientras tanto, el estado operativo del proyecto es **"pipeline técnicamente es
 - **No abrir integración AG-EVIDENCE**.
 - **No refactorizar el Excel** — el esquema actual (26 columnas) basta para validación humana.
 - **No commitear el Excel automáticamente** — queda en estado provisional hasta autorización explícita de Hans (`EXCEL VALIDADO` / `AUTORIZADO PARA VERSIONAR`). Ver D-23.
+- **No regenerar `expediente.json` ni Excel para migrar a v4 sin autorización** — el código PRE-PASO 4.5 está mergeado, pero los artefactos siguen en v3. La regeneración debe ser controlada (1 expediente piloto, comparación v3 vs v4) antes de tocar los 4 expedientes existentes. Ver siguiente sección y D-24.
+
+---
+
+## Hilo PRE-PASO 4.5 — regeneración controlada a `expediente.v4` (autorizable)
+
+**Estado al 2026-04-27:** código mergeado en 5 commits. Sin ejecución de pipeline. Sin tests automáticos ejecutados. Sin artefactos regenerados.
+
+### Próximo paso autorizable (no ejecutado todavía)
+
+1. **Ejecutar la suite de tests sintéticos** añadida en PRE-PASO 4.5:
+   - `pytest tests/test_consistencia_tributaria.py tests/test_consolidador_persistencia.py tests/test_idempotencia_consolidador.py -v`
+   - Confirma que módulo puro, persistencia y idempotencia byte-a-byte pasan en este entorno.
+2. **Elegir 1 expediente piloto** de los 4 actuales (sugerencia operativa: `DIED2026-INT-0344746` por tener la mayor cobertura de campos tributarios reales).
+3. **Hacer backup** del JSON v3 actual (`control_previo/procesados/<id>/expediente.json` → copia con sufijo `.v3.bak`) **antes** de regenerar.
+4. **Regenerar el JSON** del expediente piloto con `python scripts/consolidador.py` (o el comando equivalente que use `consolidar()` desde el CLI).
+5. **Diff semántico** v3 vs v4:
+   - `schema_version` debe pasar de `"expediente.v3"` a `"expediente.v4"`.
+   - Cada `comprobante` debe ganar `ruc_receptor`, `estado_consistencia`, `tipo_tributario`, `detalle_inconsistencia`.
+   - Los demás campos no deben cambiar (montos, RUC emisor, fechas, hashes).
+6. **Regenerar Excel solo de ese expediente** con `python scripts/ingest_expedientes.py export --expediente-id <id>` (output local, no commit).
+7. **Comparar Excel v3 vs Excel v4** sobre el mismo expediente piloto:
+   - `estado_consistencia` y `tipo_tributario` deben coincidir fila por fila (la lógica es la misma, solo cambió el lugar donde se calcula).
+   - Si no coincide → bug en `consistencia_tributaria.py` o en la propagación; bloqueante.
+8. **Reportar diff** y esperar autorización para migrar los 3 expedientes restantes.
+
+### Qué NO hacer en este hilo
+
+- No regenerar los 4 expedientes en lote sin haber validado el piloto primero.
+- No commitear el Excel v4 (sigue D-23).
+- No tocar `decision_engine.py` ni introducir el motor PASO 4.5 todavía — eso requiere haber cerrado este hilo y pasar a Fase 1 con autorización separada.
 
 ---
 
@@ -73,7 +106,7 @@ Mientras tanto, el estado operativo del proyecto es **"pipeline técnicamente es
 ## Referencias rápidas
 
 - Estado técnico completo: [`CURRENT_STATE.md`](CURRENT_STATE.md)
-- Decisiones D-01…D-23: [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md)
+- Decisiones D-01…D-24: [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md)
 - Regenerar Excel localmente (no versionar): `python scripts/ingest_expedientes.py export`
 - Reprocesar un expediente puntual: `python scripts/ingest_expedientes.py run-all --src <carpeta> --expediente-id <id>`
 - **Política Excel**: el `.xlsx` NO se commitea automáticamente hasta que Hans autorice con frase equivalente a `EXCEL VALIDADO` / `AUTORIZADO PARA VERSIONAR`. Ver D-23.
