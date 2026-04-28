@@ -2,11 +2,11 @@
 
 > Documento vivo. Reemplazar/actualizar al cambiar el siguiente paso.
 
-**Fecha:** 2026-04-28
+**Fecha:** 2026-04-28 (cierre de sesión)
 **Etapa vigente:** Tres hilos en paralelo, todos abiertos:
 1. **Hilo principal (sin cambios):** validación humana del Excel v3 sobre 4 expedientes (86 comprobantes). **Fase NO cerrada** — pendiente revisión manual contra PDFs.
-2. **Hilo PRE-PASO 4.5 (2026-04-27):** código `expediente.v4` mergeado. Piloto `DEBEDSAR2026-INT-0103251` regenerado a v4 con 9/10 `ruc_receptor` poblado, Excel dedicado validado contra JSON. Los otros 3 expedientes siguen en v3 — su migración requiere autorización separada. Ver D-24.
-3. **Hilo PASO 4.5 Fase 1 (nuevo, 2026-04-28):** motor determinista MVP implementado en código (5 reglas, schema `decision_engine.v1`, 14 tests integración + idempotencia, suite 69/69 verde). **Motor NO ejecutado sobre expedientes reales todavía.** Próximo paso autorizable: ejecutar el motor sobre el piloto `DEBEDSAR2026-INT-0103251` v4. Ver D-25.
+2. **Hilo PRE-PASO 4.5 (cerrado en código):** schema `expediente.v4` commiteado en `eda3f4d`. Piloto `DEBEDSAR2026-INT-0103251` regenerado a v4 con `ruc_receptor` poblado en 9/10, Excel dedicado validado contra JSON. Los otros 3 expedientes siguen en v3. Ver D-24.
+3. **Hilo PASO 4.5 Fase 1 (cerrado en código + validado empíricamente):** motor determinista MVP commiteado en `df813e2`. **Primera corrida real ejecutada sobre el piloto v4** → `decision_global=REVISAR`, 9 hallazgos, idempotencia byte-a-byte confirmada. Suite 69/69 verde. Ver D-25 + adenda 2026-04-28 en [`CURRENT_STATE.md`](CURRENT_STATE.md).
 
 ---
 
@@ -97,37 +97,40 @@ Mientras tanto, el estado operativo del proyecto es **"pipeline técnicamente es
 
 ---
 
-## Hilo PASO 4.5 Fase 1 — primera ejecución del motor sobre el piloto v4 (autorizable)
+## Hilo PASO 4.5 Fase 1 — validado empíricamente (cierre 2026-04-28)
 
-**Estado al 2026-04-28:** motor mergeado en 4 commits (Commit 1 schema/dataclasses, Commit 2 reglas, Commit 3 orquestador + idempotencia, Commit 4 documentación). Tests sintéticos 69/69 verdes. Sin ejecución sobre expedientes reales.
+Estado al cierre de sesión: motor implementado, tests 69/69 verdes, **primera corrida real ejecutada sobre el piloto v4**, idempotencia byte-a-byte confirmada empíricamente. Detalle completo en la adenda "Cierre de sesión 2026-04-28" de [`CURRENT_STATE.md`](CURRENT_STATE.md).
 
-### Próximo paso autorizable (no ejecutado todavía)
+### Próximo paso recomendado para mañana — mini-demo técnica del PASO 4.5
 
-1. **Confirmar suite verde** en este entorno antes de ejecutar:
-   - `C:/Python314/python.exe -m pytest tests/ -v`
-   - Esperado: 69 PASSED, ~0.25 s.
-2. **Elegir expediente para primera ejecución**: piloto `DEBEDSAR2026-INT-0103251` (único en formato `expediente.v4` validado tras PRE-PASO 4.5).
-3. **Ejecutar motor SIN escribir disco** (modo defensivo) — solo stdout para inspección visual:
-   - `C:/Python314/python.exe scripts/auditoria/decision_engine.py control_previo/procesados/DEBEDSAR2026-INT-0103251 --deterministico`
-   - Output esperado en stdout: JSON con `decision_global`, las 5 reglas evaluadas, lista de hallazgos.
-4. **Verificar resultado contra hipótesis previas**:
-   - `R-IDENTIDAD-EXPEDIENTE` debería caer a `REVISAR` (el piloto reportó `BAJA_CONFIANZA`/conf=0.85 en la regeneración v4).
-   - `R-CONSISTENCIA` debería caer a `REVISAR` (el piloto tiene 5 `DIFERENCIA_CRITICA` + 1 `DATOS_INSUFICIENTES`).
-   - `R-CAMPO-CRITICO-NULL` esperable según cobertura del piloto.
-   - `R-FIRMAS` esperable según validación del expediente.
-   - `R-UE-RECEPTOR` debería ser cercano a OK (9/10 con `ruc_receptor=20380795907` confirmado).
-   - `decision_global` esperado: `REVISAR` (peor severidad domina).
-5. **Si los resultados encajan con la realidad ya conocida del piloto**, autorizar segunda corrida con `--out` para escribir `decision_engine_output.json` dedicado (path sugerido: `control_previo/procesados/DEBEDSAR2026-INT-0103251/decision_engine_output.json`).
-6. **Idempotencia empírica**: re-correr el motor sobre el mismo input y verificar que el `to_dict_deterministic()` (excluyendo `metadata_corrida`) es byte-igual al anterior.
-7. **Reportar diff** y esperar autorización para extender a expedientes adicionales.
+Preparar una mini-demo reproducible para concurso/jueces que muestre el flujo end-to-end sobre el piloto:
 
-### Qué NO hacer en este hilo
+1. **Suite verde**: `C:/Python314/python.exe -m pytest tests/ -v` → 69 PASSED.
+2. **Mostrar `expediente.v4` real** del piloto: campos persistidos (`ruc_receptor`, `estado_consistencia`, `tipo_tributario`, `detalle_inconsistencia`).
+3. **Ejecutar el motor en vivo** sobre el piloto: `python scripts/auditoria/decision_engine.py control_previo/procesados/DEBEDSAR2026-INT-0103251 --deterministico` → JSON a stdout.
+4. **Mostrar `decision_global=REVISAR`** y los 9 hallazgos clasificados por regla.
+5. **Demostrar idempotencia** corriendo el motor 2 veces y haciendo diff del payload determinista (sha256 byte-igual).
+6. **Mostrar separación schema vs lógica**: `decision_engine.v1` desacoplado de `expediente.v4`; reglas atómicas auditables individualmente.
 
-- No ejecutar el motor sobre los otros 3 expedientes (siguen en v3, el motor los rechazaría con `SchemaVersionError`).
-- No tocar Excel — la visualización del `decision_engine_output.json` queda fuera de Fase 1.
-- No integrar con `ingest_expedientes.py` (subcomando `audit` queda para fase posterior).
-- No agregar reglas adicionales (R-DUPLICADOS, R-MONTO-MAXIMO-NORMATIVO, R-FECHA-FUERA-DE-COMISION, etc.) — fuera del MVP.
-- No introducir LLM en ninguna regla.
+Material a preparar: guion + capturas + tiempos estimados. Sin código nuevo. Sin reglas nuevas. Sin IA. Solo lo ya entregado funcionando reproduciblemente.
+
+### Alternativas (si la mini-demo no es prioritaria)
+
+- **Migrar un segundo expediente a `expediente.v4`** (sugerido: `DIED2026-INT-0344746` por ser el de mayor cobertura tributaria) y correr el motor sobre él para diversificar la evidencia.
+- **Crear exportador Excel para `decision_engine_output.json`** (visualización del veredicto del motor por revisor humano; complementario al Excel de comprobantes existente).
+- **Diseñar capa IA explicadora** (no juez) que responda preguntas de jueces sobre los hallazgos, leyendo el `decision_engine_output.json` como contexto.
+
+Cualquiera de las 3 alternativas requiere **autorización explícita por separado** y diseño previo antes de tocar código.
+
+### Qué NO hacer todavía
+
+- **No correr el motor sobre los otros 3 expedientes** sin migrarlos antes a `expediente.v4` (los rechazaría con `SchemaVersionError`).
+- **No regenerar el Excel principal** `validacion_expedientes.xlsx` (ver D-23 sobre política de versionado).
+- **No commitear el Excel piloto** `validacion_DEBEDSAR2026-INT-0103251_v4_piloto.xlsx`.
+- **No introducir LLM como juez** (las reglas son deterministas por diseño; un LLM puede explicar pero no decidir).
+- **No agregar reglas nuevas** (R-DUPLICADOS, R-MONTO-MAXIMO, R-FECHA-FUERA-DE-COMISION, etc.) antes de validar la demo y cerrar feedback.
+- **No hacer push de artefactos** (Excel piloto, `decision_engine_output.json`, `*.bak`, PDFs, datos sensibles del expediente).
+- **No integrar con `ingest_expedientes.py`** (subcomando `audit`) hasta haber visto el motor en una demo y recibir feedback.
 
 ---
 

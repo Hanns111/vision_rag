@@ -413,4 +413,46 @@ Esta instrucción queda en D-23 del catálogo de decisiones.
 
 *Adenda 2026-04-27 — PRE-PASO 4.5: código preparado para `expediente.v4` (persistencia de `ruc_receptor` + `estado_consistencia` + `tipo_tributario` + `detalle_inconsistencia`). Lógica determinista movida del exportador al consolidador vía nuevo módulo puro `scripts/modelo/consistencia_tributaria.py`. Tests sintéticos añadidos (módulo puro, persistencia, idempotencia). **Artefactos reales (`expediente.json` y Excel) siguen en formato v3** — la regeneración controlada de 1 expediente piloto a v4 requiere autorización explícita. Decisión D-24 agregada.*
 
-*Adenda 2026-04-28 — PASO 4.5 Fase 1: motor determinista MVP implementado (schema `decision_engine.v1`, 5 reglas atómicas, agregación por severidad máxima, idempotencia byte-a-byte probada). Sin LLM, sin re-OCR. Suite global 69/69 verde. **Motor NO ejecutado sobre expedientes reales todavía**; el piloto `DEBEDSAR2026-INT-0103251` v4 (regenerado en PRE-PASO 4.5) es el candidato para la primera corrida autorizable. Decisión D-25 agregada.*
+*Adenda 2026-04-28 — PASO 4.5 Fase 1: motor determinista MVP implementado (schema `decision_engine.v1`, 5 reglas atómicas, agregación por severidad máxima, idempotencia byte-a-byte probada). Sin LLM, sin re-OCR. Suite global 69/69 verde. Decisión D-25 agregada.*
+
+---
+
+## Cierre de sesión 2026-04-28
+
+### Lo que se hizo hoy
+
+- **PRE-PASO 4.5 cerrado** y commiteado en `eda3f4d` (schema `expediente.v4` con 4 campos persistidos: `ruc_receptor`, `estado_consistencia`, `tipo_tributario`, `detalle_inconsistencia`; lógica determinista movida a módulo puro nuevo `scripts/modelo/consistencia_tributaria.py`; exportador Excel adelgazado).
+- **PASO 4.5 Fase 1 cerrado** y commiteado en `df813e2` (motor `scripts/auditoria/decision_engine.py` + 5 reglas atómicas + schema `decision_engine.v1` + tests sintéticos 60 nuevos, suite global 69/69 verde).
+- **Piloto `DEBEDSAR2026-INT-0103251` regenerado localmente a `expediente.v4`** vía dos pasadas controladas:
+  - 1ª: solo `consolidador.py` sobre `extractions/*.json` antiguos → `ruc_receptor` quedó `0/10` (los extractions previos no tenían el campo, esperable).
+  - 2ª: `process` + `consolidate` con `--expediente-id` → `ruc_receptor` poblado en **9/10 comprobantes** con valor `20380795907` (RUC MINEDU). El 1/10 ausente coincide con el comprobante en `DATOS_INSUFICIENTES`.
+- **Excel dedicado del piloto generado**: `data/piloto_ocr/metrics/validacion_DEBEDSAR2026-INT-0103251_v4_piloto.xlsx` — archivo separado vía flag `--xlsx` para no sobrescribir el consolidado. 10 filas, las 4 columnas `estado_consistencia` / `tipo_tributario` / `detalle_inconsistencia` / `flag_revision_manual` cuadran 1:1 con el JSON v4. **Excel principal `validacion_expedientes.xlsx` quedó intacto** (mtime 2026-04-21, sin cambios).
+- **Motor 4.5 ejecutado sobre el piloto real** (primera corrida real fuera de fixtures sintéticos):
+  - `decision_engine_output.json` generado en `control_previo/procesados/DEBEDSAR2026-INT-0103251/decision_engine_output.json` (10 729 B). Ruta gitignored, no se versiona.
+  - `decision_global = REVISAR`. 9 hallazgos.
+  - `expediente_json_sha256 = 2c6ff80e6af88043664e79f5695d773acb3b75f4b2c00bf7439794ed35c8ff43`.
+- **Idempotencia empírica confirmada byte-a-byte**: 2ª corrida sobre el mismo input produjo payload determinista byte-idéntico (sha256 `b6f86ff35a…fb0ac9` en ambas), tamaño 10 729 B en ambas. `metadata_corrida` (run_id + timestamp) varía como diseñado.
+
+### Estado actual del repo
+
+- Código **PRE-PASO 4.5 commiteado en `main`** (`eda3f4d`). Sin push todavía.
+- Código **PASO 4.5 Fase 1 commiteado en `main`** (`df813e2`). Sin push todavía.
+- **Artefactos locales generados, NO versionados**:
+  - Excel piloto v4 dedicado (`validacion_DEBEDSAR2026-INT-0103251_v4_piloto.xlsx`) → untracked en `data/piloto_ocr/metrics/`.
+  - `decision_engine_output.json` del piloto → gitignored vía `control_previo/`.
+  - Backups locales `.v3.bak.json`, `.v4.pre_reprocess.bak.json`, `extractions.v3.bak/` → gitignored vía `control_previo/`.
+- Otros 3 expedientes (`DIED2026-INT-0250235`, `DIED2026-INT-0344746`, `DEBE2026-INT-0316916`) **siguen en `expediente.v3`** — el motor los rechazaría por `SchemaVersionError` si se intentara correr sobre ellos sin migración previa.
+- Excel consolidado principal **sigue en estado previo** (4 expedientes en formato v3), no regenerado.
+- **No existe aún exportador Excel del `decision_engine_output.json`** (visualización del veredicto del motor para revisor humano).
+- **No existe aún capa IA conversacional** (que pueda explicar los hallazgos a jueces).
+
+### Qué significa el resultado del piloto
+
+- **`REVISAR` no es fallo del motor**. Significa que el motor, aplicando reglas deterministas sobre evidencia ya estructurada, encontró condiciones que requieren revisión humana: o bien evidencia insuficiente para certificar (ej. `ruc_receptor` ausente, identidad con `BAJA_CONFIANZA`), o bien diferencias contables no explicadas por los datos (ej. `bi_gravado` no extraído por OCR de tabla densa).
+- **9 hallazgos del piloto, distribución por regla**:
+  - `R-CAMPO-CRITICO-NULL = OK` — los 4 campos críticos (`monto_total`, `ruc`, `fecha`, `serie_numero`) están presentes en los 10 comprobantes.
+  - `R-FIRMAS = OBSERVAR` — el Anexo 3 reporta `firmas_anexo3.estado=OBSERVADO` (algunos roles no detectados, no es ausencia total).
+  - `R-CONSISTENCIA = REVISAR` — 5 comprobantes en `DIFERENCIA_CRITICA` (todos del patrón Marcoantonio con `bi_gravado` perdido por OCR de columnas pegadas, ya documentado en D-22) + 1 en `DATOS_INSUFICIENTES`.
+  - `R-IDENTIDAD-EXPEDIENTE = REVISAR` — `BAJA_CONFIANZA` con conf=0.85 < umbral 0.9 (ajuste obligatorio Fase 1).
+  - `R-UE-RECEPTOR = REVISAR` — 9/10 OK + 1/10 ausente (mismo comprobante que `DATOS_INSUFICIENTES`).
+- **Cruce con realidad conocida del piloto**: las 4 hipótesis previas (decision_global=REVISAR, R-CONSISTENCIA con 5+1, R-UE-RECEPTOR 9/10, R-IDENTIDAD por BAJA_CONFIANZA) se confirmaron empíricamente. El motor produce las decisiones que el diseño anticipaba.
