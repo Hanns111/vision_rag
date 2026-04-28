@@ -217,6 +217,37 @@ Desde el baseline pre-SON (D-16, 2026-04-18) el cuello de botella ha evolucionad
 - **Próximo paso autorizable**: regeneración controlada de 1 expediente piloto a v4 con verificación de que el Excel exportado preserva los mismos `estado_consistencia` / `tipo_tributario` que la versión v3 (no debe haber regresión semántica). Detalle en [`NEXT_STEP.md`](NEXT_STEP.md).
 - **Decisión de respaldo**: D-24 en [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md).
 
+### PASO 4.5 Fase 1 — motor determinista MVP (2026-04-28)
+
+> Estado: **código mergeado en 4 commits, tests 69/69 verdes, motor NO ejecutado sobre expedientes reales todavía**. El piloto `DEBEDSAR2026-INT-0103251` ya está en formato `expediente.v4` (validado en PRE-PASO 4.5) y es el candidato para la primera ejecución autorizable; los otros 3 expedientes siguen en v3.
+
+- **Schema de salida**: `decision_engine.v1` definido en `scripts/modelo/decision_engine_output.py` (dataclasses `DecisionEngineOutput`, `ResultadoRegla`, `Hallazgo`, `Criterio`, `MetadataCorrida`).
+- **Estados**: `OK` / `OBSERVAR` / `REVISAR` / `NO_APLICABLE`. Principio: `OBSERVAR` = incumplimiento verificable; `REVISAR` = falta de evidencia para verificar.
+- **Severidad opcional** (`BAJA` / `MEDIA` / `ALTA`) ortogonal al resultado, solo informa priorización; no entra en la agregación.
+- **5 reglas MVP** registradas en `scripts/auditoria/reglas/`:
+  - **R-IDENTIDAD-EXPEDIENTE** (scope=expediente): `BAJA_CONFIANZA` o conf<umbral → `REVISAR` (ajuste obligatorio: falta de certeza).
+  - **R-CONSISTENCIA** (scope=comprobante): passthrough auditable de `estado_consistencia` ya calculado por el consolidador.
+  - **R-CAMPO-CRITICO-NULL** (scope=comprobante): `monto_total` / `ruc` / `fecha` / `serie_numero` en null → `REVISAR` (con severidad ALTA o MEDIA según campo).
+  - **R-FIRMAS** (scope=expediente): contra estados reales del módulo `validaciones/firmas_anexo3.py` — `CONFORME→OK`, `OBSERVADO→OBSERVAR`, `INSUFICIENTE_EVIDENCIA→REVISAR`, sin entrada → `NO_APLICABLE`.
+  - **R-UE-RECEPTOR** (scope=comprobante): `ruc_receptor` == UE_ESPERADA → OK, ≠ → OBSERVAR, ausente → REVISAR. **`UE_ESPERADA="20380795907"` es valor temporal MVP** documentado como deuda en `scripts/auditoria/config.py`.
+- **Agregación**: `decision_global = REVISAR` si cualquier regla es REVISAR; sino `OBSERVAR` si alguna; sino `OK`.
+- **Orquestador**: `scripts/auditoria/decision_engine.py::evaluar_expediente(exp_dir)`. Solo lee, valida que el input sea `expediente.v4` (sino `SchemaVersionError`), calcula `expediente_json_sha256`, ejecuta las 5 reglas en orden estable, ordena hallazgos, retorna `DecisionEngineOutput`. **NO escribe `decision_engine_output.json` por sí sola**; el CLI solo escribe disco con flag `--out` explícito.
+- **Idempotencia probada** (regla 6 PASO 4.5): dos llamadas consecutivas sobre el mismo input producen `to_dict_deterministic()` byte-idéntico. El sub-objeto `metadata_corrida` (timestamps + uuid + host + git_commit) está aislado y se excluye del diff.
+- **Sin LLM**, sin re-OCR, sin re-extracción.
+- **Tests añadidos en Fase 1** (todos sintéticos, sin tocar expedientes reales):
+  - `tests/test_decision_engine_dataclasses.py` (7) — serialización determinista del schema.
+  - `tests/test_reglas/test_r_*.py` (39 — uno por regla).
+  - `tests/test_decision_engine_integracion.py` (9 — happy path + degradado).
+  - `tests/test_decision_engine_idempotencia.py` (5 — regla 6 + estabilidad de hallazgos + sha256).
+- **Resultado de suite global**: 69/69 PASSED en ~0.24 s.
+- **Lo que NO se hizo en esta fase** (deliberadamente):
+  - **No** se ejecutó el motor sobre ningún `expediente.json` real.
+  - **No** se generó ningún `decision_engine_output.json`.
+  - **No** se tocó Excel ni `expediente.json`.
+  - **No** se integró con el flujo `ingest_expedientes.py` (subcomando `audit` queda para fase posterior).
+- **Próximo paso autorizable**: ejecutar el motor sobre el piloto v4 ya validado. Detalle en [`NEXT_STEP.md`](NEXT_STEP.md).
+- **Decisión de respaldo**: D-25 en [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md).
+
 ---
 
 ## Políticas operativas, vocabulario tentativo y riesgos (2026-04-18)
@@ -381,3 +412,5 @@ Esta instrucción queda en D-23 del catálogo de decisiones.
 *Última actualización: 2026-04-21 — 4to expediente (`DEBE2026-INT-0316916`) incorporado. Parsing determinista completado con oráculo SON en letras (+21 montos recuperados vs baseline), regex tolerantes OCR (IGV/V.V./I.T./RECARGO), cross-check físico 1.5×, cross-check suma. Validador refactorizado con jerarquía conceptual tributaria (GRAVADA/EXONERADA/INAFECTA/MIXTA) y estado_consistencia en 4 niveles. Excel final preparado con hoja `resumen`, orden por prioridad, columnas `tipo_tributario` / `flag_revision_manual` / `comentario_validacion`. OCR agresivo como 2da pasada implementado (recuperó 4/59 INSUFICIENTES). Agregadas decisiones D-18, D-19, D-20. **Fase abierta: pendiente validación humana del Excel** — ver [`NEXT_STEP.md`](NEXT_STEP.md).*
 
 *Adenda 2026-04-27 — PRE-PASO 4.5: código preparado para `expediente.v4` (persistencia de `ruc_receptor` + `estado_consistencia` + `tipo_tributario` + `detalle_inconsistencia`). Lógica determinista movida del exportador al consolidador vía nuevo módulo puro `scripts/modelo/consistencia_tributaria.py`. Tests sintéticos añadidos (módulo puro, persistencia, idempotencia). **Artefactos reales (`expediente.json` y Excel) siguen en formato v3** — la regeneración controlada de 1 expediente piloto a v4 requiere autorización explícita. Decisión D-24 agregada.*
+
+*Adenda 2026-04-28 — PASO 4.5 Fase 1: motor determinista MVP implementado (schema `decision_engine.v1`, 5 reglas atómicas, agregación por severidad máxima, idempotencia byte-a-byte probada). Sin LLM, sin re-OCR. Suite global 69/69 verde. **Motor NO ejecutado sobre expedientes reales todavía**; el piloto `DEBEDSAR2026-INT-0103251` v4 (regenerado en PRE-PASO 4.5) es el candidato para la primera corrida autorizable. Decisión D-25 agregada.*

@@ -2,10 +2,11 @@
 
 > Documento vivo. Reemplazar/actualizar al cambiar el siguiente paso.
 
-**Fecha:** 2026-04-27
-**Etapa vigente:** Dos hilos en paralelo, ambos abiertos:
+**Fecha:** 2026-04-28
+**Etapa vigente:** Tres hilos en paralelo, todos abiertos:
 1. **Hilo principal (sin cambios):** validación humana del Excel v3 sobre 4 expedientes (86 comprobantes). **Fase NO cerrada** — pendiente revisión manual contra PDFs.
-2. **Hilo PRE-PASO 4.5 (nuevo, 2026-04-27):** código preparado para `expediente.v4` (persistencia de 4 campos en JSON). **Artefactos reales aún en v3.** Próximo paso autorizable: regeneración controlada de 1 expediente piloto a v4 para validar que no hay regresión semántica antes de migrar el resto. Ver D-24.
+2. **Hilo PRE-PASO 4.5 (2026-04-27):** código `expediente.v4` mergeado. Piloto `DEBEDSAR2026-INT-0103251` regenerado a v4 con 9/10 `ruc_receptor` poblado, Excel dedicado validado contra JSON. Los otros 3 expedientes siguen en v3 — su migración requiere autorización separada. Ver D-24.
+3. **Hilo PASO 4.5 Fase 1 (nuevo, 2026-04-28):** motor determinista MVP implementado en código (5 reglas, schema `decision_engine.v1`, 14 tests integración + idempotencia, suite 69/69 verde). **Motor NO ejecutado sobre expedientes reales todavía.** Próximo paso autorizable: ejecutar el motor sobre el piloto `DEBEDSAR2026-INT-0103251` v4. Ver D-25.
 
 ---
 
@@ -96,6 +97,40 @@ Mientras tanto, el estado operativo del proyecto es **"pipeline técnicamente es
 
 ---
 
+## Hilo PASO 4.5 Fase 1 — primera ejecución del motor sobre el piloto v4 (autorizable)
+
+**Estado al 2026-04-28:** motor mergeado en 4 commits (Commit 1 schema/dataclasses, Commit 2 reglas, Commit 3 orquestador + idempotencia, Commit 4 documentación). Tests sintéticos 69/69 verdes. Sin ejecución sobre expedientes reales.
+
+### Próximo paso autorizable (no ejecutado todavía)
+
+1. **Confirmar suite verde** en este entorno antes de ejecutar:
+   - `C:/Python314/python.exe -m pytest tests/ -v`
+   - Esperado: 69 PASSED, ~0.25 s.
+2. **Elegir expediente para primera ejecución**: piloto `DEBEDSAR2026-INT-0103251` (único en formato `expediente.v4` validado tras PRE-PASO 4.5).
+3. **Ejecutar motor SIN escribir disco** (modo defensivo) — solo stdout para inspección visual:
+   - `C:/Python314/python.exe scripts/auditoria/decision_engine.py control_previo/procesados/DEBEDSAR2026-INT-0103251 --deterministico`
+   - Output esperado en stdout: JSON con `decision_global`, las 5 reglas evaluadas, lista de hallazgos.
+4. **Verificar resultado contra hipótesis previas**:
+   - `R-IDENTIDAD-EXPEDIENTE` debería caer a `REVISAR` (el piloto reportó `BAJA_CONFIANZA`/conf=0.85 en la regeneración v4).
+   - `R-CONSISTENCIA` debería caer a `REVISAR` (el piloto tiene 5 `DIFERENCIA_CRITICA` + 1 `DATOS_INSUFICIENTES`).
+   - `R-CAMPO-CRITICO-NULL` esperable según cobertura del piloto.
+   - `R-FIRMAS` esperable según validación del expediente.
+   - `R-UE-RECEPTOR` debería ser cercano a OK (9/10 con `ruc_receptor=20380795907` confirmado).
+   - `decision_global` esperado: `REVISAR` (peor severidad domina).
+5. **Si los resultados encajan con la realidad ya conocida del piloto**, autorizar segunda corrida con `--out` para escribir `decision_engine_output.json` dedicado (path sugerido: `control_previo/procesados/DEBEDSAR2026-INT-0103251/decision_engine_output.json`).
+6. **Idempotencia empírica**: re-correr el motor sobre el mismo input y verificar que el `to_dict_deterministic()` (excluyendo `metadata_corrida`) es byte-igual al anterior.
+7. **Reportar diff** y esperar autorización para extender a expedientes adicionales.
+
+### Qué NO hacer en este hilo
+
+- No ejecutar el motor sobre los otros 3 expedientes (siguen en v3, el motor los rechazaría con `SchemaVersionError`).
+- No tocar Excel — la visualización del `decision_engine_output.json` queda fuera de Fase 1.
+- No integrar con `ingest_expedientes.py` (subcomando `audit` queda para fase posterior).
+- No agregar reglas adicionales (R-DUPLICADOS, R-MONTO-MAXIMO-NORMATIVO, R-FECHA-FUERA-DE-COMISION, etc.) — fuera del MVP.
+- No introducir LLM en ninguna regla.
+
+---
+
 ## Criterio de salida de este paso
 
 - Excel con todas las filas `flag_revision_manual=SI` revisadas contra PDF, columnas humanas llenas.
@@ -106,7 +141,7 @@ Mientras tanto, el estado operativo del proyecto es **"pipeline técnicamente es
 ## Referencias rápidas
 
 - Estado técnico completo: [`CURRENT_STATE.md`](CURRENT_STATE.md)
-- Decisiones D-01…D-24: [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md)
+- Decisiones D-01…D-25: [`docs/DECISIONES_TECNICAS.md`](docs/DECISIONES_TECNICAS.md)
 - Regenerar Excel localmente (no versionar): `python scripts/ingest_expedientes.py export`
 - Reprocesar un expediente puntual: `python scripts/ingest_expedientes.py run-all --src <carpeta> --expediente-id <id>`
 - **Política Excel**: el `.xlsx` NO se commitea automáticamente hasta que Hans autorice con frase equivalente a `EXCEL VALIDADO` / `AUTORIZADO PARA VERSIONAR`. Ver D-23.
